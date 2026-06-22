@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AniZe — Stream Without Limits</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --white: #fff;
+  --off: #aaa;
+  --dim: #555;
+  --dimmer: #333;
+  --bg: #000;
+  --accent: #e8e8d8;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+.ink-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 0 8vw;
+  max-width: 820px;
+  width: 72%;
+}
+
+.eyebrow {
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin-bottom: 1.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.eyebrow::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 1px;
+  background: var(--dimmer);
+}
+
+.logo-wrap {
+  margin-bottom: 0.2rem;
+}
+
+.logo {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(4rem, 9vw, 7.5rem);
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  display: block;
+}
+
+.logo-slash-line {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #555;
+  letter-spacing: 0.18em;
+  margin-top: 0.55rem;
+  display: block;
+  animation: slashpulse 3s ease-in-out infinite;
+}
+
+@keyframes slashpulse {
+  0%, 100% { color: #444; }
+  50%       { color: #999; }
+}
+
+.tagline {
+  font-size: clamp(0.92rem, 1.5vw, 1.1rem);
+  font-weight: 300;
+  color: var(--dim);
+  line-height: 1.9;
+  margin-top: 1.8rem;
+  margin-bottom: 2.6rem;
+  letter-spacing: 0.02em;
+}
+
+.enter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--white);
+  text-decoration: none;
+  border: 1px solid var(--dimmer);
+  padding: 0.9rem 2.2rem;
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+  cursor: pointer;
+}
+
+.enter-btn:hover {
+  background: var(--white);
+  color: #000;
+  border-color: var(--white);
+}
+
+.enter-btn:hover .arr { transform: translateX(5px); }
+
+.arr {
+  font-size: 1rem;
+  transition: transform 0.3s;
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.35;
+  animation: bobble 2.4s ease-in-out infinite;
+}
+
+.scroll-hint span {
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--off);
+}
+
+.scroll-hint svg { width: 14px; height: 14px; stroke: var(--off); fill: none; }
+
+@keyframes bobble {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(6px); }
+}
+
+/* ── FALLING LEAVES ── */
+#leaves {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  overflow: hidden;
+}
+
+.leaf {
+  position: absolute;
+  top: -30px;
+  opacity: 0;
+  animation: leaffall linear infinite;
+}
+
+@keyframes leaffall {
+  0%   { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; }
+  6%   { opacity: 0.55; }
+  88%  { opacity: 0.35; }
+  100% { transform: translateY(105vh) rotate(680deg) translateX(60px); opacity: 0; }
+}
+
+/* ── BOTTOM BAR ── */
+.bottom-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 10;
+  padding: 0.65rem 2rem;
+  background: rgba(0,0,0,0.9);
+  border-top: 1px solid #111;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bar-left .made {
+  font-size: 0.68rem;
+  color: #ccc;
+  letter-spacing: 0.04em;
+}
+
+.bar-left .made .highlight {
+  color: #fff;
+  font-weight: 600;
+}
+
+.bar-left .discord-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.65rem;
+  color: #bbb;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.bar-left .discord-link:hover { color: #fff; }
+
+.bar-left .discord-link svg {
+  width: 12px; height: 12px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.bar-right {
+  text-align: right;
+}
+
+.bar-right .copyright {
+  display: block;
+  font-size: 0.63rem;
+  color: #ccc;
+  letter-spacing: 0.03em;
+}
+
+.bar-right .disclaimer {
+  display: block;
+  font-size: 0.57rem;
+  color: #aaa;
+  margin-top: 2px;
+  letter-spacing: 0.02em;
+  max-width: 400px;
+}
+
+/* ── SCROLL SECTIONS ── */
+.section {
+  padding: 6rem 8vw 5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--dimmer);
+  margin-bottom: 0.8rem;
+}
+
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: 0.04em;
+  margin-bottom: 1.8rem;
+  line-height: 1.2;
+}
+
+.section-body {
+  font-size: 0.92rem;
+  font-weight: 300;
+  color: #777;
+  line-height: 1.9;
+  max-width: 680px;
+}
+
+.section-body p + p { margin-top: 1rem; }
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: #111;
+  margin: 0 8vw;
+  width: calc(100% - 16vw);
+}
+
+/* Features grid */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.feat-card {
+  border: 1px solid #151515;
+  padding: 1.6rem;
+  background: #080808;
+  position: relative;
+  transition: border-color 0.3s;
+}
+
+.feat-card:hover { border-color: #333; }
+
+.feat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 2px; height: 0;
+  background: var(--off);
+  transition: height 0.3s;
+}
+
+.feat-card:hover::before { height: 100%; }
+
+.feat-num {
+  font-family: 'Cinzel', serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  color: var(--dimmer);
+  margin-bottom: 0.9rem;
+}
+
+.feat-title {
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--off);
+  margin-bottom: 0.7rem;
+}
+
+.feat-text {
+  font-size: 0.82rem;
+  font-weight: 300;
+  color: #555;
+  line-height: 1.75;
+}
+
+/* Spacer before fixed bar */
+.bar-spacer { height: 52px; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+
+  <!-- Ink brush background SVG -->
+  <svg class="ink-canvas" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1440" height="900" fill="#000"/>
+
+    <!-- Moon — subtle, top right -->
+    <circle cx="1150" cy="180" r="110" fill="#0e0e0e"/>
+    <circle cx="1150" cy="180" r="88" fill="#111"/>
+    <circle cx="1150" cy="180" r="66" fill="#141412" opacity="0.9"/>
+
+    <!-- Big ink brush stroke — main horizontal sweep -->
+    <path d="M-40 520 C200 480 500 440 780 460 C1060 480 1280 530 1480 490" stroke="#181816" stroke-width="220" fill="none" stroke-linecap="round" opacity="0.7"/>
+
+    <!-- Secondary sweeping brush — upper -->
+    <path d="M600 100 C750 120 900 90 1100 130 C1260 160 1380 120 1460 100" stroke="#131311" stroke-width="120" fill="none" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- Diagonal slash brush — dramatic, right side -->
+    <path d="M980 0 C1020 150 1060 320 1120 520 C1180 720 1200 820 1250 900" stroke="#161614" stroke-width="160" fill="none" stroke-linecap="round" opacity="0.6"/>
+
+    <!-- Thin energetic slashes — top area, right -->
+    <path d="M820 40 C870 80 930 50 990 70" stroke="#222" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <path d="M860 58 C910 95 965 68 1015 88" stroke="#1e1e1c" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.5"/>
+    <path d="M900 30 C940 60 985 40 1030 55" stroke="#222" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.4"/>
+
+    <!-- Ink splatter dots — scattered -->
+    <circle cx="1080" cy="320" r="3" fill="#252520" opacity="0.7"/>
+    <circle cx="1095" cy="340" r="1.5" fill="#252520" opacity="0.5"/>
+    <circle cx="1060" cy="355" r="2" fill="#252520" opacity="0.6"/>
+    <circle cx="1110" cy="308" r="1" fill="#252520" opacity="0.4"/>
+    <circle cx="940" cy="260" r="2.5" fill="#202020" opacity="0.5"/>
+    <circle cx="955" cy="278" r="1.5" fill="#202020" opacity="0.4"/>
+    <circle cx="1200" cy="400" r="2" fill="#1e1e1c" opacity="0.5"/>
+    <circle cx="1215" cy="415" r="1" fill="#1e1e1c" opacity="0.4"/>
+
+    <!-- Long thin calligraphy strokes -->
+    <path d="M1050 60 C1070 200 1090 380 1100 560" stroke="#1a1a18" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+    <path d="M1090 40 C1108 180 1115 350 1125 530" stroke="#181816" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.4"/>
+    <path d="M1160 80 C1175 220 1185 410 1190 600" stroke="#1a1a18" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.35"/>
+
+    <!-- Small horizontal brushmarks — left side atmosphere -->
+    <path d="M30 350 C80 345 130 348 175 343" stroke="#161614" stroke-width="18" fill="none" stroke-linecap="round" opacity="0.4"/>
+    <path d="M50 390 C90 386 130 388 165 383" stroke="#141412" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.3"/>
+    <path d="M20 420 C70 415 120 418 160 414" stroke="#121210" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.25"/>
+
+    <!-- Fade left content area to black for readability -->
+    <rect x="0" y="0" width="520" height="900" fill="url(#leftFade)"/>
+    <defs>
+      <linearGradient id="leftFade" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#000" stop-opacity="1"/>
+        <stop offset="85%" stop-color="#000" stop-opacity="0.6"/>
+        <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- Hero text -->
+  <div class="hero-content">
+    <p class="eyebrow">Stream Without Limits</p>
+
+    <div class="logo-wrap">
+      <h1 class="logo">AniZe</h1>
+    </div>
+
+    <p class="tagline">
+      Your anime. Your way — sub or dub, old school or seasonal.<br>
+      No sign-up. No paywalls. No pop-up hell.<br>
+      Just you, the story, and zero compromise.
+    </p>
+
+    <a class="enter-btn" href="anize-home.html">
+      ENTER <span class="arr">→</span>
+    </a>
+  </div>
+
+  <!-- Scroll hint -->
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <svg viewBox="0 0 14 14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="2,5 7,10 12,5"/>
+    </svg>
+  </div>
+</section>
+
+<!-- FALLING LEAVES -->
+<div id="leaves"></div>
+
+<!-- ABOUT SECTION -->
+<div class="divider"></div>
+<section class="section">
+  <p class="section-label">What is AniZe</p>
+  <h2 class="section-title">Built by fans.<br>Made for everyone.</h2>
+  <div class="section-body">
+    <p>AniZe is a free anime streaming platform built for the people who actually watch anime — not for shareholders or ad networks. No credit card. No email sign-up. No "subscribe to continue." Just click, stream, and enjoy.</p>
+    <p>Whether you're a sub purist who lives for the original Japanese voice acting or you prefer kicking back with a fully dubbed version, AniZe has got you covered — with a library that grows every day, from the latest seasonal hits straight out of Japan to rare retro gems you thought were gone forever.</p>
+    <p>AniZe does not host or store any video files. All content is sourced via embedded players from third-party providers. We are a discovery and streaming interface, built for accessibility and speed.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FEATURES SECTION -->
+<section class="section">
+  <p class="section-label">Why AniZe</p>
+  <h2 class="section-title">What makes us<br>different.</h2>
+
+  <div class="features-grid">
+    <div class="feat-card">
+      <p class="feat-num">01</p>
+      <p class="feat-title">Safety</p>
+      <p class="feat-text">No malware-ridden pop-ups. No sketchy redirects. We actively monitor the site and our community flags anything suspicious fast.</p>
+    </div>
+    <div class="feat-card">
+      <p class="feat-num">02</p>
+      <p class="feat-title">Content Library</p>
+      <p class="feat-text">From seasonal hits that just dropped in Japan to retro classics from the 80s and 90s — if it exists in anime, you'll find it here. Updated constantly.</p>
+    </div>
+    <div class="feat-card">
+      <p class="feat-num">03</p>
+      <p class="feat-title">Streaming Quality</p>
+      <p class="feat-text">Full HD where available. Flexible quality selector so you stay in the zone even on slower connections. Anime is art — it deserves to look right.</p>
+    </div>
+    <div class="feat-card">
+      <p class="feat-num">04</p>
+      <p class="feat-title">Speed</p>
+      <p class="feat-text">Multiple high-performance servers. If one lane is slow, switch instantly. No buffering circles killing your hype before a fight scene.</p>
+    </div>
+    <div class="feat-card">
+      <p class="feat-num">05</p>
+      <p class="feat-title">Sub &amp; Dub</p>
+      <p class="feat-text">Both options for almost every title. Watch your way — original Japanese audio or a fully dubbed version in your language.</p>
+    </div>
+    <div class="feat-card">
+      <p class="feat-num">06</p>
+      <p class="feat-title">Any Device</p>
+      <p class="feat-text">Desktop, laptop, tablet, phone. AniZe is fully responsive and built to work wherever you are — on the bus, in bed, wherever.</p>
+    </div>
+  </div>
+</section>
+
+<div class="bar-spacer"></div>
+
+<!-- FIXED BOTTOM BAR -->
+<div class="bottom-bar">
+  <div class="bar-left">
+    <span class="made">Made by <span class="highlight">Team Re:start</span></span>
+    <a class="discord-link" href="https://discord.gg/YyQ6qZ2nf5" target="_blank">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.054a19.9 19.9 0 0 0 5.993 3.031.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
+      </svg>
+      discord.gg/YyQ6qZ2nf5
+    </a>
+  </div>
+
+  <div class="bar-right">
+    <span class="copyright">© 2026 AniZe. All rights reserved.</span>
+    <span class="disclaimer">AniZe does not store any files on its server. All contents are provided by non-affiliated third parties.</span>
+  </div>
+</div>
+
+<script>
+  const lc = document.getElementById('leaves');
+  for (let i = 0; i < 15; i++) {
+    const el = document.createElement('div');
+    el.classList.add('leaf');
+    const sz = 8 + Math.random() * 12;
+    const op = 0.3 + Math.random() * 0.35;
+    el.style.cssText = `left:${Math.random()*100}%;animation-duration:${8+Math.random()*12}s;animation-delay:${Math.random()*18}s;`;
+    el.innerHTML = `<svg width="${sz}" height="${sz*1.6}" viewBox="0 0 10 16" xmlns="http://www.w3.org/2000/svg"><path d="M5 0C8 3 9 7 8 11C7 14 5 16 5 16C5 16 3 14 2 11C1 7 2 3 5 0Z" fill="#c8b8b0" opacity="${op}"/><line x1="5" y1="2" x2="5" y2="15" stroke="#a89888" stroke-width="0.5" opacity="${op*0.7}"/></svg>`;
+    lc.appendChild(el);
+  }
+</script>
+</body>
+</html>

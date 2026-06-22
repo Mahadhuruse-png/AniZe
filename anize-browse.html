@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AniZe — Browse Anime</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #000;
+  --bg2: #0a0a0a;
+  --bg3: #111;
+  --border: #1c1c1c;
+  --border2: #2a2a2a;
+  --text: #fff;
+  --text2: #888;
+  --text3: #555;
+  --nav-h: 58px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ── NAVBAR ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: rgba(0,0,0,0.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  gap: 2rem;
+}
+
+.nav-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+  text-transform: uppercase;
+}
+
+.nav-links a:hover { color: var(--text); background: var(--bg3); }
+.nav-links a.active { color: var(--text); }
+
+.nav-search {
+  flex: 1;
+  max-width: 520px;
+  margin-left: auto;
+  position: relative;
+}
+
+.nav-search input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  padding: 0.45rem 0.9rem 0.45rem 2.2rem;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.nav-search input:focus { border-color: var(--border2); }
+.nav-search input::placeholder { color: var(--text3); }
+
+.nav-search svg {
+  position: absolute;
+  left: 0.65rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 13px; height: 13px;
+  stroke: var(--text3);
+  fill: none;
+  pointer-events: none;
+}
+
+.nav-right { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+
+.btn-login {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--text);
+  border: none;
+  padding: 0.42rem 1rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-login:hover { opacity: 0.85; }
+
+/* ── MAIN ── */
+main {
+  padding-top: calc(var(--nav-h) + 2.5rem);
+  padding-bottom: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
+/* ── BROWSER HEADER ── */
+.browser-header {
+  margin-bottom: 2rem;
+}
+
+.browser-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.browser-count {
+  font-size: 0.75rem;
+  color: var(--text3);
+  letter-spacing: 0.04em;
+}
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  padding: 1rem 1.2rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.filter-search {
+  position: relative;
+  flex: 1;
+  min-width: 160px;
+}
+
+.filter-search svg {
+  position: absolute;
+  left: 0.65rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 13px; height: 13px;
+  stroke: var(--text3);
+  fill: none;
+  pointer-events: none;
+}
+
+.filter-search input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.76rem;
+  padding: 0.42rem 0.8rem 0.42rem 2rem;
+  border-radius: 3px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.filter-search input:focus { border-color: var(--border2); }
+.filter-search input::placeholder { color: var(--text3); }
+
+.filter-select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  padding: 0.42rem 1.8rem 0.42rem 0.7rem;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  transition: border-color 0.2s, color 0.2s;
+  min-width: 90px;
+}
+.filter-select:hover { border-color: var(--border2); color: var(--text); }
+
+.btn-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #000;
+  background: #fff;
+  border: none;
+  padding: 0.44rem 1rem;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-left: auto;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+.btn-filter:hover { opacity: 0.85; }
+.btn-filter svg { width: 13px; height: 13px; stroke: #000; fill: none; }
+
+/* ── ANIME GRID ── */
+.anime-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 1rem;
+}
+
+.anime-card {
+  position: relative;
+  cursor: pointer;
+}
+
+.anime-card:hover .card-img { filter: brightness(0.7); }
+.anime-card:hover .card-overlay { opacity: 1; }
+
+.card-thumb {
+  position: relative;
+  aspect-ratio: 2/3;
+  overflow: hidden;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  margin-bottom: 0.55rem;
+}
+
+.card-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: filter 0.25s;
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.card-play {
+  width: 36px; height: 36px;
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-play svg { width: 12px; height: 12px; fill: #fff; margin-left: 2px; }
+
+.card-ep {
+  position: absolute;
+  bottom: 0.4rem; left: 0.4rem;
+  font-size: 0.58rem; font-weight: 600;
+  letter-spacing: 0.06em;
+  background: rgba(0,0,0,0.75);
+  color: #ccc;
+  padding: 0.18rem 0.45rem;
+  border-radius: 2px;
+}
+
+.card-badge {
+  position: absolute;
+  top: 0.4rem; left: 0.4rem;
+  font-size: 0.52rem; font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #fff;
+  color: #000;
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+}
+
+.card-sub {
+  position: absolute;
+  top: 0.4rem; right: 0.4rem;
+  font-size: 0.55rem; font-weight: 600;
+  background: #fff; color: #000;
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+}
+
+.card-title {
+  font-size: 0.75rem; font-weight: 500;
+  color: var(--text2); line-height: 1.3;
+  white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.2s;
+}
+.anime-card:hover .card-title { color: var(--text); }
+
+.card-type { font-size: 0.62rem; color: var(--text3); margin-top: 0.18rem; }
+
+/* skeleton */
+.skeleton { background: var(--bg3); animation: shimmer 1.5s infinite; border-radius: 2px; }
+@keyframes shimmer { 0%{opacity:.4} 50%{opacity:.7} 100%{opacity:.4} }
+.skel-thumb { aspect-ratio: 2/3; width: 100%; margin-bottom: 0.55rem; }
+.skel-title { height: 12px; width: 85%; }
+.skel-sub   { height: 10px; width: 50%; margin-top: 6px; }
+
+/* ── PAGINATION ── */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 3rem;
+}
+
+.page-btn {
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text3);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.75rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 34px;
+  text-align: center;
+}
+.page-btn:hover { color: var(--text); border-color: var(--border2); }
+.page-btn.active { color: #000; background: #fff; border-color: #fff; }
+.page-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* no results */
+.no-results {
+  text-align: center;
+  color: var(--text3);
+  font-size: 0.8rem;
+  padding: 4rem 0;
+  letter-spacing: 0.04em;
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="anize-home.html" class="nav-logo">AniZe</a>
+  <ul class="nav-links">
+    <li><a href="anize-home.html">Home</a></li>
+    <li><a href="#" class="active">New</a></li>
+    <li><a href="#">Ongoing</a></li>
+    <li><a href="#">Schedule</a></li>
+  </ul>
+  <div class="nav-search">
+    <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" id="navSearch" placeholder="Search anime..." autocomplete="off"/>
+  </div>
+  <div class="nav-right">
+    <button class="btn-login">Login</button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main>
+
+  <!-- Header -->
+  <div class="browser-header">
+    <h1 class="browser-title">Browser</h1>
+    <p class="browser-count" id="animeCount">Loading...</p>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="filter-search">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="filterSearch" placeholder="Search..." autocomplete="off"/>
+    </div>
+
+    <select class="filter-select" id="filterType">
+      <option value="">Type</option>
+      <option value="tv">TV</option>
+      <option value="movie">Movie</option>
+      <option value="ova">OVA</option>
+      <option value="ona">ONA</option>
+      <option value="special">Special</option>
+    </select>
+
+    <select class="filter-select" id="filterGenre">
+      <option value="">Genre</option>
+      <option value="1">Action</option>
+      <option value="2">Adventure</option>
+      <option value="4">Comedy</option>
+      <option value="8">Drama</option>
+      <option value="10">Fantasy</option>
+      <option value="14">Horror</option>
+      <option value="62">Isekai</option>
+      <option value="18">Mecha</option>
+      <option value="7">Mystery</option>
+      <option value="20">Parody</option>
+      <option value="40">Psychological</option>
+      <option value="22">Romance</option>
+      <option value="24">Sci-Fi</option>
+      <option value="23">School</option>
+      <option value="27">Shounen</option>
+      <option value="25">Shoujo</option>
+      <option value="36">Slice of Life</option>
+      <option value="30">Sports</option>
+      <option value="37">Supernatural</option>
+      <option value="41">Thriller</option>
+    </select>
+
+    <select class="filter-select" id="filterStatus">
+      <option value="">Status</option>
+      <option value="airing">Airing</option>
+      <option value="complete">Completed</option>
+      <option value="upcoming">Upcoming</option>
+    </select>
+
+    <select class="filter-select" id="filterSort">
+      <option value="score">Top Rated</option>
+      <option value="popularity">Popularity</option>
+      <option value="start_date">Newest</option>
+      <option value="title">A–Z</option>
+      <option value="favorites">Most Favourite</option>
+    </select>
+
+    <button class="btn-filter" onclick="applyFilters()">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="16" y2="18"/></svg>
+      Filter
+    </button>
+  </div>
+
+  <!-- Grid -->
+  <div class="anime-grid" id="browseGrid"></div>
+
+  <!-- Pagination -->
+  <div class="pagination" id="pagination"></div>
+
+</main>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid #1c1c1c;padding:1.4rem 2.5rem;display:flex;align-items:center;justify-content:space-between;background:#0a0a0a;">
+  <div style="display:flex;flex-direction:column;gap:0.3rem">
+    <span style="font-size:0.68rem;font-weight:500;letter-spacing:0.06em;color:#fff">Made by <span style="color:#fff;font-weight:700">Team Re:start</span></span>
+    <a href="https://discord.gg/YyQ6qZ2nf5" target="_blank" style="font-size:0.64rem;color:#ccc;letter-spacing:0.04em;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#666'">discord.gg/YyQ6qZ2nf5</a>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem">
+    <span style="font-size:0.68rem;color:#fff;letter-spacing:0.04em">© 2026 AniZe. All rights reserved.</span>
+    <span style="font-size:0.6rem;color:#aaa;letter-spacing:0.03em">AniZe does not store any files on its server. All contents are provided by non-affiliated third parties.</span>
+  </div>
+</footer>
+
+<script>
+let currentPage = 1;
+let totalPages  = 1;
+let currentFilters = {};
+
+function renderSkeletons(count) {
+  document.getElementById('browseGrid').innerHTML = Array(count).fill(0).map(() => `
+    <div class="anime-card">
+      <div class="skeleton skel-thumb"></div>
+      <div class="skeleton skel-title"></div>
+      <div class="skeleton skel-sub"></div>
+    </div>`).join('');
+}
+
+function animeCard(a) {
+  const img   = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+  const title = a.title || 'Unknown';
+  const eps   = a.episodes ? `EP ${a.episodes}` : 'Ongoing';
+  const type  = a.type || 'TV';
+  const status = a.status === 'Not yet aired' ? 'Upcoming' : '';
+  return `
+    <div class="anime-card" onclick="window.location.href='anize-player.html?id=${a.mal_id}'">
+      <div class="card-thumb">
+        <img class="card-img" src="${img}" alt="${title}" loading="lazy" onerror="this.style.opacity='0'">
+        <div class="card-ep">${eps}</div>
+        ${status ? `<div class="card-badge">${status}</div>` : '<div class="card-sub">SUB</div>'}
+        <div class="card-overlay"><div class="card-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+      </div>
+      <div class="card-title">${title}</div>
+      <div class="card-type">${type}</div>
+    </div>`;
+}
+
+function buildPagination() {
+  const el = document.getElementById('pagination');
+  if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+  let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>← Prev</button>`;
+
+  let start = Math.max(1, currentPage - 2);
+  let end   = Math.min(totalPages, currentPage + 2);
+  if (start > 1) html += `<button class="page-btn" onclick="goPage(1)">1</button>${start>2?'<span style="color:#555;padding:0 4px">…</span>':''}`;
+  for (let i = start; i <= end; i++) {
+    html += `<button class="page-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  if (end < totalPages) html += `${end<totalPages-1?'<span style="color:#555;padding:0 4px">…</span>':''}<button class="page-btn" onclick="goPage(${totalPages})">${totalPages}</button>`;
+
+  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>Next →</button>`;
+  el.innerHTML = html;
+}
+
+async function loadAnime(page=1) {
+  renderSkeletons(24);
+  document.getElementById('pagination').innerHTML = '';
+
+  const params = new URLSearchParams();
+  params.set('page', page);
+  params.set('limit', 24);
+  params.set('order_by', currentFilters.sort || 'popularity');
+  params.set('sort', 'desc');
+  if (currentFilters.type)   params.set('type', currentFilters.type);
+  if (currentFilters.status) params.set('status', currentFilters.status);
+  if (currentFilters.genre)  params.set('genres', currentFilters.genre);
+  if (currentFilters.q)      params.set('q', currentFilters.q);
+
+  try {
+    const r = await fetch(`https://api.jikan.moe/v4/anime?${params}`);
+    const d = await r.json();
+    const list = d.data || [];
+    totalPages = d.pagination?.last_visible_page || 1;
+    const total = d.pagination?.items?.total || list.length;
+
+    document.getElementById('animeCount').textContent = `${total.toLocaleString()} anime`;
+    document.getElementById('browseGrid').innerHTML = list.length
+      ? list.map(animeCard).join('')
+      : '<p class="no-results">No anime found — try different filters.</p>';
+
+    buildPagination();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch {
+    document.getElementById('browseGrid').innerHTML = '<p class="no-results">Couldn\'t load — check your connection.</p>';
+  }
+}
+
+function goPage(p) {
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  loadAnime(p);
+}
+
+function applyFilters() {
+  currentPage = 1;
+  currentFilters = {
+    q:      document.getElementById('filterSearch').value.trim(),
+    type:   document.getElementById('filterType').value,
+    genre:  document.getElementById('filterGenre').value,
+    status: document.getElementById('filterStatus').value,
+    sort:   document.getElementById('filterSort').value,
+  };
+  loadAnime(1);
+}
+
+/* Check URL for search query from homepage */
+const urlParams = new URLSearchParams(window.location.search);
+const urlQ = urlParams.get('q');
+if (urlQ) {
+  document.getElementById('filterSearch').value = urlQ;
+  document.getElementById('navSearch').value = urlQ;
+  currentFilters.q = urlQ;
+}
+
+document.getElementById('navSearch').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    document.getElementById('filterSearch').value = e.target.value.trim();
+    applyFilters();
+  }
+});
+
+document.getElementById('filterSearch').addEventListener('keydown', e => {
+  if (e.key === 'Enter') applyFilters();
+});
+
+document.addEventListener('DOMContentLoaded', () => loadAnime(1));
+</script>
+</body>
+</html>
