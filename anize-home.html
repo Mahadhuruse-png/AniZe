@@ -48,28 +48,63 @@ nav {
   padding: 0 2rem;
   gap: 2rem;
 }
-.nav-logo { font-family: 'Cinzel', serif; font-size: 1.3rem; font-weight: 900; letter-spacing: 0.06em; }
+.nav-logo { font-family: 'Cinzel', serif; font-size: 1.3rem; font-weight: 900; letter-spacing: 0.06em; cursor: pointer; }
 .nav-links { display: flex; align-items: center; gap: 0.2rem; list-style: none; }
 .nav-links a { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; color: var(--text3); padding: 0.4rem 0.75rem; border-radius: 4px; text-transform: uppercase; transition: color 0.2s; }
 .nav-links a:hover, .nav-links a.active { color: var(--text); }
 .nav-search { flex: 1; max-width: 400px; margin-left: auto; position: relative; }
 .nav-search input { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 0.45rem 1rem; border-radius: 4px; outline: none; font-size: 0.75rem; }
 
-/* ── MAIN CONTENT OVERVIEW ── */
-.home-main { padding: calc(var(--nav-h) + 2rem) 2rem 2rem 2rem; max-width: 1600px; margin: 0 auto; }
+/* ── HERO BANNER ROTATION ── */
+.hero-slider {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 3.5rem;
+}
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  display: flex;
+  align-items: center;
+  padding: 0 4rem;
+}
+.hero-slide.active { opacity: 1; z-index: 2; }
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.25) blur(2px);
+  z-index: -1;
+}
+.hero-content { max-width: 600px; z-index: 5; }
+.hero-title { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; margin-bottom: 1rem; line-height: 1.2; letter-spacing: 0.02em; }
+.hero-synopsis { font-size: 0.82rem; color: var(--text2); line-height: 1.6; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.hero-btn { display: inline-block; background: var(--text); color: var(--bg); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; padding: 0.6rem 1.5rem; border-radius: 3px; letter-spacing: 0.1em; transition: opacity 0.2s; cursor: pointer; }
+.hero-btn:hover { opacity: 0.85; }
+
+/* ── MAIN LAYOUT ── */
+.home-main { padding: calc(var(--nav-h) + 0rem) 0rem 2rem 0rem; max-width: 1600px; margin: 0 auto; }
+.content-padding { padding: 0 2rem; }
 
 .section-title { font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
 .more-link { font-size: 0.65rem; font-family: 'Inter', sans-serif; color: var(--text3); letter-spacing: 0.05em; transition: color 0.2s; }
 .more-link:hover { color: var(--text); }
 
-/* ── GRID SYSTEM (Balanced 7 Top, 7 Bottom via 14 Items) ── */
+/* ── GRID SYSTEM (Balanced 14 Items) ── */
 .anime-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 1.2rem;
   margin-bottom: 3.5rem;
 }
-
 @media (max-width: 1400px) { .anime-grid { grid-template-columns: repeat(6, 1fr); } }
 @media (max-width: 1200px) { .anime-grid { grid-template-columns: repeat(5, 1fr); } }
 @media (max-width: 992px) { .anime-grid { grid-template-columns: repeat(4, 1fr); } }
@@ -107,6 +142,22 @@ nav {
 
 .fallback-txt { font-size: 0.75rem; color: var(--text3); padding: 1rem 0; }
 
+/* ── LEFT SLIDE OVER SCHEDULE DRAWER ── */
+.drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 150; backdrop-filter: blur(4px); }
+.drawer-overlay.active { opacity: 1; visibility: visible; }
+.drawer { position: fixed; top: 0; left: -340px; bottom: 0; width: 340px; background: var(--bg2); border-right: 1px solid var(--border); z-index: 160; transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
+.drawer.active { left: 0; }
+.drawer-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.drawer-title { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 700; }
+.drawer-close { background: none; border: none; color: var(--text2); font-size: 1.2rem; cursor: pointer; }
+.drawer-content { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+
+.sched-day-block { border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+.sched-day-name { font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--text); margin-bottom: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; border-left: 2px solid var(--text); padding-left: 0.5rem; }
+.sched-item { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; cursor: pointer; font-size: 0.75rem; color: var(--text2); }
+.sched-item:hover { color: var(--text); }
+.sched-time { color: var(--text3); font-weight: 600; margin-right: 0.5rem; }
+
 /* ── FOOTER ── */
 footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; justify-content: space-between; align-items: center; margin-top: 4rem; }
 .foot-l, .foot-r { font-size: 0.68rem; color: #fff; letter-spacing: 0.04em; }
@@ -116,51 +167,65 @@ footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; just
 <body>
 
 <nav>
-  <div class="nav-logo">ANIZE</div>
+  <div class="nav-logo" onclick="window.location.href='anize-home.html'">ANIZE</div>
   <ul class="nav-links">
     <li><a href="anize-home.html" class="active">Home</a></li>
     <li><a href="anize-browse.html">Browse</a></li>
     <li><a href="anize-ongoing.html">Ongoing</a></li>
-    <li><a href="anize-schedule.html">Schedule</a></li>
+    <li><a href="#" id="openScheduleDrawer">Schedule</a></li>
   </ul>
   <div class="nav-search">
     <input type="text" id="navSearch" placeholder="Quick search anime...">
   </div>
 </nav>
 
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="scheduleDrawer">
+  <div class="drawer-header">
+    <div class="drawer-title">Weekly Schedule</div>
+    <button class="drawer-close" id="closeScheduleDrawer">✕</button>
+  </div>
+  <div class="drawer-content" id="drawerContent">
+    <p class="fallback-txt">Loading release timelines...</p>
+  </div>
+</div>
+
 <main class="home-main">
-  <!-- POPULAR THIS SEASON GRID (14 Items for 7x7 Balance) -->
-  <section id="trendingSection">
-    <h2 class="section-title">Popular This Season <a href="anize-ongoing.html" class="more-link">More →</a></h2>
-    <div class="anime-grid" id="trendingGrid"></div>
+  <section class="hero-slider" id="heroSlider">
+    <div style="padding: 4rem; font-size:0.8rem; color:var(--text3)">Syncing spotlight rotations...</div>
   </section>
 
-  <!-- DYNAMIC A-Z SEARCH MODULE -->
-  <section class="az-container">
-    <h2 class="section-title" style="margin-bottom:0.5rem;">Browse Alphabetically</h2>
-    <p style="font-size:0.7rem; color:var(--text3);">Filter popular curated anime series by indexing initial tags.</p>
-    <ul class="az-list" id="azList"></ul>
-  </section>
+  <div class="content-padding">
+    <section id="trendingSection">
+      <h2 class="section-title">Popular This Season <a href="anize-ongoing.html" class="more-link">More →</a></h2>
+      <div class="anime-grid" id="trendingGrid"></div>
+    </section>
 
-  <!-- FOUR COLUMN METRICS STABILIZER -->
-  <section class="columns-wrapper">
-    <div class="metric-col">
-      <h3 class="section-title">Most Favourite</h3>
-      <div class="metric-list" id="colFav"><p class="fallback-txt">Loading records...</p></div>
-    </div>
-    <div class="metric-col">
-      <h3 class="section-title">Most Completed</h3>
-      <div class="metric-list" id="colComp"><p class="fallback-txt">Loading records...</p></div>
-    </div>
-    <div class="metric-col">
-      <h3 class="section-title">Most Viewed</h3>
-      <div class="metric-list" id="colView"><p class="fallback-txt">Loading records...</p></div>
-    </div>
-    <div class="metric-col">
-      <h3 class="section-title">New Releases</h3>
-      <div class="metric-list" id="colNew"><p class="fallback-txt">Loading records...</p></div>
-    </div>
-  </section>
+    <section class="az-container">
+      <h2 class="section-title" style="margin-bottom:0.5rem;">Browse Alphabetically</h2>
+      <p style="font-size:0.7rem; color:var(--text3);">Filter popular curated anime series by indexing initial tags.</p>
+      <ul class="az-list" id="azList"></ul>
+    </section>
+
+    <section class="columns-wrapper">
+      <div class="metric-col">
+        <h3 class="section-title">Most Favourite</h3>
+        <div class="metric-list" id="colFav"><p class="fallback-txt">Loading records...</p></div>
+      </div>
+      <div class="metric-col">
+        <h3 class="section-title">Most Completed</h3>
+        <div class="metric-list" id="colComp"><p class="fallback-txt">Loading records...</p></div>
+      </div>
+      <div class="metric-col">
+        <h3 class="section-title">Most Viewed</h3>
+        <div class="metric-list" id="colView"><p class="fallback-txt">Loading records...</p></div>
+      </div>
+      <div class="metric-col">
+        <h3 class="section-title">New Releases</h3>
+        <div class="metric-list" id="colNew"><p class="fallback-txt">Loading records...</p></div>
+      </div>
+    </section>
+  </div>
 </main>
 
 <footer>
@@ -169,39 +234,83 @@ footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; just
 </footer>
 
 <script>
-// Exclude NSFW, Hentai, Ecchi, Harem, BL, GL, Reverse Harem
 const EXCLUDE_GENRES = "9,12,26,28,35,73"; 
 const DELAY = (ms) => new Promise(res => setTimeout(res, ms));
 
-// Render A-Z row. Now passes sorting logic to browse page to filter out music videos
+// Slide Drawer Event Listeners
+const openBtn = document.getElementById('openScheduleDrawer');
+const closeBtn = document.getElementById('closeScheduleDrawer');
+const overlay = document.getElementById('drawerOverlay');
+const drawer = document.getElementById('scheduleDrawer');
+
+function toggleDrawer(open) {
+  if (open) {
+    drawer.classList.add('active');
+    overlay.classList.add('active');
+    loadDrawerSchedule();
+  } else {
+    drawer.classList.remove('active');
+    overlay.classList.remove('active');
+  }
+}
+openBtn.addEventListener('click', (e) => { e.preventDefault(); toggleDrawer(true); });
+closeBtn.addEventListener('click', () => toggleDrawer(false));
+overlay.addEventListener('click', () => toggleDrawer(false));
+
+// Render Alphabet
 function initAZ() {
   const container = document.getElementById('azList');
   const letters = ['All', '0-9', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')];
   container.innerHTML = letters.map(l => {
     let letterVal = l === 'All' ? '' : l;
-    // Forces browse page to rank by popularity and ignore raw musical tracking files
     let queryUrl = `anize-browse.html?letter=${encodeURIComponent(letterVal)}&order_by=popularity&type=tv`;
     return `<li><a href="${queryUrl}">${l}</a></li>`;
   }).join('');
 }
 
-// Render Skeletons for 14-item grids
-function renderSkelGrid(targetId, count) {
-  const target = document.getElementById(targetId);
-  if (target) {
-    target.innerHTML = Array(count).fill(0).map(() => `
-      <div class="card">
-        <div class="thumb" style="background:#111;"></div>
-        <div style="height:12px; background:#111; width:80%; margin-bottom:4px;"></div>
-        <div style="height:10px; background:#111; width:40%;"></div>
-      </div>
-    `).join('');
+// Fetch and Handle Hero Rotation Slider
+async function loadHeroSlider() {
+  try {
+    const res = await fetch(`https://api.jikan.moe/v4/top/anime?filter=airing&limit=5`);
+    const json = await res.json();
+    const items = json.data || [];
+    
+    if (items.length === 0) return;
+    
+    let sliderHtml = items.map((a, idx) => {
+      const title = a.title_english || a.title;
+      const synopsis = a.synopsis || "No summary profile details filed.";
+      return `
+        <div class="hero-slide ${idx === 0 ? 'active' : ''}">
+          <img class="hero-bg" src="${a.images?.jpg?.large_image_url || a.images?.jpg?.image_url}" alt="">
+          <div class="hero-content">
+            <h1 class="hero-title">${title}</h1>
+            <p class="hero-synopsis">${synopsis}</p>
+            <div class="hero-btn" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">Watch Now</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    document.getElementById('heroSlider').innerHTML = sliderHtml;
+    
+    // Auto Rotation Loop
+    let slides = document.querySelectorAll('.hero-slide');
+    let currentSlide = 0;
+    setInterval(() => {
+      if(slides.length === 0) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }, 5000);
+    
+  } catch {
+    document.getElementById('heroSlider').style.display = 'none';
   }
 }
 
-// Fetch Popular This Season (Requesting 14 items exactly)
+// Fetch balanced 14 items Grid
 async function loadTrendingGrid() {
-  renderSkelGrid('trendingGrid', 14);
   try {
     const res = await fetch(`https://api.jikan.moe/v4/seasons/now?limit=14&sfw=true&genres_exclude=${EXCLUDE_GENRES}`);
     const json = await res.json();
@@ -221,31 +330,26 @@ async function loadTrendingGrid() {
       `;
     }).join('');
   } catch {
-    document.getElementById('trendingGrid').innerHTML = '<p class="fallback-txt">Failed to sync seasonal index records.</p>';
+    document.getElementById('trendingGrid').innerHTML = '<p class="fallback-txt">Failed to sync records.</p>';
   }
 }
 
-// Fetch helper with retry logic for columns to survive Jikan rate limits
+// Stable Column Engine
 async function fetchWithRetry(url, retries = 2, delayMs = 600) {
   for (let i = 0; i <= retries; i++) {
     try {
       const res = await fetch(url);
-      if (res.status === 429) { // Rate limited, wait and try again
-        await DELAY(delayMs * (i + 1));
-        continue;
-      }
-      if (!res.ok) throw new Error("Fetch failed status");
+      if (res.status === 429) { await DELAY(delayMs * (i + 1)); continue; }
       const json = await res.json();
       if (json && json.data) return json.data;
-    } catch (err) {
-      if (i === retries) throw err;
+    } catch {
+      if (i === retries) return [];
       await DELAY(delayMs);
     }
   }
   return [];
 }
 
-// Securely space column fetches out with dynamic fallbacks so they always show content
 async function loadFourColumns() {
   const configurations = [
     { id: 'colFav', url: `https://api.jikan.moe/v4/anime?order_by=favorites&sort=desc&limit=5&sfw=true&genres_exclude=${EXCLUDE_GENRES}` },
@@ -256,15 +360,12 @@ async function loadFourColumns() {
 
   for (const col of configurations) {
     try {
-      // Add heavy stagger delay between column fires
-      await DELAY(500);
+      await DELAY(400);
       const items = await fetchWithRetry(col.url);
-      
       if (!items || items.length === 0) {
         document.getElementById(col.id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>';
         continue;
       }
-
       document.getElementById(col.id).innerHTML = items.map(a => {
         const title = a.title_english || a.title;
         return `
@@ -283,15 +384,50 @@ async function loadFourColumns() {
   }
 }
 
-// Quick Search Nav Redirect Action
+// Load Drawer Schedule Content Separately
+let scheduleLoaded = false;
+async function loadDrawerSchedule() {
+  if (scheduleLoaded) return;
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const target = document.getElementById('drawerContent');
+  target.innerHTML = '<p class="fallback-txt">Loading release timelines...</p>';
+  
+  let html = '';
+  for (const day of days) {
+    try {
+      await DELAY(300);
+      const res = await fetch(`https://api.jikan.moe/v4/schedules?filter=${day.toLowerCase()}&limit=6`);
+      const json = await res.json();
+      const items = json.data || [];
+      
+      if(items.length > 0) {
+        html += `
+          <div class="sched-day-block">
+            <div class="sched-day-name">${day}</div>
+            ${items.map(a => `
+              <div class="sched-item" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
+                <span class="sched-title truncate" style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${a.title_english || a.title}</span>
+                <span class="sched-time">${a.broadcast?.time || 'Ongoing'}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    } catch {}
+  }
+  target.innerHTML = html || '<p class="fallback-txt">Schedule down temporarily.</p>';
+  scheduleLoaded = true;
+}
+
 document.getElementById('navSearch').addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && e.target.value.trim().length > 0) {
     window.location.href = `anize-browse.html?q=${encodeURIComponent(e.target.value.trim())}`;
   }
 });
 
-// Run Init
+// Init Execution
 initAZ();
+loadHeroSlider();
 loadTrendingGrid();
 loadFourColumns();
 </script>
