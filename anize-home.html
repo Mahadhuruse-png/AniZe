@@ -59,7 +59,7 @@ nav {
 .hero-slider {
   position: relative;
   width: 100%;
-  height: 460px;
+  height: 480px;
   background: var(--bg2);
   border-bottom: 1px solid var(--border);
   overflow: hidden;
@@ -69,7 +69,7 @@ nav {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 0.9s ease-in-out;
+  transition: opacity 0.8s ease-in-out;
   display: flex;
   align-items: center;
   padding: 0 4rem;
@@ -81,15 +81,15 @@ nav {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center 20%;
   filter: brightness(0.22) blur(3px);
-  transform: scale(1.05);
+  transform: scale(1.06);
   z-index: -1;
 }
-.hero-content { max-width: 580px; z-index: 5; }
-.hero-title { font-family: 'Cinzel', serif; font-size: 2rem; font-weight: 900; margin-bottom: 1rem; line-height: 1.2; letter-spacing: 0.02em; color: #fff; }
-.hero-synopsis { font-size: 0.8rem; color: #aaa; line-height: 1.7; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.hero-btn { display: inline-block; background: #fff; color: #000; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; padding: 0.65rem 1.6rem; border-radius: 3px; letter-spacing: 0.12em; transition: opacity 0.2s; cursor: pointer; }
+.hero-content { max-width: 600px; z-index: 5; }
+.hero-title { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; margin-bottom: 1rem; line-height: 1.2; letter-spacing: 0.02em; }
+.hero-synopsis { font-size: 0.82rem; color: var(--text2); line-height: 1.6; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.hero-btn { display: inline-block; background: var(--text); color: var(--bg); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; padding: 0.6rem 1.5rem; border-radius: 3px; letter-spacing: 0.1em; transition: opacity 0.2s; cursor: pointer; }
 .hero-btn:hover { opacity: 0.85; }
 
 /* ── MAIN LAYOUT ── */
@@ -128,23 +128,28 @@ nav {
 .az-list a { background: var(--bg3); border: 1px solid var(--border); padding: 0.4rem 0.75rem; font-size: 0.7rem; font-weight: 600; border-radius: 3px; color: var(--text2); transition: all 0.2s; }
 .az-list a:hover { color: var(--bg); background: var(--text); border-color: var(--text); }
 
-/* ── TRENDING STRIP (numbered, horizontal scroll, equal cards) ── */
+/* ── TRENDING STRIP (numbered, horizontal scroll) ── */
 .trending-strip { display: flex; gap: 0; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 3.5rem; }
-.trending-item { position: relative; flex: 0 0 180px; cursor: pointer; padding-right: 1rem; }
+.trending-item { position: relative; flex: 0 0 160px; width: 160px; cursor: pointer; padding-right: 1.2rem; flex-shrink: 0; }
 .trending-item:hover .thumb img { transform: scale(1.04); filter: brightness(0.75); }
-.trending-item:hover .title { color: var(--text); }
+.trending-item:hover .title { color: #fff; }
 .trending-rank {
-  position: absolute; bottom: 3rem; left: 0; z-index: 2;
-  font-family: 'Cinzel', serif; font-size: 3.5rem; font-weight: 900;
-  color: var(--bg); -webkit-text-stroke: 1.5px #333;
-  line-height: 1; letter-spacing: -0.04em;
-  text-shadow: 0 0 0 transparent;
+  position: absolute;
+  bottom: 2.8rem;
+  left: -0.4rem;
+  z-index: 2;
+  font-family: 'Cinzel', serif;
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px #444;
   user-select: none;
+  pointer-events: none;
 }
 .title { font-size: 0.75rem; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
 .meta { font-size: 0.65rem; color: var(--text3); margin-top: 0.15rem; }
-
-/* ── 4 COLUMN METRICS SECTIONS ── */
 .columns-wrapper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 4rem; }
 @media (max-width: 1200px) { .columns-wrapper { grid-template-columns: repeat(2, 1fr); gap: 2rem; } }
 @media (max-width: 600px) { .columns-wrapper { grid-template-columns: 1fr; } }
@@ -327,14 +332,13 @@ async function loadHeroSlider() {
   }
 }
 
-// Fetch and render the numbered Trending strip (top airing, offset from hero to avoid duplicates)
+// Fetch and render the numbered Trending strip (top 10 airing anime)
 async function loadTrending() {
   try {
-    // Fetch two pages so we can skip the top 5 (used by hero) and show the next 10
+    // Fetch 25 so we can skip the first 5 (used by hero slider) — no duplicates
     const res = await fetch(`https://api.jikan.moe/v4/top/anime?filter=airing&limit=25&sfw=true`);
     const json = await res.json();
-    // Skip first 5 (those are in the hero slider), show next 10
-    const data = (json.data || []).slice(5, 15);
+    const data = (json.data || []).slice(5, 15); // ranks 6–15, never overlap with hero
 
     document.getElementById('trendingStrip').innerHTML = data.map((a, idx) => {
       const title = a.title_english || a.title;

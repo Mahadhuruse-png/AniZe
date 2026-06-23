@@ -246,9 +246,13 @@ main {
 /* ── ANIME GRID ── */
 .anime-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  grid-template-columns: repeat(6, 1fr);
   gap: 1rem;
 }
+@media (max-width: 1100px) { .anime-grid { grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 900px)  { .anime-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 650px)  { .anime-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 420px)  { .anime-grid { grid-template-columns: repeat(2, 1fr); } }
 
 .anime-card {
   position: relative;
@@ -543,40 +547,40 @@ async function loadAnime(page=1) {
   renderSkeletons(24);
   document.getElementById('pagination').innerHTML = '';
 
-  const SORT_DIRECTION = { score: 'desc', popularity: 'asc', start_date: 'desc', title: 'asc', favorites: 'desc' };
-  const sortField = currentFilters.sort || 'popularity';
-
   const params = new URLSearchParams();
   params.set('page', page);
   params.set('limit', 24);
-  params.set('sfw', 'true');
-  params.set('status', 'airing');
-  params.set('order_by', sortField);
-  params.set('sort', SORT_DIRECTION[sortField] || 'asc');
+  params.set('order_by', currentFilters.sort || 'popularity');
+  params.set('sort', 'desc');
+  params.set('status', currentFilters.status || 'airing');
   if (currentFilters.type)  params.set('type', currentFilters.type);
   if (currentFilters.genre) params.set('genres', currentFilters.genre);
   if (currentFilters.q)     params.set('q', currentFilters.q);
 
   try {
-    const r = await fetch(`https://api.jikan.moe/v4/anime?${params}`);
+    const SORT_DIRECTION = { score: 'desc', popularity: 'asc', start_date: 'desc', title: 'asc', favorites: 'desc' };
+    const sortField = currentFilters.sort || 'popularity';
+    let url = `https://api.jikan.moe/v4/anime?status=airing&order_by=${sortField}&sort=${SORT_DIRECTION[sortField]||'asc'}&sfw=true&page=${page}&limit=24`;
+    if (currentFilters.type)  url += `&type=${currentFilters.type}`;
+    if (currentFilters.genre) url += `&genres=${currentFilters.genre}`;
+    if (currentFilters.q)     url += `&q=${encodeURIComponent(currentFilters.q)}`;
+
+    const r = await fetch(url);
     const d = await r.json();
     // Deduplicate by mal_id
     const seen = new Set();
-    const list = (d.data || []).filter(a => {
+    const raw = (d.data || []).filter(a => {
       if (seen.has(a.mal_id)) return false;
-      seen.add(a.mal_id);
-      return true;
+      seen.add(a.mal_id); return true;
     });
     totalPages = d.pagination?.last_visible_page || 1;
-    const total = d.pagination?.items?.total || list.length;
-
-    // Trim to nearest multiple of 6 so grid rows are always full
-    const cols = 6;
-    const trimmed = list.length >= cols ? list.slice(0, Math.floor(list.length / cols) * cols) : list;
+    const total = d.pagination?.items?.total || raw.length;
+    // Trim to nearest multiple of 6 so rows are always full
+    const list = raw.length >= 6 ? raw.slice(0, Math.floor(raw.length / 6) * 6) : raw;
 
     document.getElementById('animeCount').textContent = `${total.toLocaleString()} anime`;
-    document.getElementById('browseGrid').innerHTML = trimmed.length
-      ? trimmed.map(animeCard).join('')
+    document.getElementById('browseGrid').innerHTML = list.length
+      ? list.map(animeCard).join('')
       : '<p class="no-results">No anime found — try different filters.</p>';
 
     buildPagination();

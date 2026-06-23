@@ -257,9 +257,13 @@ main {
 /* ── ANIME GRID ── */
 .anime-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  grid-template-columns: repeat(6, 1fr);
   gap: 1rem;
 }
+@media (max-width: 1100px) { .anime-grid { grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 900px)  { .anime-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 650px)  { .anime-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 420px)  { .anime-grid { grid-template-columns: repeat(2, 1fr); } }
 
 .anime-card {
   position: relative;
@@ -561,6 +565,9 @@ async function loadAnime(page=1) {
   renderSkeletons(24);
   document.getElementById('pagination').innerHTML = '';
 
+  // NOTE: In Jikan, "popularity" is a RANK (#1 = most popular), so it has to
+  // sort ascending to show the most popular first. "A–Z" is also ascending.
+  // Everything else (score, favorites, newest-first) sorts descending.
   const SORT_DIRECTION = { score: 'desc', popularity: 'asc', start_date: 'desc', title: 'asc', favorites: 'desc' };
   const sortField = currentFilters.sort || document.getElementById('filterSort').value || 'score';
 
@@ -581,19 +588,16 @@ async function loadAnime(page=1) {
     const d = await r.json();
     // Deduplicate by mal_id
     const seen = new Set();
-    const list = (d.data || []).filter(a => {
+    const raw = (d.data || []).filter(a => {
       if (seen.has(a.mal_id)) return false;
-      seen.add(a.mal_id);
-      return true;
+      seen.add(a.mal_id); return true;
     });
     totalPages = d.pagination?.last_visible_page || 1;
+    // Trim to nearest multiple of 6 so rows are always full
+    const list = raw.length >= 6 ? raw.slice(0, Math.floor(raw.length / 6) * 6) : raw;
 
-    // Trim to nearest multiple of 6 so grid rows are always full
-    const cols = 6;
-    const trimmed = list.length >= cols ? list.slice(0, Math.floor(list.length / cols) * cols) : list;
-
-    document.getElementById('browseGrid').innerHTML = trimmed.length
-      ? trimmed.map(animeCard).join('')
+    document.getElementById('browseGrid').innerHTML = list.length
+      ? list.map(animeCard).join('')
       : '<p class="no-results">No anime found — try different filters.</p>';
 
     buildPagination();
