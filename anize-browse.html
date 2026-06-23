@@ -389,9 +389,9 @@ main {
   <a href="anize-home.html" class="nav-logo">AniZe</a>
   <ul class="nav-links">
     <li><a href="anize-home.html">Home</a></li>
-    <li><a href="#" class="active">New</a></li>
-    <li><a href="#">Ongoing</a></li>
-    <li><a href="#">Schedule</a></li>
+    <li><a href="anize-browse.html" class="active">New</a></li>
+    <li><a href="anize-ongoing.html">Ongoing</a></li>
+    <li><a href="anize-schedule.html">Schedule</a></li>
   </ul>
   <div class="nav-search">
     <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -554,8 +554,10 @@ async function loadAnime(page=1) {
   const params = new URLSearchParams();
   params.set('page', page);
   params.set('limit', 24);
-  params.set('order_by', currentFilters.sort || 'popularity');
+  params.set('order_by', currentFilters.sort || 'score');
   params.set('sort', 'desc');
+  params.set('min_score', '6');
+  params.set('sfw', 'true');
   if (currentFilters.type)   params.set('type', currentFilters.type);
   if (currentFilters.status) params.set('status', currentFilters.status);
   if (currentFilters.genre)  params.set('genres', currentFilters.genre);

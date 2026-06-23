@@ -1031,11 +1031,11 @@ async function init() {
   renderListSkeletons('newReleasesList', 6);
 
   await Promise.all([
-    fetchGrid('https://api.jikan.moe/v4/seasons/now?limit=12', 'popularGrid'),
-    fetchList('https://api.jikan.moe/v4/top/anime?filter=favorite&limit=6', 'favListCol'),
-    fetchList('https://api.jikan.moe/v4/anime?status=complete&order_by=end_date&sort=desc&limit=6', 'completedList'),
-    fetchList('https://api.jikan.moe/v4/top/anime?filter=airing&limit=6', 'mostViewedList', 6, rankCard),
-    fetchList('https://api.jikan.moe/v4/anime?status=airing&order_by=start_date&sort=desc&limit=6', 'newReleasesList'),
+    fetchGrid('https://api.jikan.moe/v4/seasons/now?limit=12&sfw=true', 'popularGrid'),
+    fetchList('https://api.jikan.moe/v4/top/anime?filter=favorite&limit=6&sfw=true', 'favListCol'),
+    fetchList('https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=6&sfw=true', 'completedList'),
+    fetchList('https://api.jikan.moe/v4/top/anime?limit=6&sfw=true', 'mostViewedList', 6, rankCard),
+    fetchList('https://api.jikan.moe/v4/seasons/upcoming?limit=6&sfw=true', 'newReleasesList'),
   ]);
 }
 
