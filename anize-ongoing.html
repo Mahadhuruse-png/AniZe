@@ -556,13 +556,12 @@ async function loadAnime(page=1) {
   try {
     let url;
     if (currentFilters.q || currentFilters.type || currentFilters.genre) {
-      // Use search endpoint when filters applied
       url = `https://api.jikan.moe/v4/anime?status=airing&order_by=popularity&sort=asc&sfw=true&page=${page}&limit=24`;
       if (currentFilters.type)  url += `&type=${currentFilters.type}`;
       if (currentFilters.genre) url += `&genres=${currentFilters.genre}`;
       if (currentFilters.q)     url += `&q=${encodeURIComponent(currentFilters.q)}`;
     } else {
-      url = `https://api.jikan.moe/v4/seasons/now?page=${page}&limit=24&sfw=true`;
+      url = `https://api.jikan.moe/v4/anime?status=airing&order_by=popularity&sort=asc&sfw=true&page=${page}&limit=24`;
     }
     const r = await fetch(url);
     const d = await r.json();

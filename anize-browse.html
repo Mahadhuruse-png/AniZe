@@ -554,10 +554,12 @@ async function loadAnime(page=1) {
   const params = new URLSearchParams();
   params.set('page', page);
   params.set('limit', 24);
-  params.set('order_by', currentFilters.sort || 'score');
+  params.set('order_by', currentFilters.sort || 'popularity');
   params.set('sort', 'desc');
-  params.set('min_score', '6');
   params.set('sfw', 'true');
+  if (!currentFilters.q && !currentFilters.type && !currentFilters.status && !currentFilters.genre) {
+    params.set('start_date', '2015-01-01'); // default: show modern anime
+  }
   if (currentFilters.type)   params.set('type', currentFilters.type);
   if (currentFilters.status) params.set('status', currentFilters.status);
   if (currentFilters.genre)  params.set('genres', currentFilters.genre);
@@ -600,13 +602,34 @@ function applyFilters() {
   loadAnime(1);
 }
 
-/* Check URL for search query from homepage */
+/* Check URL params — from homepage search or schedule genre sidebar */
 const urlParams = new URLSearchParams(window.location.search);
-const urlQ = urlParams.get('q');
+const urlQ      = urlParams.get('q');
+const urlGenre  = urlParams.get('genre');
+const urlType   = urlParams.get('type');
+const urlStatus = urlParams.get('status');
+const urlSort   = urlParams.get('sort');
+
 if (urlQ) {
   document.getElementById('filterSearch').value = urlQ;
   document.getElementById('navSearch').value = urlQ;
   currentFilters.q = urlQ;
+}
+if (urlGenre) {
+  document.getElementById('filterGenre').value = urlGenre;
+  currentFilters.genre = urlGenre;
+}
+if (urlType) {
+  document.getElementById('filterType').value = urlType;
+  currentFilters.type = urlType;
+}
+if (urlStatus) {
+  document.getElementById('filterStatus').value = urlStatus;
+  currentFilters.status = urlStatus;
+}
+if (urlSort) {
+  document.getElementById('filterSort').value = urlSort;
+  currentFilters.sort = urlSort;
 }
 
 document.getElementById('navSearch').addEventListener('keydown', e => {
