@@ -32,6 +32,17 @@ body {
 
 a { text-decoration: none; color: inherit; }
 
+/* Global scrollbar hider — keeps things clean, no clunky default scrollbars anywhere */
+body, div, aside, main, section, ul {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+body::-webkit-scrollbar, div::-webkit-scrollbar, aside::-webkit-scrollbar, main::-webkit-scrollbar, section::-webkit-scrollbar, ul::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 /* ── NAVBAR ── */
 nav {
   position: fixed;
@@ -410,7 +421,6 @@ main {
   <!-- Header -->
   <div class="browser-header">
     <h1 class="browser-title">Browser</h1>
-    <p class="browser-count" id="animeCount">Loading...</p>
   </div>
 
   <!-- Filter Bar -->
@@ -567,15 +577,14 @@ async function loadAnime(page=1) {
   if (currentFilters.status) params.set('status', currentFilters.status);
   if (currentFilters.genre)  params.set('genres', currentFilters.genre);
   if (currentFilters.q)      params.set('q', currentFilters.q);
+  if (currentFilters.letter) params.set('letter', currentFilters.letter);
 
   try {
     const r = await fetch(`https://api.jikan.moe/v4/anime?${params}`);
     const d = await r.json();
     const list = d.data || [];
     totalPages = d.pagination?.last_visible_page || 1;
-    const total = d.pagination?.items?.total || list.length;
 
-    document.getElementById('animeCount').textContent = `${total.toLocaleString()} anime`;
     document.getElementById('browseGrid').innerHTML = list.length
       ? list.map(animeCard).join('')
       : '<p class="no-results">No anime found — try different filters.</p>';
@@ -612,6 +621,7 @@ const urlGenre  = urlParams.get('genre');
 const urlType   = urlParams.get('type');
 const urlStatus = urlParams.get('status');
 const urlSort   = urlParams.get('sort');
+const urlLetter = urlParams.get('letter');
 
 if (urlQ) {
   document.getElementById('filterSearch').value = urlQ;
@@ -633,6 +643,9 @@ if (urlStatus) {
 if (urlSort) {
   document.getElementById('filterSort').value = urlSort;
   currentFilters.sort = urlSort;
+}
+if (urlLetter) {
+  currentFilters.letter = urlLetter;
 }
 
 document.getElementById('navSearch').addEventListener('keydown', e => {
