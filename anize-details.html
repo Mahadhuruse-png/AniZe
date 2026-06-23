@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AniZe — Anime Details</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #000; --bg2: #0a0a0a; --bg3: #111;
+  --border: #1c1c1c; --border2: #2a2a2a;
+  --text: #fff; --text2: #888; --text3: #555;
+  --accent: #fff; --nav-h: 58px;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; min-height: 100vh; }
+a { text-decoration: none; color: inherit; }
+
+nav { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); background: rgba(0,0,0,0.92); border-bottom: 1px solid var(--border); backdrop-filter: blur(12px); z-index: 100; display: flex; align-items: center; padding: 0 2rem; gap: 2rem; }
+.nav-logo { font-family: 'Cinzel', serif; font-size: 1.3rem; font-weight: 900; color: var(--text); letter-spacing: 0.06em; flex-shrink: 0; }
+.nav-links { display: flex; align-items: center; gap: 0.2rem; list-style: none; }
+.nav-links a { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; color: var(--text3); padding: 0.4rem 0.75rem; border-radius: 4px; transition: color 0.2s, background 0.2s; text-transform: uppercase; }
+.nav-links a:hover { color: var(--text); background: var(--bg3); }
+.nav-search { flex: 1; max-width: 520px; margin-left: auto; position: relative; }
+.nav-search input { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.78rem; padding: 0.45rem 0.9rem 0.45rem 2.2rem; border-radius: 4px; outline: none; transition: border-color 0.2s; }
+.nav-search input::placeholder { color: var(--text3); }
+.nav-search svg { position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); width: 13px; height: 13px; stroke: var(--text3); fill: none; pointer-events: none; }
+.nav-right { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+.btn-login { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--bg); background: var(--text); border: none; padding: 0.42rem 1rem; border-radius: 3px; cursor: pointer; transition: opacity 0.2s; }
+.btn-login:hover { opacity: 0.85; }
+
+/* HERO BANNER */
+.details-hero {
+  margin-top: var(--nav-h);
+  position: relative;
+  height: 340px;
+  overflow: hidden;
+  background: var(--bg2);
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center 20%;
+  filter: blur(18px) brightness(0.25) saturate(1.2);
+  transform: scale(1.05);
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 3rem 2rem;
+  gap: 2rem;
+}
+.hero-poster {
+  width: 150px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.8);
+  background: var(--bg3);
+}
+.hero-text { flex: 1; min-width: 0; padding-bottom: 0.2rem; }
+.hero-type-badge {
+  display: inline-block;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #888;
+  border: 1px solid #333;
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  margin-bottom: 0.6rem;
+}
+.hero-title {
+  font-family: 'Cinzel', serif;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 0.6rem;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.9);
+}
+.hero-title-jp { font-size: 0.75rem; color: #444; margin-bottom: 0.8rem; font-style: italic; }
+.hero-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+.hero-pill { font-size: 0.58rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.22rem 0.55rem; border: 1px solid #333; border-radius: 2px; color: #666; }
+.hero-pill.score { color: #f5c842; border-color: rgba(245,200,66,0.3); }
+.hero-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.btn-watch {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  color: #000; background: #fff; border: none; padding: 0.6rem 1.4rem;
+  border-radius: 3px; cursor: pointer; transition: opacity 0.2s; flex-shrink: 0;
+}
+.btn-watch:hover { opacity: 0.85; }
+.btn-watchlist {
+  font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #888; background: transparent; border: 1px solid #333; padding: 0.6rem 1.2rem;
+  border-radius: 3px; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+}
+.btn-watchlist:hover { color: #fff; border-color: #555; }
+
+/* CONTENT AREA */
+.content-wrap {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 2rem 3rem;
+  align-items: start;
+}
+
+.main-col { padding-right: 2rem; }
+
+/* SECTION */
+.section { margin-bottom: 2.5rem; }
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.6rem;
+  margin-bottom: 1rem;
+}
+.synopsis-text { font-size: 0.79rem; line-height: 1.85; color: #888; }
+
+/* CHARACTERS */
+.char-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.6rem;
+}
+.char-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg2);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.char-card:hover { border-color: var(--border2); }
+.char-img {
+  width: 40px; height: 56px;
+  object-fit: cover; border-radius: 2px;
+  background: var(--bg3); flex-shrink: 0;
+}
+.char-name { font-size: 0.65rem; font-weight: 500; color: #888; line-height: 1.3; }
+.char-role { font-size: 0.55rem; color: #444; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.2rem; }
+
+/* INFO SIDEBAR */
+.info-sidebar { position: sticky; top: calc(var(--nav-h) + 1.5rem); }
+.info-block {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 1.2rem;
+  background: var(--bg2);
+}
+.info-row {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.7rem;
+}
+.info-row:last-child { border-bottom: none; }
+.info-key {
+  width: 95px;
+  flex-shrink: 0;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  background: var(--bg3);
+  border-right: 1px solid var(--border);
+}
+.info-val {
+  padding: 0.55rem 0.8rem;
+  color: #888;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  flex: 1;
+}
+
+/* RELATED GRID */
+.related-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.rel-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  background: var(--bg2);
+}
+.rel-card:hover { border-color: var(--border2); }
+.rel-thumb {
+  width: 100%; aspect-ratio: 3/4;
+  object-fit: cover;
+  background: var(--bg3);
+}
+.rel-info { padding: 0.45rem 0.5rem; }
+.rel-title { font-size: 0.65rem; font-weight: 500; color: #888; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rel-type { font-size: 0.55rem; color: #444; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.2rem; }
+
+/* LOADING */
+@keyframes shimmer { 0% { background-position: -700px 0; } 100% { background-position: 700px 0; } }
+.skeleton { background: linear-gradient(90deg, #111 25%, #1a1a1a 50%, #111 75%); background-size: 700px 100%; animation: shimmer 1.4s infinite; border-radius: 2px; }
+
+/* BREADCRUMB */
+.breadcrumb { padding: 0.8rem 3rem; font-size: 0.64rem; color: var(--text3); display: flex; align-items: center; gap: 0.4rem; border-bottom: 1px solid var(--border); background: var(--bg2); }
+.breadcrumb a { color: var(--text3); transition: color 0.2s; }
+.breadcrumb a:hover { color: var(--text); }
+.breadcrumb span { color: #333; }
+
+@media (max-width: 900px) {
+  .content-wrap { grid-template-columns: 1fr; padding: 1.2rem; }
+  .main-col { padding-right: 0; }
+  .hero-content { padding: 0 1.2rem 1.5rem; }
+  .hero-title { font-size: 1.3rem; }
+  .hero-poster { width: 100px; height: 150px; }
+  .info-sidebar { position: static; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="anize-splash.html" class="nav-logo">AniZe</a>
+  <ul class="nav-links">
+    <li><a href="anize-home.html">Home</a></li>
+    <li><a href="anize-browse.html">New</a></li>
+    <li><a href="anize-ongoing.html">Ongoing</a></li>
+    <li><a href="#" onclick="openSchedule(event)">Schedule</a></li>
+  </ul>
+  <div class="nav-search">
+    <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" id="searchInput" placeholder="Search anime..." autocomplete="off"/>
+  </div>
+  <div class="nav-right">
+    <button class="btn-login">Login</button>
+  </div>
+</nav>
+
+<!-- BREADCRUMB (populated by JS) -->
+<div class="breadcrumb">
+  <a href="anize-home.html">Home</a>
+  <span>›</span>
+  <a href="anize-browse.html">Browse</a>
+  <span>›</span>
+  <span id="breadTitle" style="color:#555">Loading...</span>
+</div>
+
+<!-- HERO -->
+<div class="details-hero" id="detailsHero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-content">
+    <img class="hero-poster skeleton" id="heroPoster" src="" alt="" style="display:none">
+    <div class="hero-poster skeleton" id="heroPosterSkel"></div>
+    <div class="hero-text">
+      <div class="skeleton" style="height:0.7rem;width:60px;margin-bottom:0.7rem"></div>
+      <div class="skeleton" style="height:2rem;width:55%;margin-bottom:0.5rem"></div>
+      <div class="skeleton" style="height:0.75rem;width:35%;margin-bottom:1rem"></div>
+      <div style="display:flex;gap:0.4rem;margin-bottom:1rem">
+        <div class="skeleton" style="height:1rem;width:55px"></div>
+        <div class="skeleton" style="height:1rem;width:70px"></div>
+        <div class="skeleton" style="height:1rem;width:50px"></div>
+      </div>
+      <div style="display:flex;gap:0.6rem">
+        <div class="skeleton" style="height:2rem;width:100px;border-radius:3px"></div>
+        <div class="skeleton" style="height:2rem;width:110px;border-radius:3px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content-wrap">
+  <div class="main-col">
+
+    <!-- SYNOPSIS -->
+    <div class="section" id="sectionSynopsis" style="display:none">
+      <div class="section-title">Synopsis</div>
+      <p class="synopsis-text" id="synopsisText"></p>
+    </div>
+
+    <!-- CHARACTERS -->
+    <div class="section" id="sectionChars" style="display:none">
+      <div class="section-title">Characters</div>
+      <div class="char-grid" id="charGrid"></div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="info-sidebar">
+
+    <div class="section-title" style="margin-bottom:0.8rem">Information</div>
+    <div class="info-block" id="infoBlock">
+      <div class="skeleton" style="height:200px"></div>
+    </div>
+
+    <div class="section-title" style="margin-bottom:0.8rem;margin-top:1.5rem">Related</div>
+    <div class="related-grid" id="relatedGrid">
+      <div class="skeleton" style="height:160px;border-radius:3px"></div>
+      <div class="skeleton" style="height:160px;border-radius:3px"></div>
+      <div class="skeleton" style="height:160px;border-radius:3px"></div>
+      <div class="skeleton" style="height:160px;border-radius:3px"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid #1c1c1c;padding:1.4rem 2.5rem;display:flex;align-items:center;justify-content:space-between;background:#0a0a0a;">
+  <div style="display:flex;flex-direction:column;gap:0.3rem">
+    <span style="font-size:0.68rem;font-weight:500;letter-spacing:0.06em;color:#fff">Made by <span style="color:#fff;font-weight:700">Team Re:start</span></span>
+    <a href="https://discord.gg/YyQ6qZ2nf5" target="_blank" style="font-size:0.64rem;color:#ccc;letter-spacing:0.04em;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#666'">discord.gg/YyQ6qZ2nf5</a>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem">
+    <span style="font-size:0.68rem;color:#fff;letter-spacing:0.04em">© 2026 AniZe. All rights reserved.</span>
+    <span style="font-size:0.6rem;color:#aaa;letter-spacing:0.03em">AniZe does not store any files on its server. All contents are provided by non-affiliated third parties.</span>
+  </div>
+</footer>
+
+<!-- SCHEDULE SLIDE-OVER -->
+<div id="scheduleOverlay" onclick="closeSchedule()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;opacity:0;transition:opacity 0.3s"></div>
+<div id="schedulePanel" style="display:none;position:fixed;left:0;top:0;bottom:0;width:320px;background:#0a0a0a;border-right:1px solid #1c1c1c;z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;flex-direction:column">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;letter-spacing:0.06em">AniZe</span>
+    <button onclick="closeSchedule()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.2rem;padding:0.2rem">✕</button>
+  </div>
+  <div style="display:flex;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <button id="spt-menu" onclick="spTab('menu')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:none;border:none;border-bottom:2px solid #fff;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>Menu
+    </button>
+    <button id="spt-genre" onclick="spTab('genre')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Genre
+    </button>
+    <button id="spt-schedule" onclick="spTab('schedule')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Schedule
+    </button>
+  </div>
+  <div id="sp-menu" style="padding:1rem 1.4rem;display:flex;flex-direction:column">
+    <div onclick="window.location.href='anize-browse.html?type=movie';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">Movies <span style="color:#444">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=tv';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">TV Series <span style="color:#444">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ova';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">OVAs <span style="color:#444">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ona';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">ONAs <span style="color:#444">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=special';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;font-size:0.82rem;color:#aaa;cursor:pointer">Specials <span style="color:#444">›</span></div>
+    <div style="padding:1rem 0 0.4rem;font-size:0.58rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#444">Quick Navigation</div>
+    <div onclick="window.location.href='anize-home.html';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">Home</div>
+    <div onclick="window.location.href='anize-browse.html';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">New Releases</div>
+    <div onclick="window.location.href='anize-ongoing.html';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">Ongoing</div>
+    <div onclick="window.location.href='anize-browse.html?sort=popularity';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">Popular</div>
+    <div onclick="window.location.href='anize-browse.html?sort=score';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer">Top Rated</div>
+  </div>
+  <div id="sp-genre" style="display:none;padding:0.8rem 1.2rem;flex-wrap:wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;width:100%" id="spGenreList"></div>
+  </div>
+  <div id="sp-schedule" style="display:none;flex-direction:column">
+    <div style="padding:0.8rem 1.2rem;border-bottom:1px solid #1c1c1c;display:flex;justify-content:space-between">
+      <span id="spClock" style="font-size:0.68rem;color:#555"></span>
+      <span id="spTz" style="font-size:0.62rem;color:#555"></span>
+    </div>
+    <div id="spScheduleList"></div>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const MAL_ID = params.get('id');
+
+const BLOCKED_GENRES = [9, 49, 12, 35, 26, 74, 75, 57];
+
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.value.trim())
+    window.location.href = `anize-browse.html?q=${encodeURIComponent(e.target.value.trim())}`;
+});
+
+if (!MAL_ID) {
+  document.getElementById('breadTitle').textContent = 'Not Found';
+} else {
+  loadDetails();
+}
+
+async function loadDetails() {
+  try {
+    const [fullRes, charRes, recRes] = await Promise.all([
+      fetch(`https://api.jikan.moe/v4/anime/${MAL_ID}/full`),
+      fetch(`https://api.jikan.moe/v4/anime/${MAL_ID}/characters`),
+      fetch(`https://api.jikan.moe/v4/anime/${MAL_ID}/recommendations`)
+    ]);
+
+    const [fullData, charData, recData] = await Promise.all([
+      fullRes.json(), charRes.json(), recRes.json()
+    ]);
+
+    const a = fullData.data;
+    if (!a) return;
+
+    const genreIds = (a.genres || []).map(g => g.mal_id);
+    if (genreIds.some(id => BLOCKED_GENRES.includes(id))) return;
+
+    const title = a.title_english || a.title;
+    document.title = `AniZe — ${title}`;
+    document.getElementById('breadTitle').textContent = title.length > 40 ? title.slice(0,38)+'…' : title;
+
+    renderHero(a);
+    renderSynopsis(a);
+    renderInfo(a);
+    renderChars(charData.data || []);
+    renderRelated(recData.data || []);
+
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+function renderHero(a) {
+  const title = a.title_english || a.title;
+  const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+  const score = a.score ? `⭐ ${a.score}` : '';
+  const type = a.type || '';
+  const year = a.year || a.aired?.prop?.from?.year || '';
+  const status = a.status || '';
+  const eps = a.episodes ? `${a.episodes} EP` : 'Ongoing';
+  const genres = (a.genres || [])
+    .filter(g => !BLOCKED_GENRES.includes(g.mal_id))
+    .slice(0, 5).map(g => g.name);
+
+  // Set blurred background
+  if (img) document.getElementById('heroBg').style.backgroundImage = `url(${img})`;
+
+  document.getElementById('detailsHero').querySelector('.hero-content').innerHTML = `
+    <img class="hero-poster" src="${img}" alt="${title}" onerror="this.style.display='none'">
+    <div class="hero-text">
+      ${type ? `<div class="hero-type-badge">${type}</div>` : ''}
+      <h1 class="hero-title">${title}</h1>
+      ${a.title !== title ? `<div class="hero-title-jp">${a.title}</div>` : ''}
+      <div class="hero-pills">
+        ${score ? `<span class="hero-pill score">${score}</span>` : ''}
+        ${year ? `<span class="hero-pill">${year}</span>` : ''}
+        ${eps ? `<span class="hero-pill">${eps}</span>` : ''}
+        ${status ? `<span class="hero-pill">${status}</span>` : ''}
+        ${genres.map(g => `<span class="hero-pill">${g}</span>`).join('')}
+      </div>
+      <div class="hero-actions">
+        <button class="btn-watch" onclick="window.location.href='anize-player.html?id=${a.mal_id}'">▶ Watch Now</button>
+        <button class="btn-watchlist" onclick="alert('Watchlist coming soon! Login feature is in progress.')">+ Watchlist</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderSynopsis(a) {
+  const s = document.getElementById('sectionSynopsis');
+  const text = a.synopsis || '';
+  if (!text) return;
+  s.style.display = 'block';
+  document.getElementById('synopsisText').textContent = text.replace(/\[Written by MAL Rewrite\]/g, '').trim();
+}
+
+function renderInfo(a) {
+  const rows = [
+    ['Type', a.type],
+    ['Episodes', a.episodes || 'Unknown'],
+    ['Status', a.status],
+    ['Aired', a.aired?.string || '—'],
+    ['Season', a.season ? `${a.season.charAt(0).toUpperCase() + a.season.slice(1)} ${a.year}` : '—'],
+    ['Score', a.score ? `${a.score} / 10` : '—'],
+    ['Ranked', a.rank ? `#${a.rank}` : '—'],
+    ['Popularity', a.popularity ? `#${a.popularity}` : '—'],
+    ['Members', a.members ? a.members.toLocaleString() : '—'],
+    ['Rating', a.rating || '—'],
+    ['Studios', (a.studios || []).map(s => s.name).join(', ') || '—'],
+    ['Source', a.source || '—'],
+    ['Duration', a.duration || '—'],
+  ].filter(r => r[1]);
+
+  document.getElementById('infoBlock').innerHTML = rows.map(([k, v]) =>
+    `<div class="info-row">
+      <div class="info-key">${k}</div>
+      <div class="info-val">${v}</div>
+    </div>`
+  ).join('');
+}
+
+function renderChars(chars) {
+  const s = document.getElementById('sectionChars');
+  const filtered = chars.filter(c => c.role !== 'Background').slice(0, 16);
+  if (!filtered.length) return;
+  s.style.display = 'block';
+  document.getElementById('charGrid').innerHTML = filtered.map(c => {
+    const img = c.character.images?.jpg?.image_url || '';
+    const name = c.character.name;
+    const role = c.role;
+    return `
+      <div class="char-card">
+        ${img ? `<img class="char-img" src="${img}" alt="${name}" loading="lazy">` : '<div class="char-img skeleton"></div>'}
+        <div>
+          <div class="char-name">${name}</div>
+          <div class="char-role">${role}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderRelated(recs) {
+  const grid = document.getElementById('relatedGrid');
+  const items = recs.slice(0, 6);
+  if (!items.length) { grid.innerHTML = '<p style="font-size:0.7rem;color:#333;grid-column:1/-1">No recommendations found.</p>'; return; }
+  grid.innerHTML = items.map(r => {
+    const a = r.entry;
+    const img = a.images?.jpg?.image_url || '';
+    const title = a.title;
+    return `
+      <div class="rel-card" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
+        ${img ? `<img class="rel-thumb" src="${img}" alt="${title}" loading="lazy">` : '<div class="rel-thumb skeleton"></div>'}
+        <div class="rel-info">
+          <div class="rel-title">${title}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── SCHEDULE SLIDE-OVER ──
+function openSchedule(e) {
+  if(e) e.preventDefault();
+  const overlay = document.getElementById('scheduleOverlay');
+  const panel   = document.getElementById('schedulePanel');
+  overlay.style.display = 'block'; panel.style.display = 'flex'; panel.style.flexDirection = 'column';
+  requestAnimationFrame(() => { overlay.style.opacity = '1'; panel.style.transform = 'translateX(0)'; });
+  loadSpSchedule(); startSpClock(); loadSpGenres();
+}
+function closeSchedule() {
+  const overlay = document.getElementById('scheduleOverlay');
+  const panel   = document.getElementById('schedulePanel');
+  overlay.style.opacity = '0'; panel.style.transform = 'translateX(-100%)';
+  setTimeout(() => { overlay.style.display='none'; panel.style.display='none'; }, 300);
+}
+function spTab(name) {
+  ['menu','genre','schedule'].forEach(t => {
+    const btn = document.getElementById('spt-'+t);
+    const panel = document.getElementById('sp-'+t);
+    const isActive = t === name;
+    btn.style.color = isActive ? '#fff' : '#555';
+    btn.style.borderBottomColor = isActive ? '#fff' : 'transparent';
+    panel.style.display = isActive ? (t === 'schedule' ? 'flex' : t === 'genre' ? 'block' : 'flex') : 'none';
+  });
+}
+function loadSpGenres() {
+  const G = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41};
+  document.getElementById('spGenreList').innerHTML = Object.entries(G).map(([g,id]) =>
+    `<div onclick="window.location.href='anize-browse.html?genre=${id}';closeSchedule()" style="padding:0.5rem 0.4rem;font-size:0.75rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c;display:flex;align-items:center;gap:0.4rem"><span style="color:#333">•</span>${g}</div>`
+  ).join('');
+}
+const DAYS_SP = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_SHORT_SP = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let spClockTimer;
+function startSpClock() {
+  clearInterval(spClockTimer);
+  function tick() {
+    const now = new Date(); const h12 = now.getHours()%12||12; const m = now.getMinutes().toString().padStart(2,'0'); const ap = now.getHours()>=12?'p.m.':'a.m.'; const off = -now.getTimezoneOffset()/60;
+    document.getElementById('spClock').textContent = `${h12}:${m} ${ap}`;
+    document.getElementById('spTz').textContent = `GMT ${off>=0?'+':''}${off}:00`;
+  }
+  tick(); spClockTimer = setInterval(tick,1000);
+}
+async function loadSpSchedule() {
+  const el = document.getElementById('spScheduleList');
+  el.innerHTML = '<p style="padding:1rem 1.4rem;font-size:0.72rem;color:#444">Loading...</p>';
+  const today = new Date(); const todayIdx = today.getDay(); let html='';
+  try {
+    for(let offset=0;offset<4;offset++){
+      const idx=(todayIdx+offset)%7; const dateObj=new Date(today); dateObj.setDate(today.getDate()+offset);
+      const isToday=offset===0; const dayNum=dateObj.getDate(); const monthStr=dateObj.toLocaleString('en',{month:'short'}).toUpperCase();
+      const r=await fetch(`https://api.jikan.moe/v4/schedules?filter=${DAYS_SP[idx].toLowerCase()}&limit=10&sfw=true`);
+      const d=await r.json(); const items=d.data||[];
+      html+=`<div style="padding:0.8rem 1.2rem 0.3rem"><div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.6rem"><div style="width:36px;height:42px;${isToday?'background:#fff;':'background:#111;border:1px solid #1c1c1c;'}border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:0.95rem;font-weight:700;color:${isToday?'#000':'#fff'};line-height:1">${dayNum}</span><span style="font-size:0.5rem;font-weight:600;letter-spacing:0.1em;color:${isToday?'#555':'#444'};margin-top:1px">${monthStr}</span></div><div><div style="font-size:0.85rem;font-weight:600;color:#fff;text-transform:uppercase;letter-spacing:0.06em">${DAYS_SHORT_SP[idx]}</div>${isToday?'<div style="font-size:0.6rem;color:#444;letter-spacing:0.08em;text-transform:uppercase">Today</div>':''}</div></div>${items.slice(0,8).map(a=>`<div onclick="window.location.href='anize-player.html?id=${a.mal_id}'" style="display:flex;align-items:center;gap:0.7rem;padding:0.5rem 0.5rem;border-radius:3px;cursor:pointer;border-bottom:1px solid #111"><span style="font-size:0.62rem;font-weight:600;color:#444;width:36px;flex-shrink:0">${a.broadcast?.time||'--:--'}</span><span style="font-size:0.76rem;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title}</span></div>`).join('')}${items.length===0?'<p style="font-size:0.68rem;color:#333;padding:0.4rem 0">No schedule data</p>':''}</div><div style="height:1px;background:#1c1c1c;margin:0.4rem 1.2rem"></div>`;
+    }
+    el.innerHTML = html;
+  } catch { el.innerHTML='<p style="padding:1rem 1.4rem;font-size:0.72rem;color:#444">Couldn\'t load schedule.</p>'; }
+}
+</script>
+
+</body>
+</html>
