@@ -543,35 +543,40 @@ async function loadAnime(page=1) {
   renderSkeletons(24);
   document.getElementById('pagination').innerHTML = '';
 
+  const SORT_DIRECTION = { score: 'desc', popularity: 'asc', start_date: 'desc', title: 'asc', favorites: 'desc' };
+  const sortField = currentFilters.sort || 'popularity';
+
   const params = new URLSearchParams();
   params.set('page', page);
   params.set('limit', 24);
-  params.set('order_by', currentFilters.sort || 'popularity');
-  params.set('sort', 'desc');
-  params.set('status', currentFilters.status || 'airing');
+  params.set('sfw', 'true');
+  params.set('status', 'airing');
+  params.set('order_by', sortField);
+  params.set('sort', SORT_DIRECTION[sortField] || 'asc');
   if (currentFilters.type)  params.set('type', currentFilters.type);
   if (currentFilters.genre) params.set('genres', currentFilters.genre);
   if (currentFilters.q)     params.set('q', currentFilters.q);
 
   try {
-    let url;
-    if (currentFilters.q || currentFilters.type || currentFilters.genre) {
-      url = `https://api.jikan.moe/v4/anime?status=airing&order_by=popularity&sort=asc&sfw=true&page=${page}&limit=24`;
-      if (currentFilters.type)  url += `&type=${currentFilters.type}`;
-      if (currentFilters.genre) url += `&genres=${currentFilters.genre}`;
-      if (currentFilters.q)     url += `&q=${encodeURIComponent(currentFilters.q)}`;
-    } else {
-      url = `https://api.jikan.moe/v4/anime?status=airing&order_by=popularity&sort=asc&sfw=true&page=${page}&limit=24`;
-    }
-    const r = await fetch(url);
+    const r = await fetch(`https://api.jikan.moe/v4/anime?${params}`);
     const d = await r.json();
-    const list = d.data || [];
+    // Deduplicate by mal_id
+    const seen = new Set();
+    const list = (d.data || []).filter(a => {
+      if (seen.has(a.mal_id)) return false;
+      seen.add(a.mal_id);
+      return true;
+    });
     totalPages = d.pagination?.last_visible_page || 1;
     const total = d.pagination?.items?.total || list.length;
 
+    // Trim to nearest multiple of 6 so grid rows are always full
+    const cols = 6;
+    const trimmed = list.length >= cols ? list.slice(0, Math.floor(list.length / cols) * cols) : list;
+
     document.getElementById('animeCount').textContent = `${total.toLocaleString()} anime`;
-    document.getElementById('browseGrid').innerHTML = list.length
-      ? list.map(animeCard).join('')
+    document.getElementById('browseGrid').innerHTML = trimmed.length
+      ? trimmed.map(animeCard).join('')
       : '<p class="no-results">No anime found — try different filters.</p>';
 
     buildPagination();

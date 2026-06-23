@@ -561,9 +561,6 @@ async function loadAnime(page=1) {
   renderSkeletons(24);
   document.getElementById('pagination').innerHTML = '';
 
-  // NOTE: In Jikan, "popularity" is a RANK (#1 = most popular), so it has to
-  // sort ascending to show the most popular first. "A–Z" is also ascending.
-  // Everything else (score, favorites, newest-first) sorts descending.
   const SORT_DIRECTION = { score: 'desc', popularity: 'asc', start_date: 'desc', title: 'asc', favorites: 'desc' };
   const sortField = currentFilters.sort || document.getElementById('filterSort').value || 'score';
 
@@ -582,11 +579,21 @@ async function loadAnime(page=1) {
   try {
     const r = await fetch(`https://api.jikan.moe/v4/anime?${params}`);
     const d = await r.json();
-    const list = d.data || [];
+    // Deduplicate by mal_id
+    const seen = new Set();
+    const list = (d.data || []).filter(a => {
+      if (seen.has(a.mal_id)) return false;
+      seen.add(a.mal_id);
+      return true;
+    });
     totalPages = d.pagination?.last_visible_page || 1;
 
-    document.getElementById('browseGrid').innerHTML = list.length
-      ? list.map(animeCard).join('')
+    // Trim to nearest multiple of 6 so grid rows are always full
+    const cols = 6;
+    const trimmed = list.length >= cols ? list.slice(0, Math.floor(list.length / cols) * cols) : list;
+
+    document.getElementById('browseGrid').innerHTML = trimmed.length
+      ? trimmed.map(animeCard).join('')
       : '<p class="no-results">No anime found — try different filters.</p>';
 
     buildPagination();
