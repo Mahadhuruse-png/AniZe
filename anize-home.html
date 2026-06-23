@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AniZe — Watch Anime Free</title>
+<title>AniZe — Home</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -17,21 +17,22 @@
   --text: #fff;
   --text2: #888;
   --text3: #555;
-  --accent: #fff;
   --nav-h: 58px;
 }
 
-html { scroll-behavior: smooth; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', sans-serif;
-  overflow-x: hidden;
-  min-height: 100vh;
-}
-
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; overflow-x: hidden; }
 a { text-decoration: none; color: inherit; }
+
+/* Global Scrollbar Hider to keep layout clean */
+body, div, aside, main, section, ul {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+body::-webkit-scrollbar, div::-webkit-scrollbar, aside::-webkit-scrollbar, main::-webkit-scrollbar, section::-webkit-scrollbar, ul::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
 
 /* ── NAVBAR ── */
 nav {
@@ -47,1165 +48,252 @@ nav {
   padding: 0 2rem;
   gap: 2rem;
 }
+.nav-logo { font-family: 'Cinzel', serif; font-size: 1.3rem; font-weight: 900; letter-spacing: 0.06em; }
+.nav-links { display: flex; align-items: center; gap: 0.2rem; list-style: none; }
+.nav-links a { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; color: var(--text3); padding: 0.4rem 0.75rem; border-radius: 4px; text-transform: uppercase; transition: color 0.2s; }
+.nav-links a:hover, .nav-links a.active { color: var(--text); }
+.nav-search { flex: 1; max-width: 400px; margin-left: auto; position: relative; }
+.nav-search input { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 0.45rem 1rem; border-radius: 4px; outline: none; font-size: 0.75rem; }
 
-.nav-logo {
-  font-family: 'Cinzel', serif;
-  font-size: 1.3rem;
-  font-weight: 900;
-  color: var(--text);
-  letter-spacing: 0.06em;
-  flex-shrink: 0;
-}
+/* ── MAIN CONTENT OVERVIEW ── */
+.home-main { padding: calc(var(--nav-h) + 2rem) 2rem 2rem 2rem; max-width: 1600px; margin: 0 auto; }
 
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 0.2rem;
-  list-style: none;
-}
+.section-title { font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+.more-link { font-size: 0.65rem; font-family: 'Inter', sans-serif; color: var(--text3); letter-spacing: 0.05em; transition: color 0.2s; }
+.more-link:hover { color: var(--text); }
 
-.nav-links a {
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  color: var(--text3);
-  padding: 0.4rem 0.75rem;
-  border-radius: 4px;
-  transition: color 0.2s, background 0.2s;
-  text-transform: uppercase;
-}
-
-.nav-links a:hover { color: var(--text); background: var(--bg3); }
-.nav-links a.active { color: var(--text); }
-
-.nav-search {
-  flex: 1;
-  max-width: 520px;
-  margin-left: auto;
-  position: relative;
-}
-
-.nav-search input {
-  width: 100%;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.78rem;
-  padding: 0.45rem 0.9rem 0.45rem 2.2rem;
-  border-radius: 4px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.nav-search input:focus { border-color: var(--border2); }
-.nav-search input::placeholder { color: var(--text3); }
-
-.nav-search svg {
-  position: absolute;
-  left: 0.65rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 13px; height: 13px;
-  stroke: var(--text3);
-  fill: none;
-  pointer-events: none;
-}
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex-shrink: 0;
-}
-
-.btn-settings {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px; height: 32px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text3);
-  cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
-}
-.btn-settings:hover { color: var(--text); border-color: var(--border2); }
-
-.btn-login {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--bg);
-  background: var(--text);
-  border: none;
-  padding: 0.42rem 1rem;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.btn-login:hover { opacity: 0.85; }
-
-/* ── HERO ── */
-.hero {
-  position: relative;
-  width: 100%;
-  height: 520px;
-  margin-top: var(--nav-h);
-  overflow: hidden;
-  background: var(--bg2);
-}
-
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center top;
-  filter: brightness(0.35) grayscale(0.4);
-  transition: opacity 0.8s ease;
-}
-
-.hero-gradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to right, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.2) 70%, transparent),
-              linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 40%);
-}
-
-.hero-content {
-  position: relative;
-  z-index: 2;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 0 3.5rem 3rem;
-  max-width: 600px;
-}
-
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.58rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 0.8rem;
-}
-
-.hero-badge span {
-  display: inline-block;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: #fff;
-  opacity: 0.4;
-}
-
-.hero-title {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-  font-weight: 700;
-  line-height: 1.15;
-  margin-bottom: 0.8rem;
-  letter-spacing: 0.02em;
-}
-
-.hero-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 0.9rem;
-}
-
-.hero-meta span {
-  font-size: 0.7rem;
-  color: var(--text3);
-  letter-spacing: 0.04em;
-}
-
-.hero-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text3); }
-
-.hero-desc {
-  font-size: 0.82rem;
-  font-weight: 300;
-  color: var(--text2);
-  line-height: 1.7;
-  margin-bottom: 1.6rem;
-  max-width: 440px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.hero-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.btn-watch {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #000;
-  background: #fff;
-  border: none;
-  padding: 0.7rem 1.6rem;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.btn-watch:hover { opacity: 0.88; }
-
-.btn-watch svg { width: 12px; height: 12px; fill: #000; }
-
-.btn-bookmark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px; height: 38px;
-  border: 1px solid var(--border2);
-  background: transparent;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-}
-
-.btn-bookmark:hover { border-color: #555; background: var(--bg3); }
-.btn-bookmark svg { width: 14px; height: 14px; stroke: var(--text2); fill: none; }
-
-/* Hero dots */
-.hero-dots {
-  position: absolute;
-  bottom: 1.4rem;
-  right: 2.5rem;
-  display: flex;
-  gap: 6px;
-  z-index: 3;
-}
-
-.hero-dot {
-  width: 20px; height: 2px;
-  background: var(--border2);
-  cursor: pointer;
-  transition: background 0.2s, width 0.2s;
-}
-
-.hero-dot.active { background: #fff; width: 32px; }
-
-/* ── MAIN CONTENT ── */
-main {
-  padding: 2.5rem 2.5rem 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-/* Section header */
-.section-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 1.2rem;
-  padding-bottom: 0.7rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.section-title {
-  font-family: 'Cinzel', serif;
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text);
-}
-
-.section-link {
-  font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text3);
-  transition: color 0.2s;
-}
-
-.section-link:hover { color: var(--text2); }
-
-/* Filter tabs */
-.filter-tabs {
-  display: flex;
-  gap: 0.3rem;
-  margin-bottom: 1.4rem;
-  flex-wrap: wrap;
-}
-
-.tab {
-  font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text3);
-  padding: 0.3rem 0.8rem;
-  border: 1px solid var(--border);
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-  border-radius: 2px;
-}
-
-.tab:hover { color: var(--text2); border-color: var(--border2); }
-.tab.active { color: var(--text); border-color: var(--border2); background: var(--bg3); }
-
-/* Anime grid */
+/* ── GRID SYSTEM (Balanced 7 Top, 7 Bottom via 14 Items) ── */
 .anime-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
-}
-
-.anime-card {
-  position: relative;
-  cursor: pointer;
-  group: true;
-}
-
-.anime-card:hover .card-img { filter: brightness(0.7); }
-.anime-card:hover .card-overlay { opacity: 1; }
-
-.card-thumb {
-  position: relative;
-  aspect-ratio: 2/3;
-  overflow: hidden;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  margin-bottom: 0.55rem;
-}
-
-.card-img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: filter 0.25s;
-  background: var(--bg3);
-}
-
-.card-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.25s;
-}
-
-.card-play {
-  width: 36px; height: 36px;
-  border: 1.5px solid #fff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.card-play svg { width: 12px; height: 12px; fill: #fff; margin-left: 2px; }
-
-.card-ep {
-  position: absolute;
-  bottom: 0.4rem;
-  left: 0.4rem;
-  font-size: 0.58rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  background: rgba(0,0,0,0.75);
-  color: #ccc;
-  padding: 0.18rem 0.45rem;
-  border-radius: 2px;
-}
-
-.card-sub {
-  position: absolute;
-  top: 0.4rem;
-  right: 0.4rem;
-  font-size: 0.55rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  background: #fff;
-  color: #000;
-  padding: 0.15rem 0.4rem;
-  border-radius: 2px;
-}
-
-.card-title {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text2);
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color 0.2s;
-}
-
-.anime-card:hover .card-title { color: var(--text); }
-
-.card-type {
-  font-size: 0.62rem;
-  color: var(--text3);
-  margin-top: 0.18rem;
-}
-
-/* Skeleton loader */
-.skeleton {
-  background: var(--bg3);
-  border-radius: 2px;
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0%   { opacity: 0.4; }
-  50%  { opacity: 0.7; }
-  100% { opacity: 0.4; }
-}
-
-.skel-thumb { aspect-ratio: 2/3; width: 100%; margin-bottom: 0.55rem; }
-.skel-title { height: 12px; width: 85%; }
-.skel-sub   { height: 10px; width: 50%; margin-top: 6px; }
-
-/* Section spacing */
-.section-block { margin-bottom: 3.5rem; }
-
-/* ── 4-COL SECTION ── */
-.four-col {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.6rem;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1.2rem;
   margin-bottom: 3.5rem;
 }
 
-/* List-style card (New Releases / Just Completed) */
-.list-card {
-  display: flex;
-  gap: 0.8rem;
-  align-items: flex-start;
-  padding: 0.7rem 0;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.list-card:last-child { border-bottom: none; }
-.list-card:hover .list-title { color: var(--text); }
+@media (max-width: 1400px) { .anime-grid { grid-template-columns: repeat(6, 1fr); } }
+@media (max-width: 1200px) { .anime-grid { grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 992px) { .anime-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 768px) { .anime-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 480px) { .anime-grid { grid-template-columns: repeat(2, 1fr); } }
 
-.list-thumb {
-  width: 48px;
-  height: 64px;
-  flex-shrink: 0;
-  object-fit: cover;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-}
+.card { cursor: pointer; }
+.card:hover .thumb img { transform: scale(1.04); filter: brightness(0.85); }
+.card:hover .title { color: var(--text); }
+.thumb { width: 100%; aspect-ratio: 11 / 16; background: var(--bg3); border: 1px solid var(--border); border-radius: 3px; overflow: hidden; position: relative; margin-bottom: 0.5rem; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s, filter 0.3s; }
+.ep-tag { position: absolute; bottom: 0.4rem; left: 0.4rem; background: rgba(0,0,0,0.8); padding: 0.2rem 0.4rem; font-size: 0.6rem; font-weight: 700; border-radius: 2px; }
+.title { font-size: 0.75rem; font-weight: 600; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
+.meta { font-size: 0.65rem; color: var(--text3); margin-top: 0.15rem; }
 
-.list-info { flex: 1; min-width: 0; }
+/* ── A-Z ALPHABET COMPONENT ── */
+.az-container { background: var(--bg2); border: 1px solid var(--border); padding: 1.5rem; border-radius: 4px; margin-bottom: 3.5rem; }
+.az-list { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; margin-top: 1rem; }
+.az-list a { background: var(--bg3); border: 1px solid var(--border); padding: 0.4rem 0.75rem; font-size: 0.7rem; font-weight: 600; border-radius: 3px; color: var(--text2); transition: all 0.2s; }
+.az-list a:hover { color: var(--bg); background: var(--text); border-color: var(--text); }
 
-.list-title {
-  font-size: 0.74rem;
-  font-weight: 500;
-  color: var(--text2);
-  line-height: 1.35;
-  margin-bottom: 0.3rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  transition: color 0.2s;
-}
+/* ── 4 COLUMN METRICS SECTIONS ── */
+.columns-wrapper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 4rem; }
+@media (max-width: 1200px) { .columns-wrapper { grid-template-columns: repeat(2, 1fr); gap: 2rem; } }
+@media (max-width: 600px) { .columns-wrapper { grid-template-columns: 1fr; } }
 
-.list-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-}
+.metric-col { display: flex; flex-direction: column; }
+.metric-list { display: flex; flex-direction: column; gap: 0.8rem; }
+.metric-row { display: flex; gap: 0.8rem; align-items: center; cursor: pointer; border-bottom: 1px solid transparent; padding-bottom: 0.4rem; }
+.metric-row:hover .m-title { color: var(--text); }
+.m-img { width: 45px; height: 60px; background: var(--bg3); object-fit: cover; border: 1px solid var(--border); border-radius: 2px; }
+.m-info { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.m-title { font-size: 0.75rem; font-weight: 600; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
+.m-meta { font-size: 0.65rem; color: var(--text3); }
 
-.list-tag {
-  font-size: 0.55rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 0.12rem 0.4rem;
-  border-radius: 2px;
-  background: var(--bg3);
-  color: var(--text3);
-  border: 1px solid var(--border);
-}
+.fallback-txt { font-size: 0.75rem; color: var(--text3); padding: 1rem 0; }
 
-.list-ep {
-  font-size: 0.6rem;
-  color: var(--text3);
-}
-
-/* Most Viewed ranked list */
-.rank-card {
-  display: flex;
-  gap: 0.8rem;
-  align-items: center;
-  padding: 0.65rem 0;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-}
-.rank-card:last-child { border-bottom: none; }
-.rank-card:hover .rank-title { color: var(--text); }
-
-.rank-num {
-  font-family: 'Cinzel', serif;
-  font-size: 1.1rem;
-  font-weight: 900;
-  color: var(--border2);
-  width: 20px;
-  flex-shrink: 0;
-  text-align: center;
-}
-.rank-card:nth-child(1) .rank-num { color: #fff; }
-.rank-card:nth-child(2) .rank-num { color: #aaa; }
-.rank-card:nth-child(3) .rank-num { color: #e8a020; }
-
-.rank-thumb {
-  width: 44px;
-  height: 58px;
-  flex-shrink: 0;
-  object-fit: cover;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-}
-
-.rank-info { flex: 1; min-width: 0; }
-
-.rank-title {
-  font-size: 0.72rem;
-  font-weight: 500;
-  color: var(--text2);
-  margin-bottom: 0.25rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color 0.2s;
-}
-
-.rank-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.rank-ep { font-size: 0.58rem; color: var(--text3); }
-.rank-type { font-size: 0.55rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: .1rem .35rem; background: var(--bg3); color: var(--text3); border: 1px solid var(--border); border-radius: 2px; }
-
-/* Most Viewed time tabs */
-.mv-tabs {
-  display: flex;
-  gap: 0.6rem;
-  align-items: center;
-}
-.mv-tab {
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: var(--text3);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  transition: color 0.2s;
-}
-.mv-tab.active { color: var(--text); }
-.mv-tab:hover { color: var(--text2); }
-
-/* ── A–Z BROWSER ── */
-.az-section {
-  margin-bottom: 3.5rem;
-}
-
-.az-label {
-  font-size: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text3);
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.az-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  justify-content: center;
-}
-
-.az-btn {
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text3);
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  padding: 0.42rem 0.6rem;
-  min-width: 32px;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 2px;
-  transition: all 0.2s;
-}
-.az-btn:hover { color: var(--text); border-color: var(--border2); }
-.az-btn.active { color: #000; background: #fff; border-color: #fff; }
-
-/* Genres row */
-.genres-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 0.6rem;
-}
-
-.genre-pill {
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text3);
-  border: 1px solid var(--border);
-  padding: 0.55rem 0.8rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  border-radius: 2px;
-}
-
-.genre-pill:hover { color: var(--text); border-color: var(--border2); background: var(--bg3); }
-
-/* Loading state */
-.loading-msg {
-  text-align: center;
-  color: var(--text3);
-  font-size: 0.75rem;
-  padding: 3rem 0;
-  letter-spacing: 0.05em;
-}
-
-/* Error state */
-.error-msg {
-  text-align: center;
-  color: var(--text3);
-  font-size: 0.75rem;
-  padding: 2rem 0;
-}
-
-/* Scroll reveal */
-.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.5s, transform 0.5s; }
-.reveal.visible { opacity: 1; transform: translateY(0); }
+/* ── FOOTER ── */
+footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; justify-content: space-between; align-items: center; margin-top: 4rem; }
+.foot-l, .foot-r { font-size: 0.68rem; color: #fff; letter-spacing: 0.04em; }
+.foot-l a { text-decoration: underline; color: #fff; font-weight: 500; }
 </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav>
-  <a href="anize-splash.html" class="nav-logo">AniZe</a>
-
+  <div class="nav-logo">ANIZE</div>
   <ul class="nav-links">
     <li><a href="anize-home.html" class="active">Home</a></li>
-    <li><a href="anize-browse.html">New</a></li>
+    <li><a href="anize-browse.html">Browse</a></li>
     <li><a href="anize-ongoing.html">Ongoing</a></li>
-    <li><a href="#" onclick="openSchedule(event)">Schedule</a></li>
+    <li><a href="anize-schedule.html">Schedule</a></li>
   </ul>
-
   <div class="nav-search">
-    <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-    </svg>
-    <input type="text" id="searchInput" placeholder="Search anime..." autocomplete="off"/>
-  </div>
-
-  <div class="nav-right">
-    <button class="btn-login">Login</button>
+    <input type="text" id="navSearch" placeholder="Quick search anime...">
   </div>
 </nav>
 
-<!-- HERO -->
-<div class="hero" id="hero">
-  <div class="hero-bg" id="heroBg"></div>
-  <div class="hero-gradient"></div>
-  <div class="hero-content" id="heroContent">
-    <div class="hero-badge"><span></span> Featured</div>
-    <h1 class="hero-title" id="heroTitle">Loading...</h1>
-    <div class="hero-meta" id="heroMeta"></div>
-    <p class="hero-desc" id="heroDesc"></p>
-    <div class="hero-actions">
-      <button class="btn-watch" id="heroBtn">
-        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-        Watch Now
-      </button>
-      <button class="btn-bookmark">
-        <svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-        </svg>
-      </button>
+<main class="home-main">
+  <!-- POPULAR THIS SEASON GRID (14 Items for 7x7 Balance) -->
+  <section id="trendingSection">
+    <h2 class="section-title">Popular This Season <a href="anize-ongoing.html" class="more-link">More →</a></h2>
+    <div class="anime-grid" id="trendingGrid"></div>
+  </section>
+
+  <!-- DYNAMIC A-Z SEARCH MODULE -->
+  <section class="az-container">
+    <h2 class="section-title" style="margin-bottom:0.5rem;">Browse Alphabetically</h2>
+    <p style="font-size:0.7rem; color:var(--text3);">Filter popular curated anime series by indexing initial tags.</p>
+    <ul class="az-list" id="azList"></ul>
+  </section>
+
+  <!-- FOUR COLUMN METRICS STABILIZER -->
+  <section class="columns-wrapper">
+    <div class="metric-col">
+      <h3 class="section-title">Most Favourite</h3>
+      <div class="metric-list" id="colFav"><p class="fallback-txt">Loading records...</p></div>
     </div>
-  </div>
-  <div class="hero-dots" id="heroDots"></div>
-</div>
-
-<!-- MAIN -->
-<main>
-
-  <!-- Popular This Season -->
-  <div class="section-block reveal" id="popularBlock">
-    <div class="section-header">
-      <span class="section-title">Popular This Season</span>
-      <a href="#" class="section-link">View all →</a>
+    <div class="metric-col">
+      <h3 class="section-title">Most Completed</h3>
+      <div class="metric-list" id="colComp"><p class="fallback-txt">Loading records...</p></div>
     </div>
-    <div class="filter-tabs">
-      <button class="tab active" onclick="filterTab(this,'all')">All</button>
-      <button class="tab" onclick="filterTab(this,'sub')">Sub</button>
-      <button class="tab" onclick="filterTab(this,'dub')">Dub</button>
+    <div class="metric-col">
+      <h3 class="section-title">Most Viewed</h3>
+      <div class="metric-list" id="colView"><p class="fallback-txt">Loading records...</p></div>
     </div>
-    <div class="anime-grid" id="popularGrid"></div>
-  </div>
-
-  <!-- 4-Column: Most Favourite | Most Completed | Most Viewed | New Releases -->
-  <div class="four-col reveal">
-
-    <!-- Most Favourite -->
-    <div>
-      <div class="section-header" style="margin-bottom:0.8rem">
-        <span class="section-title">Most Favourite</span>
-        <a href="#" class="section-link">More →</a>
-      </div>
-      <div id="favListCol"></div>
+    <div class="metric-col">
+      <h3 class="section-title">New Releases</h3>
+      <div class="metric-list" id="colNew"><p class="fallback-txt">Loading records...</p></div>
     </div>
-
-    <!-- Most Completed -->
-    <div>
-      <div class="section-header" style="margin-bottom:0.8rem">
-        <span class="section-title">Most Completed</span>
-        <a href="#" class="section-link">More →</a>
-      </div>
-      <div id="completedList"></div>
-    </div>
-
-    <!-- Most Viewed -->
-    <div>
-      <div class="section-header" style="margin-bottom:0.8rem">
-        <span class="section-title">Most Viewed</span>
-        <a href="#" class="section-link">More →</a>
-      </div>
-      <div id="mostViewedList"></div>
-    </div>
-
-    <!-- New Releases -->
-    <div>
-      <div class="section-header" style="margin-bottom:0.8rem">
-        <span class="section-title">New Releases</span>
-        <a href="#" class="section-link">More →</a>
-      </div>
-      <div id="newReleasesList"></div>
-    </div>
-
-  </div>
-
-  <!-- A–Z Browser -->
-  <div class="az-section reveal">
-    <p class="az-label">Searching anime order by alphabet name A to Z</p>
-    <div class="az-grid" id="azGrid"></div>
-  </div>
-
-  <!-- Genres -->
-  <div class="section-block reveal">
-    <div class="section-header">
-      <span class="section-title">Browse by Genre</span>
-    </div>
-    <div class="genres-grid" id="genresGrid"></div>
-  </div>
-
+  </section>
 </main>
 
-<script>
-const GENRES = ['Action','Adventure','Comedy','Drama','Fantasy','Horror','Isekai','Mecha','Mystery','Romance','Sci-Fi','Slice of Life','Sports','Supernatural','Thriller'];
-const GENRE_IDS = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41};
-const AZ = ['All','0-9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-
-let HERO_ANIME = [];
-let heroIdx = 0, heroInterval;
-
-/* ── SKELETONS ── */
-function renderSkeletons(id, count) {
-  document.getElementById(id).innerHTML = Array(count).fill(0).map(() => `
-    <div class="anime-card">
-      <div class="card-thumb skeleton skel-thumb"></div>
-      <div class="skeleton skel-title"></div>
-      <div class="skeleton skel-sub"></div>
-    </div>`).join('');
-}
-
-function renderListSkeletons(id, count) {
-  document.getElementById(id).innerHTML = Array(count).fill(0).map(() => `
-    <div class="list-card">
-      <div class="skeleton" style="width:48px;height:64px;flex-shrink:0"></div>
-      <div style="flex:1">
-        <div class="skeleton" style="height:10px;width:90%;margin-bottom:6px"></div>
-        <div class="skeleton" style="height:8px;width:50%"></div>
-      </div>
-    </div>`).join('');
-}
-
-/* ── CARD BUILDERS ── */
-function animeCard(a) {
-  const img   = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
-  const title = a.title || 'Unknown';
-  const eps   = a.episodes ? `EP ${a.episodes}` : 'Ongoing';
-  const type  = a.type || 'TV';
-  return `
-    <div class="anime-card" title="${title}" onclick="window.location.href='anize-player.html?id=${a.mal_id}'">
-      <div class="card-thumb">
-        <img class="card-img" src="${img}" alt="${title}" loading="lazy" onerror="this.style.opacity='0'">
-        <div class="card-ep">${eps}</div>
-        <div class="card-sub">SUB</div>
-        <div class="card-overlay"><div class="card-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
-      </div>
-      <div class="card-title">${title}</div>
-      <div class="card-type">${type}</div>
-    </div>`;
-}
-
-function listCard(a) {
-  const img   = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
-  const title = a.title || 'Unknown';
-  const type  = a.type || 'TV';
-  const eps   = a.episodes ? `${a.episodes} eps` : 'Ongoing';
-  return `
-    <div class="list-card" onclick="window.location.href='anize-player.html?id=${a.mal_id}'">
-      <img class="list-thumb" src="${img}" alt="${title}" loading="lazy" onerror="this.style.opacity='0'">
-      <div class="list-info">
-        <div class="list-title">${title}</div>
-        <div class="list-meta">
-          <span class="list-tag">${type}</span>
-          <span class="list-ep">${eps}</span>
-        </div>
-      </div>
-    </div>`;
-}
-
-/* ── FETCHERS ── */
-async function fetchGrid(url, id, limit=12) {
-  try {
-    const r = await fetch(url);
-    const d = await r.json();
-    const list = (d.data || []).slice(0, limit);
-    document.getElementById(id).innerHTML = list.length ? list.map(animeCard).join('') : '<p class="error-msg">Nothing to show.</p>';
-  } catch { document.getElementById(id).innerHTML = '<p class="error-msg">Couldn\'t load — check your connection.</p>'; }
-}
-
-async function fetchList(url, id, limit=6) {
-  try {
-    const r = await fetch(url);
-    const d = await r.json();
-    const list = (d.data || []).slice(0, limit);
-    document.getElementById(id).innerHTML = list.length ? list.map(listCard).join('') : '<p class="error-msg">Nothing to show.</p>';
-  } catch { document.getElementById(id).innerHTML = '<p class="error-msg">Couldn\'t load.</p>'; }
-}
-
-/* ── HERO — fetches real top airing anime ── */
-async function loadHero() {
-  try {
-    const r = await fetch('https://api.jikan.moe/v4/top/anime?filter=airing&limit=5&sfw=true');
-    const d = await r.json();
-    HERO_ANIME = (d.data || []).map(a => ({
-      mal_id: a.mal_id,
-      title: a.title,
-      score: a.score || '?',
-      type: a.type || 'TV',
-      episodes: a.episodes,
-      synopsis: a.synopsis?.slice(0,160) + '...' || '',
-      image: a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || ''
-    }));
-    if (HERO_ANIME.length) {
-      buildHeroDots();
-      setHero(HERO_ANIME[0]);
-      heroInterval = setInterval(nextHero, 6000);
-    }
-  } catch {}
-}
-
-function setHero(a) {
-  document.getElementById('heroBg').style.backgroundImage = `url('${a.image}')`;
-  document.getElementById('heroTitle').textContent = a.title;
-  document.getElementById('heroDesc').textContent = a.synopsis;
-  document.getElementById('heroMeta').innerHTML = `
-    <span>${a.type}</span><span class="dot"></span>
-    <span>${a.episodes ? a.episodes + ' eps' : 'Ongoing'}</span><span class="dot"></span>
-    <span>★ ${a.score}</span>`;
-  document.getElementById('heroBtn').onclick = () => window.location.href = `anize-player.html?id=${a.mal_id}`;
-  document.querySelectorAll('.hero-dot').forEach((d,i) => d.classList.toggle('active', i===heroIdx));
-}
-function buildHeroDots() {
-  document.getElementById('heroDots').innerHTML = HERO_ANIME.map((_,i) =>
-    `<div class="hero-dot${i===0?' active':''}" onclick="jumpHero(${i})"></div>`).join('');
-}
-function jumpHero(i) { heroIdx=i; setHero(HERO_ANIME[i]); clearInterval(heroInterval); heroInterval=setInterval(nextHero,6000); }
-function nextHero() { heroIdx=(heroIdx+1)%HERO_ANIME.length; setHero(HERO_ANIME[heroIdx]); }
-
-/* ── UI ── */
-function filterTab(btn, type) {
-  document.querySelectorAll('.filter-tabs .tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-function buildAZ() {
-  document.getElementById('azGrid').innerHTML = AZ.map((l,i) =>
-    `<button class="az-btn${i===0?' active':''}" onclick="azClick(this,'${l}')">${l}</button>`).join('');
-}
-
-function azClick(btn, letter) {
-  document.querySelectorAll('.az-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  if (letter === 'All') {
-    window.location.href = 'anize-browse.html';
-  } else if (letter === '0-9') {
-    window.location.href = 'anize-browse.html?q=0';
-  } else {
-    window.location.href = `anize-browse.html?q=${letter}`;
-  }
-}
-
-function buildGenres() {
-  document.getElementById('genresGrid').innerHTML = GENRES.map(g =>
-    `<div class="genre-pill" onclick="window.location.href='anize-browse.html?genre=${GENRE_IDS[g]}&genreName=${encodeURIComponent(g)}'">${g}</div>`).join('');
-}
-
-function initReveal() {
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.05 });
-  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-}
-
-/* ── INIT ── */
-async function init() {
-  buildGenres();
-  buildAZ();
-  initReveal();
-
-  renderSkeletons('popularGrid', 12);
-  renderListSkeletons('favListCol', 6);
-  renderListSkeletons('completedList', 6);
-  renderListSkeletons('mostViewedList', 6);
-  renderListSkeletons('newReleasesList', 6);
-
-  await Promise.all([
-    loadHero(),
-    fetchGrid('https://api.jikan.moe/v4/seasons/now?limit=12&sfw=true', 'popularGrid'),
-    fetchList('https://api.jikan.moe/v4/top/anime?filter=favorite&limit=6&sfw=true', 'favListCol'),
-    fetchList('https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=6&sfw=true', 'completedList'),
-    fetchList('https://api.jikan.moe/v4/top/anime?filter=airing&limit=6&sfw=true', 'mostViewedList'),
-    fetchList('https://api.jikan.moe/v4/seasons/upcoming?limit=6&sfw=true', 'newReleasesList'),
-  ]);
-}
-
-document.addEventListener('DOMContentLoaded', init);
-
-document.getElementById('searchInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    const q = e.target.value.trim();
-    if (q) window.location.href = `anize-browse.html?q=${encodeURIComponent(q)}`;
-  }
-});
-</script>
-<!-- FOOTER -->
-<footer style="border-top:1px solid #1c1c1c;padding:1.4rem 2.5rem;display:flex;align-items:center;justify-content:space-between;background:#0a0a0a;">
-  <div style="display:flex;flex-direction:column;gap:0.3rem">
-    <span style="font-size:0.68rem;font-weight:500;letter-spacing:0.06em;color:#fff">Made by <span style="color:#fff;font-weight:700">Team Re:start</span></span>
-    <a href="https://discord.gg/YyQ6qZ2nf5" target="_blank" style="font-size:0.64rem;color:#ccc;letter-spacing:0.04em;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#666'">discord.gg/YyQ6qZ2nf5</a>
-  </div>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem">
-    <span style="font-size:0.68rem;color:#fff;letter-spacing:0.04em">© 2026 AniZe. All rights reserved.</span>
-    <span style="font-size:0.6rem;color:#aaa;letter-spacing:0.03em">AniZe does not store any files on its server. All contents are provided by non-affiliated third parties.</span>
-  </div>
+<footer>
+  <div class="foot-l">Made by Team Re:start • <a href="https://discord.gg/YyQ6qZ2nf5" target="_blank">Discord</a></div>
+  <div class="foot-r">© 2026 AniZe. All rights reserved. <span style="color:var(--text3)">Disclaimer: Operational metadata cache indices.</span></div>
 </footer>
 
-<!-- SCHEDULE SLIDE-OVER -->
-<div id="scheduleOverlay" onclick="closeSchedule()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;opacity:0;transition:opacity 0.3s"></div>
-
-<div id="schedulePanel" style="display:none;position:fixed;left:0;top:0;bottom:0;width:320px;background:#0a0a0a;border-right:1px solid #1c1c1c;z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;flex-direction:column">
-
-  <!-- Panel Header -->
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid #1c1c1c;flex-shrink:0">
-    <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;letter-spacing:0.06em">AniZe</span>
-    <button onclick="closeSchedule()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.2rem;padding:0.2rem">✕</button>
-  </div>
-
-  <!-- Tabs -->
-  <div style="display:flex;border-bottom:1px solid #1c1c1c;flex-shrink:0">
-    <button class="sp-tab active" id="spt-menu" onclick="spTab('menu')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:none;border:none;border-bottom:2px solid #fff;cursor:pointer">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      Menu
-    </button>
-    <button class="sp-tab" id="spt-genre" onclick="spTab('genre')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Genre
-    </button>
-    <button class="sp-tab" id="spt-schedule" onclick="spTab('schedule')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Schedule
-    </button>
-  </div>
-
-  <!-- Menu Panel -->
-  <div id="sp-menu" style="padding:1rem 1.4rem;display:flex;flex-direction:column">
-    <div onclick="window.location.href='anize-browse.html?type=movie';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">Movies <span style="color:#444">›</span></div>
-    <div onclick="window.location.href='anize-browse.html?type=tv';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">TV Series <span style="color:#444">›</span></div>
-    <div onclick="window.location.href='anize-browse.html?type=ova';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">OVAs <span style="color:#444">›</span></div>
-    <div onclick="window.location.href='anize-browse.html?type=ona';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">ONAs <span style="color:#444">›</span></div>
-    <div onclick="window.location.href='anize-browse.html?type=special';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">Specials <span style="color:#444">›</span></div>
-    <div style="padding:1rem 0 0.4rem;font-size:0.58rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#444">Quick Navigation</div>
-    <div onclick="window.location.href='anize-home.html';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">Home</div>
-    <div onclick="window.location.href='anize-browse.html';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">New Releases</div>
-    <div onclick="window.location.href='anize-ongoing.html';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">Ongoing</div>
-    <div onclick="window.location.href='anize-browse.html?sort=popularity';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">Popular</div>
-    <div onclick="window.location.href='anize-browse.html?sort=score';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer">Top Rated</div>
-  </div>
-
-  <!-- Genre Panel -->
-  <div id="sp-genre" style="display:none;padding:0.8rem 1.2rem;display:none;flex-wrap:wrap">
-    <div style="display:grid;grid-template-columns:1fr 1fr;width:100%" id="spGenreList"></div>
-  </div>
-
-  <!-- Schedule Panel -->
-  <div id="sp-schedule" style="display:none;flex-direction:column">
-    <div style="padding:0.8rem 1.2rem;border-bottom:1px solid #1c1c1c;display:flex;justify-content:space-between">
-      <span id="spClock" style="font-size:0.68rem;color:#555"></span>
-      <span id="spTz" style="font-size:0.62rem;color:#555"></span>
-    </div>
-    <div id="spScheduleList"></div>
-  </div>
-
-</div>
-
 <script>
-function openSchedule(e) {
-  if(e) e.preventDefault();
-  const overlay = document.getElementById('scheduleOverlay');
-  const panel   = document.getElementById('schedulePanel');
-  overlay.style.display = 'block';
-  panel.style.display = 'flex';
-  panel.style.flexDirection = 'column';
-  requestAnimationFrame(() => {
-    overlay.style.opacity = '1';
-    panel.style.transform = 'translateX(0)';
-  });
-  loadSpSchedule();
-  startSpClock();
-  loadSpGenres();
+// Exclude NSFW, Hentai, Ecchi, Harem, BL, GL, Reverse Harem
+const EXCLUDE_GENRES = "9,12,26,28,35,73"; 
+const DELAY = (ms) => new Promise(res => setTimeout(res, ms));
+
+// Render A-Z row. Now passes sorting logic to browse page to filter out music videos
+function initAZ() {
+  const container = document.getElementById('azList');
+  const letters = ['All', '0-9', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')];
+  container.innerHTML = letters.map(l => {
+    let letterVal = l === 'All' ? '' : l;
+    // Forces browse page to rank by popularity and ignore raw musical tracking files
+    let queryUrl = `anize-browse.html?letter=${encodeURIComponent(letterVal)}&order_by=popularity&type=tv`;
+    return `<li><a href="${queryUrl}">${l}</a></li>`;
+  }).join('');
 }
 
-function closeSchedule() {
-  const overlay = document.getElementById('scheduleOverlay');
-  const panel   = document.getElementById('schedulePanel');
-  overlay.style.opacity = '0';
-  panel.style.transform = 'translateX(-100%)';
-  setTimeout(() => { overlay.style.display='none'; panel.style.display='none'; }, 300);
-}
-
-function spTab(name) {
-  ['menu','genre','schedule'].forEach(t => {
-    const btn = document.getElementById('spt-'+t);
-    const panel = document.getElementById('sp-'+t);
-    const isActive = t === name;
-    btn.style.color = isActive ? '#fff' : '#555';
-    btn.style.borderBottomColor = isActive ? '#fff' : 'transparent';
-    panel.style.display = isActive ? (t === 'schedule' ? 'flex' : t === 'genre' ? 'block' : 'flex') : 'none';
-    if(t === 'genre') panel.style.flexDirection = '';
-  });
-}
-
-function loadSpGenres() {
-  const GENRE_IDS_SP = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41};
-  const genres = Object.keys(GENRE_IDS_SP);
-  document.getElementById('spGenreList').innerHTML = genres.map(g =>
-    `<div onclick="window.location.href='anize-browse.html?genre=${GENRE_IDS_SP[g]}';closeSchedule()" style="padding:0.5rem 0.4rem;font-size:0.75rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c;display:flex;align-items:center;gap:0.4rem"><span style="color:#333">•</span>${g}</div>`
-  ).join('');
-}
-
-const DAYS_SP = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-const DAYS_SHORT_SP = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-let spClockTimer;
-
-function startSpClock() {
-  clearInterval(spClockTimer);
-  function tick() {
-    const now = new Date();
-    const h12 = now.getHours() % 12 || 12;
-    const m   = now.getMinutes().toString().padStart(2,'0');
-    const ap  = now.getHours() >= 12 ? 'p.m.' : 'a.m.';
-    const off = -now.getTimezoneOffset()/60;
-    document.getElementById('spClock').textContent = `${h12}:${m} ${ap}`;
-    document.getElementById('spTz').textContent    = `GMT ${off >= 0 ? '+' : ''}${off}:00`;
+// Render Skeletons for 14-item grids
+function renderSkelGrid(targetId, count) {
+  const target = document.getElementById(targetId);
+  if (target) {
+    target.innerHTML = Array(count).fill(0).map(() => `
+      <div class="card">
+        <div class="thumb" style="background:#111;"></div>
+        <div style="height:12px; background:#111; width:80%; margin-bottom:4px;"></div>
+        <div style="height:10px; background:#111; width:40%;"></div>
+      </div>
+    `).join('');
   }
-  tick();
-  spClockTimer = setInterval(tick, 1000);
 }
 
-async function loadSpSchedule() {
-  const el = document.getElementById('spScheduleList');
-  el.innerHTML = '<p style="padding:1rem 1.4rem;font-size:0.72rem;color:#444">Loading...</p>';
-  const today = new Date();
-  const todayIdx = today.getDay();
-  let html = '';
+// Fetch Popular This Season (Requesting 14 items exactly)
+async function loadTrendingGrid() {
+  renderSkelGrid('trendingGrid', 14);
   try {
-    for (let offset = 0; offset < 4; offset++) {
-      const idx = (todayIdx + offset) % 7;
-      const dateObj = new Date(today);
-      dateObj.setDate(today.getDate() + offset);
-      const isToday = offset === 0;
-      const dayNum = dateObj.getDate();
-      const monthStr = dateObj.toLocaleString('en',{month:'short'}).toUpperCase();
-      const r = await fetch(`https://api.jikan.moe/v4/schedules?filter=${DAYS_SP[idx].toLowerCase()}&limit=10&sfw=true`);
-      const d = await r.json();
-      const items = d.data || [];
-      html += `
-        <div style="padding:0.8rem 1.2rem 0.3rem">
-          <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.6rem">
-            <div style="width:36px;height:42px;${isToday?'background:#fff;':'background:#111;border:1px solid #1c1c1c;'}border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
-              <span style="font-size:0.95rem;font-weight:700;color:${isToday?'#000':'#fff'};line-height:1">${dayNum}</span>
-              <span style="font-size:0.5rem;font-weight:600;letter-spacing:0.1em;color:${isToday?'#555':'#444'};margin-top:1px">${monthStr}</span>
-            </div>
-            <div>
-              <div style="font-size:0.85rem;font-weight:600;color:#fff;text-transform:uppercase;letter-spacing:0.06em">${DAYS_SHORT_SP[idx]}</div>
-              ${isToday?'<div style="font-size:0.6rem;color:#444;letter-spacing:0.08em;text-transform:uppercase">Today</div>':''}
+    const res = await fetch(`https://api.jikan.moe/v4/seasons/now?limit=14&sfw=true&genres_exclude=${EXCLUDE_GENRES}`);
+    const json = await res.json();
+    const data = json.data || [];
+    
+    document.getElementById('trendingGrid').innerHTML = data.map(a => {
+      const title = a.title_english || a.title;
+      return `
+        <div class="card" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
+          <div class="thumb">
+            <img src="${a.images?.jpg?.large_image_url || a.images?.jpg?.image_url}" alt="" loading="lazy">
+            <div class="ep-tag">${a.episodes ? `EP ${a.episodes}` : 'Airing'}</div>
+          </div>
+          <div class="title">${title}</div>
+          <div class="meta">${a.type || 'TV'} • ${a.status === 'Currently Airing' ? 'Ongoing' : 'Finished'}</div>
+        </div>
+      `;
+    }).join('');
+  } catch {
+    document.getElementById('trendingGrid').innerHTML = '<p class="fallback-txt">Failed to sync seasonal index records.</p>';
+  }
+}
+
+// Fetch helper with retry logic for columns to survive Jikan rate limits
+async function fetchWithRetry(url, retries = 2, delayMs = 600) {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const res = await fetch(url);
+      if (res.status === 429) { // Rate limited, wait and try again
+        await DELAY(delayMs * (i + 1));
+        continue;
+      }
+      if (!res.ok) throw new Error("Fetch failed status");
+      const json = await res.json();
+      if (json && json.data) return json.data;
+    } catch (err) {
+      if (i === retries) throw err;
+      await DELAY(delayMs);
+    }
+  }
+  return [];
+}
+
+// Securely space column fetches out with dynamic fallbacks so they always show content
+async function loadFourColumns() {
+  const configurations = [
+    { id: 'colFav', url: `https://api.jikan.moe/v4/anime?order_by=favorites&sort=desc&limit=5&sfw=true&genres_exclude=${EXCLUDE_GENRES}` },
+    { id: 'colComp', url: `https://api.jikan.moe/v4/anime?order_by=members&sort=desc&limit=5&sfw=true&genres_exclude=${EXCLUDE_GENRES}` },
+    { id: 'colView', url: `https://api.jikan.moe/v4/anime?order_by=score&sort=desc&limit=5&sfw=true&genres_exclude=${EXCLUDE_GENRES}` },
+    { id: 'colNew', url: `https://api.jikan.moe/v4/anime?status=airing&order_by=start_date&sort=desc&limit=5&sfw=true&genres_exclude=${EXCLUDE_GENRES}` }
+  ];
+
+  for (const col of configurations) {
+    try {
+      // Add heavy stagger delay between column fires
+      await DELAY(500);
+      const items = await fetchWithRetry(col.url);
+      
+      if (!items || items.length === 0) {
+        document.getElementById(col.id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>';
+        continue;
+      }
+
+      document.getElementById(col.id).innerHTML = items.map(a => {
+        const title = a.title_english || a.title;
+        return `
+          <div class="metric-row" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
+            <img class="m-img" src="${a.images?.jpg?.image_url}" alt="" loading="lazy">
+            <div class="m-info">
+              <div class="m-title">${title}</div>
+              <div class="m-meta">${a.type || 'TV'} • ${a.score ? `★ ${a.score.toFixed(1)}` : 'N/A'}</div>
             </div>
           </div>
-          ${items.slice(0,8).map(a => `
-            <div onclick="window.location.href='anize-player.html?id=${a.mal_id}'" style="display:flex;align-items:center;gap:0.7rem;padding:0.5rem 0.5rem;border-radius:3px;cursor:pointer;border-bottom:1px solid #111">
-              <span style="font-size:0.62rem;font-weight:600;color:#444;width:36px;flex-shrink:0">${a.broadcast?.time||'--:--'}</span>
-              <span style="font-size:0.76rem;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title}</span>
-            </div>`).join('')}
-          ${items.length===0?'<p style="font-size:0.68rem;color:#333;padding:0.4rem 0">No schedule data</p>':''}
-        </div>
-        <div style="height:1px;background:#1c1c1c;margin:0.4rem 1.2rem"></div>`;
+        `;
+      }).join('');
+    } catch {
+      document.getElementById(col.id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>';
     }
-    el.innerHTML = html;
-  } catch {
-    el.innerHTML = '<p style="padding:1rem 1.4rem;font-size:0.72rem;color:#444">Couldn\'t load schedule.</p>';
   }
 }
-</script>
 
+// Quick Search Nav Redirect Action
+document.getElementById('navSearch').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.value.trim().length > 0) {
+    window.location.href = `anize-browse.html?q=${encodeURIComponent(e.target.value.trim())}`;
+  }
+});
+
+// Run Init
+initAZ();
+loadTrendingGrid();
+loadFourColumns();
+</script>
 </body>
 </html>
