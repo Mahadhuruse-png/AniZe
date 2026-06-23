@@ -554,12 +554,30 @@ async function loadAnime(page=1) {
   const params = new URLSearchParams();
   params.set('page', page);
   params.set('limit', 24);
+  params.set('sfw', 'true');
+
+  // If no filters, show current season sorted by popularity
+  if (!currentFilters.q && !currentFilters.type && !currentFilters.status && !currentFilters.genre) {
+    try {
+      const r = await fetch(`https://api.jikan.moe/v4/seasons/now?page=${page}&limit=24&sfw=true`);
+      const d = await r.json();
+      const list = d.data || [];
+      totalPages = d.pagination?.last_visible_page || 1;
+      const total = d.pagination?.items?.total || list.length;
+      document.getElementById('animeCount').textContent = `${total.toLocaleString()} anime`;
+      document.getElementById('browseGrid').innerHTML = list.length
+        ? list.map(animeCard).join('')
+        : '<p class="no-results">No anime found.</p>';
+      buildPagination();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      document.getElementById('browseGrid').innerHTML = '<p class="no-results">Couldn\'t load.</p>';
+    }
+    return;
+  }
+
   params.set('order_by', currentFilters.sort || 'popularity');
   params.set('sort', 'desc');
-  params.set('sfw', 'true');
-  if (!currentFilters.q && !currentFilters.type && !currentFilters.status && !currentFilters.genre) {
-    params.set('start_date', '2015-01-01'); // default: show modern anime
-  }
   if (currentFilters.type)   params.set('type', currentFilters.type);
   if (currentFilters.status) params.set('status', currentFilters.status);
   if (currentFilters.genre)  params.set('genres', currentFilters.genre);
@@ -645,5 +663,174 @@ document.getElementById('filterSearch').addEventListener('keydown', e => {
 
 document.addEventListener('DOMContentLoaded', () => loadAnime(1));
 </script>
+<!-- SCHEDULE SLIDE-OVER -->
+<div id="scheduleOverlay" onclick="closeSchedule()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;opacity:0;transition:opacity 0.3s"></div>
+
+<div id="schedulePanel" style="display:none;position:fixed;left:0;top:0;bottom:0;width:320px;background:#0a0a0a;border-right:1px solid #1c1c1c;z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;flex-direction:column">
+
+  <!-- Panel Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;letter-spacing:0.06em">AniZe</span>
+    <button onclick="closeSchedule()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.2rem;padding:0.2rem">✕</button>
+  </div>
+
+  <!-- Tabs -->
+  <div style="display:flex;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <button class="sp-tab active" id="spt-menu" onclick="spTab('menu')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:none;border:none;border-bottom:2px solid #fff;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      Menu
+    </button>
+    <button class="sp-tab" id="spt-genre" onclick="spTab('genre')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Genre
+    </button>
+    <button class="sp-tab" id="spt-schedule" onclick="spTab('schedule')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Schedule
+    </button>
+  </div>
+
+  <!-- Menu Panel -->
+  <div id="sp-menu" style="padding:1rem 1.4rem;display:flex;flex-direction:column">
+    <div onclick="window.location.href='anize-browse.html?type=movie';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">Movies <span style="color:#444">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=tv';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">TV Series <span style="color:#444">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ova';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">OVAs <span style="color:#444">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ona';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">ONAs <span style="color:#444">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=special';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">Specials <span style="color:#444">›</span></div>
+    <div style="padding:1rem 0 0.4rem;font-size:0.58rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#444">Quick Navigation</div>
+    <div onclick="window.location.href='anize-home.html';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">Home</div>
+    <div onclick="window.location.href='anize-browse.html';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">New Releases</div>
+    <div onclick="window.location.href='anize-ongoing.html';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">Ongoing</div>
+    <div onclick="window.location.href='anize-browse.html?sort=popularity';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">Popular</div>
+    <div onclick="window.location.href='anize-browse.html?sort=score';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer">Top Rated</div>
+  </div>
+
+  <!-- Genre Panel -->
+  <div id="sp-genre" style="display:none;padding:0.8rem 1.2rem;display:none;flex-wrap:wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;width:100%" id="spGenreList"></div>
+  </div>
+
+  <!-- Schedule Panel -->
+  <div id="sp-schedule" style="display:none;flex-direction:column">
+    <div style="padding:0.8rem 1.2rem;border-bottom:1px solid #1c1c1c;display:flex;justify-content:space-between">
+      <span id="spClock" style="font-size:0.68rem;color:#555"></span>
+      <span id="spTz" style="font-size:0.62rem;color:#555"></span>
+    </div>
+    <div id="spScheduleList"></div>
+  </div>
+
+</div>
+
+<script>
+function openSchedule(e) {
+  if(e) e.preventDefault();
+  const overlay = document.getElementById('scheduleOverlay');
+  const panel   = document.getElementById('schedulePanel');
+  overlay.style.display = 'block';
+  panel.style.display = 'flex';
+  panel.style.flexDirection = 'column';
+  requestAnimationFrame(() => {
+    overlay.style.opacity = '1';
+    panel.style.transform = 'translateX(0)';
+  });
+  loadSpSchedule();
+  startSpClock();
+  loadSpGenres();
+}
+
+function closeSchedule() {
+  const overlay = document.getElementById('scheduleOverlay');
+  const panel   = document.getElementById('schedulePanel');
+  overlay.style.opacity = '0';
+  panel.style.transform = 'translateX(-100%)';
+  setTimeout(() => { overlay.style.display='none'; panel.style.display='none'; }, 300);
+}
+
+function spTab(name) {
+  ['menu','genre','schedule'].forEach(t => {
+    const btn = document.getElementById('spt-'+t);
+    const panel = document.getElementById('sp-'+t);
+    const isActive = t === name;
+    btn.style.color = isActive ? '#fff' : '#555';
+    btn.style.borderBottomColor = isActive ? '#fff' : 'transparent';
+    panel.style.display = isActive ? (t === 'schedule' ? 'flex' : t === 'genre' ? 'block' : 'flex') : 'none';
+    if(t === 'genre') panel.style.flexDirection = '';
+  });
+}
+
+function loadSpGenres() {
+  const GENRE_IDS_SP = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41};
+  const genres = Object.keys(GENRE_IDS_SP);
+  document.getElementById('spGenreList').innerHTML = genres.map(g =>
+    `<div onclick="window.location.href='anize-browse.html?genre=${GENRE_IDS_SP[g]}';closeSchedule()" style="padding:0.5rem 0.4rem;font-size:0.75rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c;display:flex;align-items:center;gap:0.4rem"><span style="color:#333">•</span>${g}</div>`
+  ).join('');
+}
+
+const DAYS_SP = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_SHORT_SP = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let spClockTimer;
+
+function startSpClock() {
+  clearInterval(spClockTimer);
+  function tick() {
+    const now = new Date();
+    const h12 = now.getHours() % 12 || 12;
+    const m   = now.getMinutes().toString().padStart(2,'0');
+    const ap  = now.getHours() >= 12 ? 'p.m.' : 'a.m.';
+    const off = -now.getTimezoneOffset()/60;
+    document.getElementById('spClock').textContent = `${h12}:${m} ${ap}`;
+    document.getElementById('spTz').textContent    = `GMT ${off >= 0 ? '+' : ''}${off}:00`;
+  }
+  tick();
+  spClockTimer = setInterval(tick, 1000);
+}
+
+async function loadSpSchedule() {
+  const el = document.getElementById('spScheduleList');
+  el.innerHTML = '<p style="padding:1rem 1.4rem;font-size:0.72rem;color:#444">Loading...</p>';
+  const today = new Date();
+  const todayIdx = today.getDay();
+  let html = '';
+  try {
+    for (let offset = 0; offset < 4; offset++) {
+      const idx = (todayIdx + offset) % 7;
+      const dateObj = new Date(today);
+      dateObj.setDate(today.getDate() + offset);
+      const isToday = offset === 0;
+      const dayNum = dateObj.getDate();
+      const monthStr = dateObj.toLocaleString('en',{month:'short'}).toUpperCase();
+      const r = await fetch(`https://api.jikan.moe/v4/schedules?filter=${DAYS_SP[idx].toLowerCase()}&limit=10&sfw=true`);
+      const d = await r.json();
+      const items = d.data || [];
+      html += `
+        <div style="padding:0.8rem 1.2rem 0.3rem">
+          <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.6rem">
+            <div style="width:36px;height:42px;${isToday?'background:#fff;':'background:#111;border:1px solid #1c1c1c;'}border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+              <span style="font-size:0.95rem;font-weight:700;color:${isToday?'#000':'#fff'};line-height:1">${dayNum}</span>
+              <span style="font-size:0.5rem;font-weight:600;letter-spacing:0.1em;color:${isToday?'#555':'#444'};margin-top:1px">${monthStr}</span>
+            </div>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;color:#fff;text-transform:uppercase;letter-spacing:0.06em">${DAYS_SHORT_SP[idx]}</div>
+              ${isToday?'<div style="font-size:0.6rem;color:#444;letter-spacing:0.08em;text-transform:uppercase">Today</div>':''}
+            </div>
+          </div>
+          ${items.slice(0,8).map(a => `
+            <div onclick="window.location.href='anize-player.html?id=${a.mal_id}'" style="display:flex;align-items:center;gap:0.7rem;padding:0.5rem 0.5rem;border-radius:3px;cursor:pointer;border-bottom:1px solid #111">
+              <span style="font-size:0.62rem;font-weight:600;color:#444;width:36px;flex-shrink:0">${a.broadcast?.time||'--:--'}</span>
+              <span style="font-size:0.76rem;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title}</span>
+            </div>`).join('')}
+          ${items.length===0?'<p style="font-size:0.68rem;color:#333;padding:0.4rem 0">No schedule data</p>':''}
+        </div>
+        <div style="height:1px;background:#1c1c1c;margin:0.4rem 1.2rem"></div>`;
+    }
+    el.innerHTML = html;
+  } catch {
+    el.innerHTML = '<p style="padding:1rem 1.4rem;font-size:0.72rem;color:#444">Couldn\'t load schedule.</p>';
+  }
+}
+</script>
+
+</body>
+
 </body>
 </html>

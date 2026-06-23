@@ -724,7 +724,7 @@ main {
     <li><a href="anize-home.html" class="active">Home</a></li>
     <li><a href="anize-browse.html">New</a></li>
     <li><a href="anize-ongoing.html">Ongoing</a></li>
-    <li><a href="anize-schedule.html">Schedule</a></li>
+    <li><a href="#" onclick="openSchedule(event)">Schedule</a></li>
   </ul>
 
   <div class="nav-search">
@@ -839,14 +839,10 @@ main {
 
 <script>
 const GENRES = ['Action','Adventure','Comedy','Drama','Fantasy','Horror','Isekai','Mecha','Mystery','Romance','Sci-Fi','Slice of Life','Sports','Supernatural','Thriller'];
+const GENRE_IDS = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41};
 const AZ = ['All','0-9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
 
-const HERO_ANIME = [
-  { title: 'Attack on Titan', score: '9.0', type: 'TV', episodes: 25, synopsis: 'Humanity lives behind enormous walls, hiding from giant humanoid creatures called Titans. When the walls are breached, young Eren Yeager vows to exterminate them all.', image: 'https://cdn.myanimelist.net/images/anime/10/47347l.jpg' },
-  { title: 'Death Note',      score: '8.6', type: 'TV', episodes: 37, synopsis: 'A high school student discovers a supernatural notebook that grants its user the power to kill anyone whose name is written in it.', image: 'https://cdn.myanimelist.net/images/anime/9/9453l.jpg' },
-  { title: 'One Piece',       score: '8.7', type: 'TV', episodes: null, synopsis: 'Monkey D. Luffy sets out on a voyage to become the King of the Pirates and find the legendary treasure One Piece.', image: 'https://cdn.myanimelist.net/images/anime/6/73245l.jpg' },
-];
-
+let HERO_ANIME = [];
 let heroIdx = 0, heroInterval;
 
 /* ── SKELETONS ── */
@@ -866,18 +862,6 @@ function renderListSkeletons(id, count) {
       <div style="flex:1">
         <div class="skeleton" style="height:10px;width:90%;margin-bottom:6px"></div>
         <div class="skeleton" style="height:8px;width:50%"></div>
-      </div>
-    </div>`).join('');
-}
-
-function renderRankSkeletons(id, count) {
-  document.getElementById(id).innerHTML = Array(count).fill(0).map((_,i) => `
-    <div class="rank-card">
-      <div class="rank-num">${i+1}</div>
-      <div class="skeleton" style="width:44px;height:58px;flex-shrink:0"></div>
-      <div style="flex:1">
-        <div class="skeleton" style="height:10px;width:85%;margin-bottom:5px"></div>
-        <div class="skeleton" style="height:8px;width:45%"></div>
       </div>
     </div>`).join('');
 }
@@ -902,7 +886,7 @@ function animeCard(a) {
 }
 
 function listCard(a) {
-  const img   = a.images?.jpg?.image_url || '';
+  const img   = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
   const title = a.title || 'Unknown';
   const type  = a.type || 'TV';
   const eps   = a.episodes ? `${a.episodes} eps` : 'Ongoing';
@@ -919,25 +903,6 @@ function listCard(a) {
     </div>`;
 }
 
-function rankCard(a, i) {
-  const img   = a.images?.jpg?.image_url || '';
-  const title = a.title || 'Unknown';
-  const type  = a.type || 'TV';
-  const eps   = a.episodes ? `${a.episodes} eps` : 'Ongoing';
-  return `
-    <div class="rank-card" onclick="window.location.href='anize-player.html?id=${a.mal_id}'">
-      <div class="rank-num">${i+1}</div>
-      <img class="rank-thumb" src="${img}" alt="${title}" loading="lazy" onerror="this.style.opacity='0'">
-      <div class="rank-info">
-        <div class="rank-title">${title}</div>
-        <div class="rank-meta">
-          <span class="rank-type">${type}</span>
-          <span class="rank-ep">${eps}</span>
-        </div>
-      </div>
-    </div>`;
-}
-
 /* ── FETCHERS ── */
 async function fetchGrid(url, id, limit=12) {
   try {
@@ -948,16 +913,37 @@ async function fetchGrid(url, id, limit=12) {
   } catch { document.getElementById(id).innerHTML = '<p class="error-msg">Couldn\'t load — check your connection.</p>'; }
 }
 
-async function fetchList(url, id, limit=6, renderer=listCard) {
+async function fetchList(url, id, limit=6) {
   try {
     const r = await fetch(url);
     const d = await r.json();
     const list = (d.data || []).slice(0, limit);
-    document.getElementById(id).innerHTML = list.length ? list.map((a,i) => renderer(a,i)).join('') : '<p class="error-msg">Nothing to show.</p>';
+    document.getElementById(id).innerHTML = list.length ? list.map(listCard).join('') : '<p class="error-msg">Nothing to show.</p>';
   } catch { document.getElementById(id).innerHTML = '<p class="error-msg">Couldn\'t load.</p>'; }
 }
 
-/* ── HERO ── */
+/* ── HERO — fetches real top airing anime ── */
+async function loadHero() {
+  try {
+    const r = await fetch('https://api.jikan.moe/v4/top/anime?filter=airing&limit=5&sfw=true');
+    const d = await r.json();
+    HERO_ANIME = (d.data || []).map(a => ({
+      mal_id: a.mal_id,
+      title: a.title,
+      score: a.score || '?',
+      type: a.type || 'TV',
+      episodes: a.episodes,
+      synopsis: a.synopsis?.slice(0,160) + '...' || '',
+      image: a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || ''
+    }));
+    if (HERO_ANIME.length) {
+      buildHeroDots();
+      setHero(HERO_ANIME[0]);
+      heroInterval = setInterval(nextHero, 6000);
+    }
+  } catch {}
+}
+
 function setHero(a) {
   document.getElementById('heroBg').style.backgroundImage = `url('${a.image}')`;
   document.getElementById('heroTitle').textContent = a.title;
@@ -966,6 +952,7 @@ function setHero(a) {
     <span>${a.type}</span><span class="dot"></span>
     <span>${a.episodes ? a.episodes + ' eps' : 'Ongoing'}</span><span class="dot"></span>
     <span>★ ${a.score}</span>`;
+  document.getElementById('heroBtn').onclick = () => window.location.href = `anize-player.html?id=${a.mal_id}`;
   document.querySelectorAll('.hero-dot').forEach((d,i) => d.classList.toggle('active', i===heroIdx));
 }
 function buildHeroDots() {
@@ -981,18 +968,6 @@ function filterTab(btn, type) {
   btn.classList.add('active');
 }
 
-function mvTab(btn, period) {
-  document.querySelectorAll('.mv-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  renderRankSkeletons('mostViewedList', 6);
-  const urls = {
-    day:   'https://api.jikan.moe/v4/top/anime?filter=airing&limit=6',
-    week:  'https://api.jikan.moe/v4/top/anime?limit=6',
-    month: 'https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=6',
-  };
-  fetchList(urls[period], 'mostViewedList', 6, rankCard);
-}
-
 function buildAZ() {
   document.getElementById('azGrid').innerHTML = AZ.map((l,i) =>
     `<button class="az-btn${i===0?' active':''}" onclick="azClick(this,'${l}')">${l}</button>`).join('');
@@ -1001,11 +976,18 @@ function buildAZ() {
 function azClick(btn, letter) {
   document.querySelectorAll('.az-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  if (letter === 'All') {
+    window.location.href = 'anize-browse.html';
+  } else if (letter === '0-9') {
+    window.location.href = 'anize-browse.html?q=0';
+  } else {
+    window.location.href = `anize-browse.html?q=${letter}`;
+  }
 }
 
 function buildGenres() {
   document.getElementById('genresGrid').innerHTML = GENRES.map(g =>
-    `<div class="genre-pill">${g}</div>`).join('');
+    `<div class="genre-pill" onclick="window.location.href='anize-browse.html?genre=${GENRE_IDS[g]}&genreName=${encodeURIComponent(g)}'">${g}</div>`).join('');
 }
 
 function initReveal() {
@@ -1017,9 +999,6 @@ function initReveal() {
 
 /* ── INIT ── */
 async function init() {
-  buildHeroDots();
-  setHero(HERO_ANIME[0]);
-  heroInterval = setInterval(nextHero, 6000);
   buildGenres();
   buildAZ();
   initReveal();
@@ -1027,14 +1006,15 @@ async function init() {
   renderSkeletons('popularGrid', 12);
   renderListSkeletons('favListCol', 6);
   renderListSkeletons('completedList', 6);
-  renderRankSkeletons('mostViewedList', 6);
+  renderListSkeletons('mostViewedList', 6);
   renderListSkeletons('newReleasesList', 6);
 
   await Promise.all([
+    loadHero(),
     fetchGrid('https://api.jikan.moe/v4/seasons/now?limit=12&sfw=true', 'popularGrid'),
     fetchList('https://api.jikan.moe/v4/top/anime?filter=favorite&limit=6&sfw=true', 'favListCol'),
     fetchList('https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=6&sfw=true', 'completedList'),
-    fetchList('https://api.jikan.moe/v4/top/anime?limit=6&sfw=true', 'mostViewedList', 6, rankCard),
+    fetchList('https://api.jikan.moe/v4/top/anime?filter=airing&limit=6&sfw=true', 'mostViewedList'),
     fetchList('https://api.jikan.moe/v4/seasons/upcoming?limit=6&sfw=true', 'newReleasesList'),
   ]);
 }
@@ -1059,6 +1039,173 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
     <span style="font-size:0.6rem;color:#aaa;letter-spacing:0.03em">AniZe does not store any files on its server. All contents are provided by non-affiliated third parties.</span>
   </div>
 </footer>
+
+<!-- SCHEDULE SLIDE-OVER -->
+<div id="scheduleOverlay" onclick="closeSchedule()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;opacity:0;transition:opacity 0.3s"></div>
+
+<div id="schedulePanel" style="display:none;position:fixed;left:0;top:0;bottom:0;width:320px;background:#0a0a0a;border-right:1px solid #1c1c1c;z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;flex-direction:column">
+
+  <!-- Panel Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;letter-spacing:0.06em">AniZe</span>
+    <button onclick="closeSchedule()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.2rem;padding:0.2rem">✕</button>
+  </div>
+
+  <!-- Tabs -->
+  <div style="display:flex;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <button class="sp-tab active" id="spt-menu" onclick="spTab('menu')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:none;border:none;border-bottom:2px solid #fff;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      Menu
+    </button>
+    <button class="sp-tab" id="spt-genre" onclick="spTab('genre')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Genre
+    </button>
+    <button class="sp-tab" id="spt-schedule" onclick="spTab('schedule')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Schedule
+    </button>
+  </div>
+
+  <!-- Menu Panel -->
+  <div id="sp-menu" style="padding:1rem 1.4rem;display:flex;flex-direction:column">
+    <div onclick="window.location.href='anize-browse.html?type=movie';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">Movies <span style="color:#444">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=tv';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">TV Series <span style="color:#444">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ova';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">OVAs <span style="color:#444">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ona';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">ONAs <span style="color:#444">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=special';closeSchedule()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.82rem;color:#aaa;cursor:pointer">Specials <span style="color:#444">›</span></div>
+    <div style="padding:1rem 0 0.4rem;font-size:0.58rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#444">Quick Navigation</div>
+    <div onclick="window.location.href='anize-home.html';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">Home</div>
+    <div onclick="window.location.href='anize-browse.html';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">New Releases</div>
+    <div onclick="window.location.href='anize-ongoing.html';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">Ongoing</div>
+    <div onclick="window.location.href='anize-browse.html?sort=popularity';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c">Popular</div>
+    <div onclick="window.location.href='anize-browse.html?sort=score';closeSchedule()" style="padding:0.55rem 0;font-size:0.76rem;color:#555;cursor:pointer">Top Rated</div>
+  </div>
+
+  <!-- Genre Panel -->
+  <div id="sp-genre" style="display:none;padding:0.8rem 1.2rem;display:none;flex-wrap:wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;width:100%" id="spGenreList"></div>
+  </div>
+
+  <!-- Schedule Panel -->
+  <div id="sp-schedule" style="display:none;flex-direction:column">
+    <div style="padding:0.8rem 1.2rem;border-bottom:1px solid #1c1c1c;display:flex;justify-content:space-between">
+      <span id="spClock" style="font-size:0.68rem;color:#555"></span>
+      <span id="spTz" style="font-size:0.62rem;color:#555"></span>
+    </div>
+    <div id="spScheduleList"></div>
+  </div>
+
+</div>
+
+<script>
+function openSchedule(e) {
+  if(e) e.preventDefault();
+  const overlay = document.getElementById('scheduleOverlay');
+  const panel   = document.getElementById('schedulePanel');
+  overlay.style.display = 'block';
+  panel.style.display = 'flex';
+  panel.style.flexDirection = 'column';
+  requestAnimationFrame(() => {
+    overlay.style.opacity = '1';
+    panel.style.transform = 'translateX(0)';
+  });
+  loadSpSchedule();
+  startSpClock();
+  loadSpGenres();
+}
+
+function closeSchedule() {
+  const overlay = document.getElementById('scheduleOverlay');
+  const panel   = document.getElementById('schedulePanel');
+  overlay.style.opacity = '0';
+  panel.style.transform = 'translateX(-100%)';
+  setTimeout(() => { overlay.style.display='none'; panel.style.display='none'; }, 300);
+}
+
+function spTab(name) {
+  ['menu','genre','schedule'].forEach(t => {
+    const btn = document.getElementById('spt-'+t);
+    const panel = document.getElementById('sp-'+t);
+    const isActive = t === name;
+    btn.style.color = isActive ? '#fff' : '#555';
+    btn.style.borderBottomColor = isActive ? '#fff' : 'transparent';
+    panel.style.display = isActive ? (t === 'schedule' ? 'flex' : t === 'genre' ? 'block' : 'flex') : 'none';
+    if(t === 'genre') panel.style.flexDirection = '';
+  });
+}
+
+function loadSpGenres() {
+  const GENRE_IDS_SP = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41};
+  const genres = Object.keys(GENRE_IDS_SP);
+  document.getElementById('spGenreList').innerHTML = genres.map(g =>
+    `<div onclick="window.location.href='anize-browse.html?genre=${GENRE_IDS_SP[g]}';closeSchedule()" style="padding:0.5rem 0.4rem;font-size:0.75rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c;display:flex;align-items:center;gap:0.4rem"><span style="color:#333">•</span>${g}</div>`
+  ).join('');
+}
+
+const DAYS_SP = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_SHORT_SP = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let spClockTimer;
+
+function startSpClock() {
+  clearInterval(spClockTimer);
+  function tick() {
+    const now = new Date();
+    const h12 = now.getHours() % 12 || 12;
+    const m   = now.getMinutes().toString().padStart(2,'0');
+    const ap  = now.getHours() >= 12 ? 'p.m.' : 'a.m.';
+    const off = -now.getTimezoneOffset()/60;
+    document.getElementById('spClock').textContent = `${h12}:${m} ${ap}`;
+    document.getElementById('spTz').textContent    = `GMT ${off >= 0 ? '+' : ''}${off}:00`;
+  }
+  tick();
+  spClockTimer = setInterval(tick, 1000);
+}
+
+async function loadSpSchedule() {
+  const el = document.getElementById('spScheduleList');
+  el.innerHTML = '<p style="padding:1rem 1.4rem;font-size:0.72rem;color:#444">Loading...</p>';
+  const today = new Date();
+  const todayIdx = today.getDay();
+  let html = '';
+  try {
+    for (let offset = 0; offset < 4; offset++) {
+      const idx = (todayIdx + offset) % 7;
+      const dateObj = new Date(today);
+      dateObj.setDate(today.getDate() + offset);
+      const isToday = offset === 0;
+      const dayNum = dateObj.getDate();
+      const monthStr = dateObj.toLocaleString('en',{month:'short'}).toUpperCase();
+      const r = await fetch(`https://api.jikan.moe/v4/schedules?filter=${DAYS_SP[idx].toLowerCase()}&limit=10&sfw=true`);
+      const d = await r.json();
+      const items = d.data || [];
+      html += `
+        <div style="padding:0.8rem 1.2rem 0.3rem">
+          <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.6rem">
+            <div style="width:36px;height:42px;${isToday?'background:#fff;':'background:#111;border:1px solid #1c1c1c;'}border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+              <span style="font-size:0.95rem;font-weight:700;color:${isToday?'#000':'#fff'};line-height:1">${dayNum}</span>
+              <span style="font-size:0.5rem;font-weight:600;letter-spacing:0.1em;color:${isToday?'#555':'#444'};margin-top:1px">${monthStr}</span>
+            </div>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;color:#fff;text-transform:uppercase;letter-spacing:0.06em">${DAYS_SHORT_SP[idx]}</div>
+              ${isToday?'<div style="font-size:0.6rem;color:#444;letter-spacing:0.08em;text-transform:uppercase">Today</div>':''}
+            </div>
+          </div>
+          ${items.slice(0,8).map(a => `
+            <div onclick="window.location.href='anize-player.html?id=${a.mal_id}'" style="display:flex;align-items:center;gap:0.7rem;padding:0.5rem 0.5rem;border-radius:3px;cursor:pointer;border-bottom:1px solid #111">
+              <span style="font-size:0.62rem;font-weight:600;color:#444;width:36px;flex-shrink:0">${a.broadcast?.time||'--:--'}</span>
+              <span style="font-size:0.76rem;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title}</span>
+            </div>`).join('')}
+          ${items.length===0?'<p style="font-size:0.68rem;color:#333;padding:0.4rem 0">No schedule data</p>':''}
+        </div>
+        <div style="height:1px;background:#1c1c1c;margin:0.4rem 1.2rem"></div>`;
+    }
+    el.innerHTML = html;
+  } catch {
+    el.innerHTML = '<p style="padding:1rem 1.4rem;font-size:0.72rem;color:#444">Couldn\'t load schedule.</p>';
+  }
+}
+</script>
 
 </body>
 </html>
