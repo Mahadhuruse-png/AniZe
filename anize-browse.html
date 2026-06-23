@@ -551,33 +551,18 @@ async function loadAnime(page=1) {
   renderSkeletons(24);
   document.getElementById('pagination').innerHTML = '';
 
+  // NOTE: In Jikan, "popularity" is a RANK (#1 = most popular), so it has to
+  // sort ascending to show the most popular first. "A–Z" is also ascending.
+  // Everything else (score, favorites, newest-first) sorts descending.
+  const SORT_DIRECTION = { score: 'desc', popularity: 'asc', start_date: 'desc', title: 'asc', favorites: 'desc' };
+  const sortField = currentFilters.sort || document.getElementById('filterSort').value || 'score';
+
   const params = new URLSearchParams();
   params.set('page', page);
   params.set('limit', 24);
   params.set('sfw', 'true');
-
-  // If no filters, show current season sorted by popularity
-  if (!currentFilters.q && !currentFilters.type && !currentFilters.status && !currentFilters.genre) {
-    try {
-      const r = await fetch(`https://api.jikan.moe/v4/seasons/now?page=${page}&limit=24&sfw=true`);
-      const d = await r.json();
-      const list = d.data || [];
-      totalPages = d.pagination?.last_visible_page || 1;
-      const total = d.pagination?.items?.total || list.length;
-      document.getElementById('animeCount').textContent = `${total.toLocaleString()} anime`;
-      document.getElementById('browseGrid').innerHTML = list.length
-        ? list.map(animeCard).join('')
-        : '<p class="no-results">No anime found.</p>';
-      buildPagination();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch {
-      document.getElementById('browseGrid').innerHTML = '<p class="no-results">Couldn\'t load.</p>';
-    }
-    return;
-  }
-
-  params.set('order_by', currentFilters.sort || 'popularity');
-  params.set('sort', 'desc');
+  params.set('order_by', sortField);
+  params.set('sort', SORT_DIRECTION[sortField] || 'desc');
   if (currentFilters.type)   params.set('type', currentFilters.type);
   if (currentFilters.status) params.set('status', currentFilters.status);
   if (currentFilters.genre)  params.set('genres', currentFilters.genre);
@@ -829,8 +814,6 @@ async function loadSpSchedule() {
   }
 }
 </script>
-
-</body>
 
 </body>
 </html>
