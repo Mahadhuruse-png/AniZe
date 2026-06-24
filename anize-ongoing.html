@@ -554,7 +554,6 @@ async function loadAnime(page=1) {
   const sortField = currentFilters.sort || 'popularity';
   let url = `https://api.jikan.moe/v4/anime?sfw=true&page=${page}&limit=25&order_by=${sortField}&sort=${SORT_DIR[sortField]||'asc'}`;
   if (currentFilters.status) url += `&status=${currentFilters.status}`;
-  else url += `&status=airing`;
   if (currentFilters.type)  url += `&type=${currentFilters.type}`;
   if (currentFilters.genre) url += `&genres=${currentFilters.genre}`;
   if (currentFilters.q)     url += `&q=${encodeURIComponent(currentFilters.q)}`;

@@ -82,9 +82,8 @@ nav {
   height: 100%;
   object-fit: cover;
   object-position: center center;
-  filter: brightness(0.35) blur(1px);
+  filter: brightness(0.55);
   z-index: -1;
-  transform: scale(1.0);
 }
 .hero-content { max-width: 600px; z-index: 5; }
 .hero-title { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; margin-bottom: 1rem; line-height: 1.2; letter-spacing: 0.02em; }
@@ -293,7 +292,7 @@ async function loadHeroSlider() {
     let sliderHtml = items.map((a, idx) => {
       const title = a.title_english || a.title;
       const synopsis = a.synopsis || "No summary available.";
-      const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+      const img = a.images?.jpg?.large_image_url || a.images?.webp?.large_image_url || a.images?.jpg?.image_url || '';
       return `
         <div class="hero-slide ${idx === 0 ? 'active' : ''}">
           <img class="hero-bg" src="${img}" alt="">
