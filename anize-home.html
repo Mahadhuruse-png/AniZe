@@ -145,7 +145,7 @@ nav {
 .metric-list { display: flex; flex-direction: column; gap: 0.8rem; }
 .metric-row { display: flex; gap: 0.8rem; align-items: center; cursor: pointer; border-bottom: 1px solid transparent; padding-bottom: 0.4rem; }
 .metric-row:hover .m-title { color: var(--text); }
-.m-img { width: 55px; height: 75px; background: var(--bg3); object-fit: cover; border: 1px solid var(--border); border-radius: 2px; }
+.m-img { width: 48px; height: 65px; background: var(--bg3); object-fit: cover; border: 1px solid var(--border); border-radius: 2px; }
 .m-info { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
 .m-title { font-size: 0.75rem; font-weight: 600; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
 .m-meta { font-size: 0.65rem; color: var(--text3); }
@@ -180,8 +180,8 @@ footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; just
   <div class="nav-logo" onclick="window.location.href='anize-home.html'">ANIZE</div>
   <ul class="nav-links">
     <li><a href="anize-home.html" class="active">Home</a></li>
-    <li><a href="anize-browse.html">Trending</a></li>
-    <li><a href="anize-ongoing.html">Ongoing</a></li>
+    <li><a href="anize-browse.html?sort=popularity">Trending</a></li>
+    <li><a href="anize-favourites.html">Favourites</a></li>
     <li><a href="anize-browse.html">Browse</a></li>
   </ul>
   <div class="nav-search">
@@ -197,7 +197,7 @@ footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; just
 
   <div class="content-padding">
     <section id="trendingSection">
-      <h2 class="section-title">Trending <a href="anize-browse.html?sort=popularity" class="more-link">More →</a></h2>
+      <h2 class="section-title">Trending Now <a href="anize-browse.html?sort=popularity" class="more-link">More →</a></h2>
       <div class="trending-strip" id="trendingStrip"></div>
     </section>
 
@@ -221,16 +221,22 @@ footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; just
     </section>
 
     <section class="az-container">
-      <h2 class="section-title" style="margin-bottom:0.5rem;">Browse Alphabetically</h2>
-      <p style="font-size:0.7rem; color:var(--text3);">Filter popular curated anime series by indexing initial tags.</p>
+      <h2 class="section-title" style="margin-bottom:0.3rem;">Browse Alphabetically</h2>
       <ul class="az-list" id="azList"></ul>
     </section>
+    <p style="font-size:0.68rem;color:var(--text3);text-align:center;margin-top:-2.5rem;margin-bottom:3.5rem;letter-spacing:0.1em">— <span style="color:#fff;font-weight:700;text-shadow:0 0 8px rgba(255,255,255,0.8),0 0 20px rgba(255,255,255,0.4)">Zaki</span> —</p>
   </div>
 </main>
 
-<footer>
-  <div class="foot-l">Made by Team Re:start • <a href="https://discord.gg/YyQ6qZ2nf5" target="_blank">Discord</a></div>
-  <div class="foot-r">© 2026 AniZe. All rights reserved. <span style="color:var(--text3)">Disclaimer: Operational metadata cache indices.</span></div>
+<footer style="border-top:1px solid #1c1c1c;padding:1.4rem 2.5rem;display:flex;align-items:center;justify-content:space-between;background:#000;">
+  <div style="display:flex;flex-direction:column;gap:0.3rem">
+    <span style="font-size:0.68rem;font-weight:500;letter-spacing:0.06em;color:#ccc">Made by <span style="color:#fff;font-weight:700">Team Re:start</span></span>
+    <a href="https://discord.gg/YyQ6qZ2nf5" target="_blank" style="font-size:0.64rem;color:#bbb;letter-spacing:0.04em;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#bbb'">discord.gg/YyQ6qZ2nf5</a>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem">
+    <span style="font-size:0.68rem;color:#ccc;letter-spacing:0.04em">© 2026 AniZe. All rights reserved.</span>
+    <span style="font-size:0.6rem;color:#aaa;letter-spacing:0.03em">AniZe does not store any files on its server. All contents are provided by non-affiliated third parties.</span>
+  </div>
 </footer>
 
 <script>
@@ -343,10 +349,10 @@ async function fetchWithRetry(url, retries = 2, delayMs = 600) {
 
 async function loadFourColumns() {
   const configurations = [
-    { id: 'colFav', url: `https://api.jikan.moe/v4/anime?order_by=favorites&sort=desc&limit=5&sfw=true&genres_exclude=${EXCLUDE_GENRES}` },
-    { id: 'colComp', url: `https://api.jikan.moe/v4/anime?order_by=members&sort=desc&limit=5&sfw=true&genres_exclude=${EXCLUDE_GENRES}` },
-    { id: 'colView', url: `https://api.jikan.moe/v4/anime?order_by=score&sort=desc&limit=5&sfw=true&genres_exclude=${EXCLUDE_GENRES}` },
-    { id: 'colNew', url: `https://api.jikan.moe/v4/anime?status=airing&order_by=start_date&sort=desc&limit=5&sfw=true&genres_exclude=${EXCLUDE_GENRES}` }
+    { id: 'colFav', url: `https://api.jikan.moe/v4/top/anime?filter=favorite&limit=5&sfw=true` },
+    { id: 'colComp', url: `https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=5&sfw=true` },
+    { id: 'colView', url: `https://api.jikan.moe/v4/top/anime?limit=5&sfw=true` },
+    { id: 'colNew', url: `https://api.jikan.moe/v4/seasons/now?limit=5&sfw=true` }
   ];
 
   for (const col of configurations) {
