@@ -278,13 +278,20 @@ function initAZ() {
   }).join('');
 }
 
-// Fetch and Handle Hero Rotation Slider — only the most famous anime
+// Fetch and Handle Hero Rotation Slider — famous anime with wide banners
 async function loadHeroSlider() {
-  // Hardcoded top famous anime MAL IDs: AoT, One Piece, Naruto, Demon Slayer, FMA:B
-  const FAMOUS_IDS = [16498, 21, 20, 38000, 5114];
+  // Fresh anime picks with their MAL IDs — different from trending cards
+  // IDs: Jujutsu Kaisen, Dragon Ball Z, Sword Art Online, Tokyo Ghoul, Hunter x Hunter (2011)
+  const PICKS = [
+    { id: 40748, banner: 'https://cdn.myanimelist.net/images/anime/1171/109222l.jpg' },
+    { id: 813,   banner: 'https://cdn.myanimelist.net/images/anime/1277/142715l.jpg' },
+    { id: 11757, banner: 'https://cdn.myanimelist.net/images/anime/11/39717l.jpg' },
+    { id: 22319, banner: 'https://cdn.myanimelist.net/images/anime/5/64449l.jpg' },
+    { id: 11061, banner: 'https://cdn.myanimelist.net/images/anime/1337/99013l.jpg' },
+  ];
   try {
     const results = await Promise.all(
-      FAMOUS_IDS.map(id => fetch(`https://api.jikan.moe/v4/anime/${id}`).then(r => r.json()).then(d => d.data).catch(() => null))
+      PICKS.map(p => fetch(`https://api.jikan.moe/v4/anime/${p.id}`).then(r => r.json()).then(d => ({ ...d.data, _banner: p.banner })).catch(() => null))
     );
     const items = results.filter(Boolean);
     if (items.length === 0) return;
@@ -292,7 +299,7 @@ async function loadHeroSlider() {
     let sliderHtml = items.map((a, idx) => {
       const title = a.title_english || a.title;
       const synopsis = a.synopsis || "No summary available.";
-      const img = a.images?.jpg?.large_image_url || a.images?.webp?.large_image_url || a.images?.jpg?.image_url || '';
+      const img = a._banner;
       return `
         <div class="hero-slide ${idx === 0 ? 'active' : ''}">
           <img class="hero-bg" src="${img}" alt="">
