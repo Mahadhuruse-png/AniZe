@@ -122,18 +122,18 @@ nav {
 .meta { font-size: 0.65rem; color: var(--text3); margin-top: 0.15rem; }
 
 /* ── A-Z ALPHABET COMPONENT ── */
-.az-container { background: var(--bg2); border: 1px solid var(--border); padding: 1.5rem; border-radius: 4px; margin-bottom: 3.5rem; }
+.az-container { background: var(--bg2); border: 1px solid var(--border); padding: 1.5rem; border-radius: 4px; margin-bottom: 3.5rem; margin-top: 2rem; }
 .az-list { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; margin-top: 1rem; }
 .az-list a { background: var(--bg3); border: 1px solid var(--border); padding: 0.4rem 0.75rem; font-size: 0.7rem; font-weight: 600; border-radius: 3px; color: var(--text2); transition: all 0.2s; }
 .az-list a:hover { color: var(--bg); background: var(--text); border-color: var(--text); }
 
 /* ── TRENDING STRIP (numbered, horizontal scroll) ── */
 .trending-strip { display: flex; gap: 1.2rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 3.5rem; align-items: flex-start; }
-.trending-item { position: relative; flex: 0 0 160px; width: 160px; cursor: pointer; }
+.trending-item { position: relative; flex: 0 0 190px; width: 190px; cursor: pointer; }
 .trending-item:hover .thumb img { transform: scale(1.04); filter: brightness(0.85); }
 .trending-item:hover .title { color: var(--text); }
-.trending-item .thumb { width: 160px; height: 240px; aspect-ratio: unset; flex-shrink: 0; }
-.trending-item .thumb img { width: 160px; height: 240px; object-fit: cover; }
+.trending-item .thumb { width: 190px; height: 280px; aspect-ratio: unset; flex-shrink: 0; }
+.trending-item .thumb img { width: 190px; height: 280px; object-fit: cover; }
 .trending-rank { display: none; }
 
 /* ── 4 COLUMN METRICS SECTIONS ── */
@@ -169,7 +169,7 @@ nav {
 .sched-time { color: var(--text3); font-weight: 600; margin-right: 0.5rem; }
 
 /* ── FOOTER ── */
-footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; justify-content: space-between; align-items: center; margin-top: 4rem; }
+footer { border-top: 1px solid var(--border); padding: 1.4rem 2rem; display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4rem; }
 .foot-l, .foot-r { font-size: 0.68rem; color: #fff; letter-spacing: 0.04em; }
 .foot-l a { text-decoration: underline; color: #fff; font-weight: 500; }
 </style>
@@ -224,7 +224,7 @@ footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; just
       <h2 class="section-title" style="margin-bottom:0.3rem;">Browse Alphabetically</h2>
       <ul class="az-list" id="azList"></ul>
     </section>
-    <p style="font-size:0.68rem;color:var(--text3);text-align:center;margin-top:-2.5rem;margin-bottom:3.5rem;letter-spacing:0.1em">— <span style="color:#fff;font-weight:700;text-shadow:0 0 8px rgba(255,255,255,0.8),0 0 20px rgba(255,255,255,0.4)">Zaki</span> —</p>
+    <p style="font-size:0.62rem;color:var(--text3);text-align:center;margin-top:-2.5rem;margin-bottom:3.5rem;letter-spacing:0.1em"></p>
   </div>
 </main>
 

@@ -550,13 +550,16 @@ async function loadAnime(page=1) {
   renderSkeletons(24);
   document.getElementById('pagination').innerHTML = '';
 
+  // Favourites = top anime by score/favourites
   const SORT_DIR = { score: 'desc', popularity: 'asc', start_date: 'desc', title: 'asc', favorites: 'desc' };
-  const sortField = currentFilters.sort || 'popularity';
-  let url = `https://api.jikan.moe/v4/anime?sfw=true&page=${page}&limit=25&order_by=${sortField}&sort=${SORT_DIR[sortField]||'asc'}`;
-  if (currentFilters.status) url += `&status=${currentFilters.status}`;
-  if (currentFilters.type)  url += `&type=${currentFilters.type}`;
-  if (currentFilters.genre) url += `&genres=${currentFilters.genre}`;
-  if (currentFilters.q)     url += `&q=${encodeURIComponent(currentFilters.q)}`;
+  const sortField = currentFilters.sort || 'favorites';
+  let url = `https://api.jikan.moe/v4/top/anime?sfw=true&page=${page}&limit=24&filter=favorite`;
+  if (currentFilters.type || currentFilters.genre || currentFilters.q || currentFilters.sort) {
+    url = `https://api.jikan.moe/v4/anime?sfw=true&page=${page}&limit=24&order_by=${sortField}&sort=${SORT_DIR[sortField]||'desc'}`;
+    if (currentFilters.type)  url += `&type=${currentFilters.type}`;
+    if (currentFilters.genre) url += `&genres=${currentFilters.genre}`;
+    if (currentFilters.q)     url += `&q=${encodeURIComponent(currentFilters.q)}`;
+  }
 
   const doFetch = () => fetch(url).then(r => { if (!r.ok) throw new Error(); return r.json(); });
 
