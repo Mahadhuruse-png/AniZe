@@ -127,15 +127,18 @@ nav {
 .az-list a:hover { color: var(--bg); background: var(--text); border-color: var(--text); }
 
 /* ── TRENDING STRIP (numbered, horizontal scroll) ── */
-.trending-strip { display: flex; gap: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 3.5rem; }
-.trending-item { position: relative; flex: 0 0 150px; cursor: pointer; }
+.trending-strip { display: flex; gap: 1.2rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 3.5rem; align-items: flex-start; }
+.trending-item { position: relative; flex: 0 0 130px; width: 130px; cursor: pointer; }
 .trending-item:hover .thumb img { transform: scale(1.04); filter: brightness(0.85); }
 .trending-item:hover .title { color: var(--text); }
+/* Force the thumb inside trending to always be 2/3 poster ratio */
+.trending-item .thumb { width: 130px; height: 195px; aspect-ratio: unset; flex-shrink: 0; }
+.trending-item .thumb img { width: 130px; height: 195px; object-fit: cover; }
 .trending-rank {
-  position: absolute; top: -0.7rem; left: -0.7rem; z-index: 2;
-  font-family: 'Cinzel', serif; font-size: 1.4rem; font-weight: 900;
+  position: absolute; top: -0.6rem; left: -0.6rem; z-index: 2;
+  font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 900;
   color: var(--text); background: var(--bg); border: 1px solid var(--border2);
-  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
   border-radius: 3px; letter-spacing: -0.03em;
 }
 
@@ -322,24 +325,25 @@ async function loadHeroSlider() {
   }
 }
 
-// Fetch and render the numbered Trending strip (top 10 airing anime)
+// Fetch and render the numbered Trending strip (top airing by popularity)
 async function loadTrending() {
   try {
-    const res = await fetch(`https://api.jikan.moe/v4/top/anime?filter=airing&limit=10&sfw=true`);
+    const res = await fetch(`https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=15&sfw=true`);
     const json = await res.json();
-    const data = json.data || [];
+    const data = (json.data || []).filter(a => a.type === 'TV' || a.type === 'Movie' || a.type === 'ONA');
 
     document.getElementById('trendingStrip').innerHTML = data.map((a, idx) => {
       const title = a.title_english || a.title;
+      const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
       return `
         <div class="trending-item" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
           <div class="trending-rank">${String(idx + 1).padStart(2, '0')}</div>
           <div class="thumb">
-            <img src="${a.images?.jpg?.large_image_url || a.images?.jpg?.image_url}" alt="" loading="lazy">
-            <div class="ep-tag">${a.episodes ? `EP ${a.episodes}` : 'Airing'}</div>
+            <img src="${img}" alt="" loading="lazy">
+            <div class="ep-tag">${a.score ? `★ ${a.score.toFixed(1)}` : 'N/A'}</div>
           </div>
           <div class="title">${title}</div>
-          <div class="meta">${a.type || 'TV'} • ${a.status === 'Currently Airing' ? 'Ongoing' : 'Finished'}</div>
+          <div class="meta">${a.type || 'TV'} • ${a.members ? (a.members > 1000000 ? (a.members/1000000).toFixed(1)+'M' : Math.round(a.members/1000)+'K') : ''}</div>
         </div>
       `;
     }).join('');
