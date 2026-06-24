@@ -81,8 +81,9 @@ nav {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center center;
-  filter: brightness(0.55);
+  object-position: center top;
+  transform: scale(1.08);
+  filter: brightness(0.45);
   z-index: -1;
 }
 .hero-content { max-width: 600px; z-index: 5; }
@@ -142,15 +143,37 @@ nav {
 @media (max-width: 600px) { .columns-wrapper { grid-template-columns: 1fr; } }
 
 .metric-col { display: flex; flex-direction: column; }
-.metric-list { display: flex; flex-direction: column; gap: 0.8rem; }
-.metric-row { display: flex; gap: 0.8rem; align-items: center; cursor: pointer; border-bottom: 1px solid transparent; padding-bottom: 0.4rem; }
+.metric-list { display: flex; flex-direction: column; gap: 1rem; }
+.metric-row { display: flex; gap: 0.9rem; align-items: center; cursor: pointer; border-bottom: 1px solid transparent; padding-bottom: 0.5rem; }
 .metric-row:hover .m-title { color: var(--text); }
-.m-img { width: 55px; height: 75px; background: var(--bg3); object-fit: cover; border: 1px solid var(--border); border-radius: 2px; }
-.m-info { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
-.m-title { font-size: 0.75rem; font-weight: 600; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
-.m-meta { font-size: 0.65rem; color: var(--text3); }
+.m-img { width: 72px; height: 96px; background: var(--bg3); object-fit: cover; border: 1px solid var(--border); border-radius: 2px; flex-shrink: 0; }
+.m-info { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.m-title { font-size: 0.82rem; font-weight: 600; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
+.m-meta { font-size: 0.68rem; color: var(--text3); }
 
 .fallback-txt { font-size: 0.75rem; color: var(--text3); padding: 1rem 0; }
+
+/* ── DAY 1s TAGS ── */
+.day1-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #fff;
+  padding: 0.55rem 1.3rem;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 3px;
+  background: rgba(255,255,255,0.04);
+  text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 28px rgba(255,255,255,0.4);
+  box-shadow: 0 0 10px rgba(255,255,255,0.07);
+  transition: text-shadow 0.3s, box-shadow 0.3s;
+  cursor: default;
+  user-select: none;
+}
+.day1-tag:hover {
+  text-shadow: 0 0 18px #fff, 0 0 40px rgba(255,255,255,0.6);
+  box-shadow: 0 0 20px rgba(255,255,255,0.15);
+}
 
 /* ── LEFT SLIDE OVER SCHEDULE DRAWER ── */
 .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 150; backdrop-filter: blur(4px); }
@@ -170,27 +193,6 @@ nav {
 
 /* ── FOOTER ── */
 footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; justify-content: space-between; align-items: center; margin-top: 4rem; }
-
-/* ── DAY 1s TAGS ── */
-.day1-tag {
-  font-family: 'Cinzel', serif;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: #fff;
-  padding: 0.5rem 1.2rem;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 3px;
-  background: rgba(255,255,255,0.04);
-  text-shadow: 0 0 12px rgba(255,255,255,0.7), 0 0 28px rgba(255,255,255,0.35);
-  box-shadow: 0 0 10px rgba(255,255,255,0.08), inset 0 0 8px rgba(255,255,255,0.04);
-  transition: text-shadow 0.3s, box-shadow 0.3s;
-  cursor: default;
-}
-.day1-tag:hover {
-  text-shadow: 0 0 16px rgba(255,255,255,0.95), 0 0 40px rgba(255,255,255,0.5);
-  box-shadow: 0 0 18px rgba(255,255,255,0.15), inset 0 0 12px rgba(255,255,255,0.06);
-}
 .foot-l, .foot-r { font-size: 0.68rem; color: #fff; letter-spacing: 0.04em; }
 .foot-l a { text-decoration: underline; color: #fff; font-weight: 500; }
 </style>
@@ -251,15 +253,13 @@ footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; just
       </div>
     </section>
 
-    <section class="az-container">
+    <section class="az-container" style="margin-top:4rem;">
       <h2 class="section-title" style="margin-bottom:0.5rem;">Browse Alphabetically</h2>
       <p style="font-size:0.7rem; color:var(--text3);">Filter popular curated anime series by indexing initial tags.</p>
       <ul class="az-list" id="azList"></ul>
     </section>
 
-    <!-- DAY 1s -->
-    <section style="margin: 3rem 0 2rem;">
-      <h2 class="section-title" style="margin-bottom:1.5rem;">Day 1s</h2>
+    <section style="margin:3rem 0 2rem;padding:0 0.5rem;">
       <div style="display:flex;flex-wrap:wrap;gap:0.8rem;">
         <span class="day1-tag">Zaki</span>
       </div>
@@ -310,34 +310,29 @@ function initAZ() {
 
 // Fetch and Handle Hero Rotation Slider — famous anime with wide banners
 async function loadHeroSlider() {
-  // Current popular picks — MAL IDs, no DBZ
+  // Fresh anime picks with their MAL IDs — different from trending cards
+  // IDs: Jujutsu Kaisen, Dragon Ball Z, Sword Art Online, Tokyo Ghoul, Hunter x Hunter (2011)
   const PICKS = [
-    { id: 52991  },  // Frieren: Beyond Journey's End
-    { id: 21     },  // One Piece
-    { id: 40748  },  // Jujutsu Kaisen
-    { id: 38000  },  // Demon Slayer
-    { id: 47779  },  // Steel Ball Run: JoJo's Bizarre Adventure
+    { id: 40748, banner: 'https://cdn.myanimelist.net/images/anime/1171/109222l.jpg' },
+    { id: 813,   banner: 'https://cdn.myanimelist.net/images/anime/1277/142715l.jpg' },
+    { id: 11757, banner: 'https://cdn.myanimelist.net/images/anime/11/39717l.jpg' },
+    { id: 22319, banner: 'https://cdn.myanimelist.net/images/anime/5/64449l.jpg' },
+    { id: 11061, banner: 'https://cdn.myanimelist.net/images/anime/1337/99013l.jpg' },
   ];
   try {
     const results = await Promise.all(
-      PICKS.map(p =>
-        fetch(`https://api.jikan.moe/v4/anime/${p.id}`)
-          .then(r => r.json())
-          .then(d => d.data)
-          .catch(() => null)
-      )
+      PICKS.map(p => fetch(`https://api.jikan.moe/v4/anime/${p.id}`).then(r => r.json()).then(d => ({ ...d.data, _banner: p.banner })).catch(() => null))
     );
     const items = results.filter(Boolean);
     if (items.length === 0) return;
 
     let sliderHtml = items.map((a, idx) => {
       const title = a.title_english || a.title;
-      const synopsis = a.synopsis || 'No summary available.';
-      // Use the largest available image for best resolution
-      const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+      const synopsis = a.synopsis || "No summary available.";
+      const img = a._banner;
       return `
         <div class="hero-slide ${idx === 0 ? 'active' : ''}">
-          <img class="hero-bg" src="${img}" alt="" onerror="this.style.opacity='0'">
+          <img class="hero-bg" src="${img}" alt="">
           <div class="hero-content">
             <h1 class="hero-title">${title}</h1>
             <p class="hero-synopsis">${synopsis}</p>
@@ -352,11 +347,11 @@ async function loadHeroSlider() {
     let slides = document.querySelectorAll('.hero-slide');
     let currentSlide = 0;
     setInterval(() => {
-      if (slides.length === 0) return;
+      if(slides.length === 0) return;
       slides[currentSlide].classList.remove('active');
       currentSlide = (currentSlide + 1) % slides.length;
       slides[currentSlide].classList.add('active');
-    }, 6000);
+    }, 5000);
 
   } catch {
     document.getElementById('heroSlider').style.display = 'none';
