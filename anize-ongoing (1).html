@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AniZe — Ongoing Anime</title>
+<title>AniZe — Favourites</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -416,7 +416,7 @@ main {
 
   <!-- Header -->
   <div class="browser-header">
-    <h1 class="browser-title">Ongoing</h1>
+    <h1 class="browser-title">Favourites</h1>
     <p class="browser-count" id="animeCount">Loading...</p>
   </div>
 
@@ -662,7 +662,7 @@ document.addEventListener('DOMContentLoaded', () => loadAnime(1));
   </div>
 
   <!-- Genre Panel -->
-  <div id="sp-genre" style="display:none;padding:0.3rem 0.8rem;flex-wrap:wrap">
+  <div id="sp-genre" style="display:none;padding:0.6rem 0.8rem">
     <div style="display:grid;grid-template-columns:1fr 1fr;width:100%" id="spGenreList"></div>
   </div>
 
@@ -715,10 +715,17 @@ function spTab(name) {
 }
 
 function loadSpGenres() {
-  const GENRE_IDS_SP = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41};
+  const GENRE_IDS_SP = {
+    'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,
+    'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,
+    'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,
+    'Thriller':41,'Psychological':40,'Martial Arts':17,'Magic':16,
+    'Music':19,'Military':38,'Parody':20,'School':23,'Demons':6,
+    'Historical':13,'Kids':15,'Gourmet':47,'Avant Garde':5
+  };
   const genres = Object.keys(GENRE_IDS_SP);
   document.getElementById('spGenreList').innerHTML = genres.map(g =>
-    `<div onclick="window.location.href='anize-browse.html?genre=${GENRE_IDS_SP[g]}';closeSchedule()" style="padding:0.5rem 0.4rem;font-size:0.75rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c;display:flex;align-items:center;gap:0.4rem"><span style="color:#333">•</span>${g}</div>`
+    `<div onclick="window.location.href='anize-browse.html?genre=${GENRE_IDS_SP[g]}';closeSchedule()" style="padding:0.6rem 0.5rem;font-size:0.76rem;color:#555;cursor:pointer;border-bottom:1px solid #1c1c1c;display:flex;align-items:center;gap:0.5rem" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'"><span style="color:#333;font-size:0.6rem">•</span>${g}</div>`
   ).join('');
 }
 
