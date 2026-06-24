@@ -145,7 +145,7 @@ nav {
 .metric-list { display: flex; flex-direction: column; gap: 0.8rem; }
 .metric-row { display: flex; gap: 0.8rem; align-items: center; cursor: pointer; border-bottom: 1px solid transparent; padding-bottom: 0.4rem; }
 .metric-row:hover .m-title { color: var(--text); }
-.m-img { width: 48px; height: 65px; background: var(--bg3); object-fit: cover; border: 1px solid var(--border); border-radius: 2px; }
+.m-img { width: 68px; height: 92px; background: var(--bg3); object-fit: cover; border: 1px solid var(--border); border-radius: 2px; }
 .m-info { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
 .m-title { font-size: 0.75rem; font-weight: 600; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
 .m-meta { font-size: 0.65rem; color: var(--text3); }
@@ -256,14 +256,14 @@ function initAZ() {
 
 // Fetch and Handle Hero Rotation Slider — famous anime with wide banners
 async function loadHeroSlider() {
-  // Fresh anime picks with their MAL IDs — different from trending cards
-  // IDs: Jujutsu Kaisen, Dragon Ball Z, Sword Art Online, Tokyo Ghoul, Hunter x Hunter (2011)
+  // Famous anime with clear character face banners
+  // IDs: Attack on Titan, Demon Slayer, Jujutsu Kaisen, One Piece, Frieren
   const PICKS = [
-    { id: 40748, banner: 'https://cdn.myanimelist.net/images/anime/1171/109222l.jpg' },
-    { id: 813,   banner: 'https://cdn.myanimelist.net/images/anime/1277/142715l.jpg' },
-    { id: 11757, banner: 'https://cdn.myanimelist.net/images/anime/11/39717l.jpg' },
-    { id: 22319, banner: 'https://cdn.myanimelist.net/images/anime/5/64449l.jpg' },
-    { id: 11061, banner: 'https://cdn.myanimelist.net/images/anime/1337/99013l.jpg' },
+    { id: 16498, banner: 'https://cdn.myanimelist.net/images/anime/10/47347l.jpg' },   // Attack on Titan
+    { id: 38000, banner: 'https://cdn.myanimelist.net/images/anime/1286/99889l.jpg' }, // Demon Slayer
+    { id: 40748, banner: 'https://cdn.myanimelist.net/images/anime/1171/109222l.jpg' }, // Jujutsu Kaisen
+    { id: 21,    banner: 'https://cdn.myanimelist.net/images/anime/6/73245l.jpg' },    // One Piece
+    { id: 52991, banner: 'https://cdn.myanimelist.net/images/anime/1015/138006l.jpg' }, // Frieren
   ];
   try {
     const results = await Promise.all(

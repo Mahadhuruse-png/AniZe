@@ -573,7 +573,7 @@ async function loadAnime(page=1) {
     const seen = new Set();
     const raw = (d.data || []).filter(a => { if (seen.has(a.mal_id)) return false; seen.add(a.mal_id); return true; });
     const list = raw.length >= 5 ? raw.slice(0, Math.floor(raw.length / 5) * 5) : raw;
-    totalPages = d.pagination?.last_visible_page || 1;
+    totalPages = Math.min(d.pagination?.last_visible_page || 1, 1000);
 
     const total = d.pagination?.items?.total || raw.length;
     document.getElementById('animeCount').textContent = `${total.toLocaleString()} anime`;
