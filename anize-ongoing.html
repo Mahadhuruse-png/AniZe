@@ -396,9 +396,9 @@ main {
   <a href="anize-home.html" class="nav-logo">AniZe</a>
   <ul class="nav-links">
     <li><a href="anize-home.html">Home</a></li>
-    <li><a href="#" class="">New</a></li>
+    <li><a href="anize-browse.html">Trending</a></li>
     <li><a href="anize-ongoing.html" class="active">Ongoing</a></li>
-    <li><a href="#" onclick="openSchedule(event)">Schedule</a></li>
+    <li><a href="#" onclick="openSchedule(event)">Browse</a></li>
   </ul>
   <div class="nav-search">
     <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -552,7 +552,7 @@ async function loadAnime(page=1) {
 
   const SORT_DIR = { score: 'desc', popularity: 'asc', start_date: 'desc', title: 'asc', favorites: 'desc' };
   const sortField = currentFilters.sort || 'popularity';
-  let url = `https://api.jikan.moe/v4/anime?status=airing&sfw=true&page=${page}&limit=24&order_by=${sortField}&sort=${SORT_DIR[sortField]||'asc'}`;
+  let url = `https://api.jikan.moe/v4/anime?status=airing&sfw=true&page=${page}&limit=25&order_by=${sortField}&sort=${SORT_DIR[sortField]||'asc'}`;
   if (currentFilters.type)  url += `&type=${currentFilters.type}`;
   if (currentFilters.genre) url += `&genres=${currentFilters.genre}`;
   if (currentFilters.q)     url += `&q=${encodeURIComponent(currentFilters.q)}`;
@@ -566,10 +566,10 @@ async function loadAnime(page=1) {
 
     const seen = new Set();
     const raw = (d.data || []).filter(a => { if (seen.has(a.mal_id)) return false; seen.add(a.mal_id); return true; });
-    totalPages = d.pagination?.last_visible_page || 1;
-    const total = d.pagination?.items?.total || raw.length;
     const list = raw.length >= 5 ? raw.slice(0, Math.floor(raw.length / 5) * 5) : raw;
+    totalPages = Math.min(d.pagination?.last_visible_page || 1, 40); // allow deep pagination
 
+    const total = d.pagination?.items?.total || raw.length;
     document.getElementById('animeCount').textContent = `${total.toLocaleString()} anime`;
     document.getElementById('browseGrid').innerHTML = list.length
       ? list.map(animeCard).join('')

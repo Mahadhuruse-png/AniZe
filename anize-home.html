@@ -81,8 +81,8 @@ nav {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: top center;
-  filter: brightness(0.25) blur(2px);
+  object-position: center 15%;
+  filter: brightness(0.3) blur(2px);
   z-index: -1;
 }
 .hero-content { max-width: 600px; z-index: 5; }
@@ -182,7 +182,7 @@ footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; just
     <li><a href="anize-home.html" class="active">Home</a></li>
     <li><a href="anize-browse.html">Trending</a></li>
     <li><a href="anize-ongoing.html">Ongoing</a></li>
-    <li><a href="#" id="openScheduleDrawer">Schedule</a></li>
+    <li><a href="#" id="openScheduleDrawer">Browse</a></li>
   </ul>
   <div class="nav-search">
     <input type="text" id="navSearch" placeholder="Quick search anime...">
@@ -270,7 +270,7 @@ overlay.addEventListener('click', () => toggleDrawer(false));
 // Render Alphabet
 function initAZ() {
   const container = document.getElementById('azList');
-  const letters = ['All', '0-9', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')];
+  const letters = ['All', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')];
   container.innerHTML = letters.map(l => {
     let letterVal = l === 'All' ? '' : l;
     let queryUrl = `anize-browse.html?letter=${encodeURIComponent(letterVal)}&sort=popularity&type=tv`;
@@ -278,21 +278,24 @@ function initAZ() {
   }).join('');
 }
 
-// Fetch and Handle Hero Rotation Slider
+// Fetch and Handle Hero Rotation Slider — only the most famous anime
 async function loadHeroSlider() {
+  // Hardcoded top famous anime MAL IDs: AoT, One Piece, Naruto, Demon Slayer, FMA:B
+  const FAMOUS_IDS = [16498, 21, 20, 38000, 5114];
   try {
-    const res = await fetch(`https://api.jikan.moe/v4/top/anime?filter=airing&limit=5`);
-    const json = await res.json();
-    const items = json.data || [];
-    
+    const results = await Promise.all(
+      FAMOUS_IDS.map(id => fetch(`https://api.jikan.moe/v4/anime/${id}`).then(r => r.json()).then(d => d.data).catch(() => null))
+    );
+    const items = results.filter(Boolean);
     if (items.length === 0) return;
-    
+
     let sliderHtml = items.map((a, idx) => {
       const title = a.title_english || a.title;
-      const synopsis = a.synopsis || "No summary profile details filed.";
+      const synopsis = a.synopsis || "No summary available.";
+      const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
       return `
         <div class="hero-slide ${idx === 0 ? 'active' : ''}">
-          <img class="hero-bg" src="${a.images?.jpg?.large_image_url || a.images?.jpg?.image_url}" alt="">
+          <img class="hero-bg" src="${img}" alt="">
           <div class="hero-content">
             <h1 class="hero-title">${title}</h1>
             <p class="hero-synopsis">${synopsis}</p>
@@ -301,10 +304,9 @@ async function loadHeroSlider() {
         </div>
       `;
     }).join('');
-    
+
     document.getElementById('heroSlider').innerHTML = sliderHtml;
-    
-    // Auto Rotation Loop
+
     let slides = document.querySelectorAll('.hero-slide');
     let currentSlide = 0;
     setInterval(() => {
@@ -313,7 +315,7 @@ async function loadHeroSlider() {
       currentSlide = (currentSlide + 1) % slides.length;
       slides[currentSlide].classList.add('active');
     }, 5000);
-    
+
   } catch {
     document.getElementById('heroSlider').style.display = 'none';
   }
