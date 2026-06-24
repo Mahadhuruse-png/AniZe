@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AniZe — Browse Anime</title>
+<title>AniZe — Trending</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -31,17 +31,6 @@ body {
 }
 
 a { text-decoration: none; color: inherit; }
-
-/* Global scrollbar hider — keeps things clean, no clunky default scrollbars anywhere */
-body, div, aside, main, section, ul {
-  -ms-overflow-style: none !important;
-  scrollbar-width: none !important;
-}
-body::-webkit-scrollbar, div::-webkit-scrollbar, aside::-webkit-scrollbar, main::-webkit-scrollbar, section::-webkit-scrollbar, ul::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-}
 
 /* ── NAVBAR ── */
 nav {
@@ -254,7 +243,6 @@ main {
 .btn-filter:hover { opacity: 0.85; }
 .btn-filter svg { width: 13px; height: 13px; stroke: #000; fill: none; }
 
-/* ── ANIME GRID ── */
 .anime-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -277,7 +265,7 @@ main {
 .card-thumb {
   position: relative;
   width: 100%;
-  padding-top: 150%; /* 2:3 ratio enforced via padding trick */
+  padding-top: 150%;
   overflow: hidden;
   background: var(--bg3);
   border: 1px solid var(--border);
@@ -408,9 +396,9 @@ main {
   <a href="anize-home.html" class="nav-logo">AniZe</a>
   <ul class="nav-links">
     <li><a href="anize-home.html">Home</a></li>
-    <li><a href="anize-trending.html">Trending</a></li>
+    <li><a href="anize-trending.html" class="active">Trending</a></li>
     <li><a href="anize-favourites.html">Favourites</a></li>
-    <li><a href="#" onclick="openBrowsePanel(event)" class="active">Browse</a></li>
+    <li><a href="#" onclick="openBrowsePanel(event)">Browse</a></li>
   </ul>
   <div class="nav-search">
     <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -428,7 +416,8 @@ main {
 
   <!-- Header -->
   <div class="browser-header">
-    <h1 class="browser-title">Browser</h1>
+    <h1 class="browser-title">Trending</h1>
+    <p class="browser-count" id="animeCount">Loading...</p>
   </div>
 
   <!-- Filter Bar -->
@@ -457,16 +446,8 @@ main {
       <option value="8">Drama</option>
       <option value="10">Fantasy</option>
       <option value="14">Horror</option>
-      <option value="62">Isekai</option>
-      <option value="18">Mecha</option>
-      <option value="7">Mystery</option>
-      <option value="20">Parody</option>
-      <option value="40">Psychological</option>
       <option value="22">Romance</option>
       <option value="24">Sci-Fi</option>
-      <option value="23">School</option>
-      <option value="27">Shounen</option>
-      <option value="25">Shoujo</option>
       <option value="36">Slice of Life</option>
       <option value="30">Sports</option>
       <option value="37">Supernatural</option>
@@ -569,22 +550,15 @@ async function loadAnime(page=1) {
   renderSkeletons(24);
   document.getElementById('pagination').innerHTML = '';
 
-  const SORT_DIRECTION = { score: 'desc', popularity: 'asc', start_date: 'desc', title: 'asc', favorites: 'desc' };
-  const sortField = currentFilters.sort || document.getElementById('filterSort').value || 'score';
+  const SORT_DIR = { score: 'desc', popularity: 'asc', start_date: 'desc', title: 'asc', favorites: 'desc' };
+  const sortField = currentFilters.sort || 'popularity';
+  let url = `https://api.jikan.moe/v4/anime?sfw=true&page=${page}&limit=25&order_by=${sortField}&sort=${SORT_DIR[sortField]||'asc'}`;
+  if (currentFilters.status) url += `&status=${currentFilters.status}`;
+  if (currentFilters.type)  url += `&type=${currentFilters.type}`;
+  if (currentFilters.genre) url += `&genres=${currentFilters.genre}`;
+  if (currentFilters.q)     url += `&q=${encodeURIComponent(currentFilters.q)}`;
 
-  const params = new URLSearchParams();
-  params.set('page', page);
-  params.set('limit', 24);
-  params.set('sfw', 'true');
-  params.set('order_by', sortField);
-  params.set('sort', SORT_DIRECTION[sortField] || 'desc');
-  if (currentFilters.type)   params.set('type', currentFilters.type);
-  if (currentFilters.status) params.set('status', currentFilters.status);
-  if (currentFilters.genre)  params.set('genres', currentFilters.genre);
-  if (currentFilters.q)      params.set('q', currentFilters.q);
-  if (currentFilters.letter) params.set('letter', currentFilters.letter);
-
-  const doFetch = () => fetch(`https://api.jikan.moe/v4/anime?${params}`).then(r => { if (!r.ok) throw new Error(); return r.json(); });
+  const doFetch = () => fetch(url).then(r => { if (!r.ok) throw new Error(); return r.json(); });
 
   try {
     let d;
@@ -593,9 +567,11 @@ async function loadAnime(page=1) {
 
     const seen = new Set();
     const raw = (d.data || []).filter(a => { if (seen.has(a.mal_id)) return false; seen.add(a.mal_id); return true; });
-    totalPages = d.pagination?.last_visible_page || 1;
     const list = raw.length >= 5 ? raw.slice(0, Math.floor(raw.length / 5) * 5) : raw;
+    totalPages = d.pagination?.last_visible_page || 1;
 
+    const total = d.pagination?.items?.total || raw.length;
+    document.getElementById('animeCount').textContent = `${total.toLocaleString()} anime`;
     document.getElementById('browseGrid').innerHTML = list.length
       ? list.map(animeCard).join('')
       : '<p class="no-results">No anime found — try different filters.</p>';
@@ -625,38 +601,13 @@ function applyFilters() {
   loadAnime(1);
 }
 
-/* Check URL params — from homepage search or schedule genre sidebar */
+/* Check URL for search query from homepage */
 const urlParams = new URLSearchParams(window.location.search);
-const urlQ      = urlParams.get('q');
-const urlGenre  = urlParams.get('genre');
-const urlType   = urlParams.get('type');
-const urlStatus = urlParams.get('status');
-const urlSort   = urlParams.get('sort');
-const urlLetter = urlParams.get('letter');
-
+const urlQ = urlParams.get('q');
 if (urlQ) {
   document.getElementById('filterSearch').value = urlQ;
   document.getElementById('navSearch').value = urlQ;
   currentFilters.q = urlQ;
-}
-if (urlGenre) {
-  document.getElementById('filterGenre').value = urlGenre;
-  currentFilters.genre = urlGenre;
-}
-if (urlType) {
-  document.getElementById('filterType').value = urlType;
-  currentFilters.type = urlType;
-}
-if (urlStatus) {
-  document.getElementById('filterStatus').value = urlStatus;
-  currentFilters.status = urlStatus;
-}
-if (urlSort) {
-  document.getElementById('filterSort').value = urlSort;
-  currentFilters.sort = urlSort;
-}
-if (urlLetter) {
-  currentFilters.letter = urlLetter;
 }
 
 document.getElementById('navSearch').addEventListener('keydown', e => {
@@ -673,6 +624,8 @@ document.getElementById('filterSearch').addEventListener('keydown', e => {
 document.addEventListener('DOMContentLoaded', () => loadAnime(1));
 </script>
 
+
+</body>
 
 
 <!-- BROWSE SLIDE-OVER -->
