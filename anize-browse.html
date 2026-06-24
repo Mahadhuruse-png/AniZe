@@ -268,6 +268,7 @@ main {
 .anime-card {
   position: relative;
   cursor: pointer;
+  min-width: 0;
 }
 
 .anime-card:hover .card-img { filter: brightness(0.7); }
@@ -275,16 +276,17 @@ main {
 
 .card-thumb {
   position: relative;
-  aspect-ratio: 2/3;
   width: 100%;
+  padding-top: 150%; /* 2:3 ratio enforced via padding trick */
   overflow: hidden;
   background: var(--bg3);
   border: 1px solid var(--border);
   margin-bottom: 0.55rem;
-  flex-shrink: 0;
 }
 
 .card-img {
+  position: absolute;
+  inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
   display: block;
@@ -406,7 +408,7 @@ main {
   <a href="anize-home.html" class="nav-logo">AniZe</a>
   <ul class="nav-links">
     <li><a href="anize-home.html">Home</a></li>
-    <li><a href="anize-browse.html" class="active">Trending</a></li>
+    <li><a href="anize-browse.html" class="active">New</a></li>
     <li><a href="anize-ongoing.html">Ongoing</a></li>
     <li><a href="anize-schedule.html">Schedule</a></li>
   </ul>
@@ -535,7 +537,7 @@ function animeCard(a) {
   return `
     <div class="anime-card" onclick="window.location.href='anize-player.html?id=${a.mal_id}'">
       <div class="card-thumb">
-        <img class="card-img" src="${img}" alt="${title}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 2 3%22%3E%3Crect width=%222%22 height=%223%22 fill=%22%23111%22/%3E%3C/svg%3E'">
+        <img class="card-img" src="${img}" alt="${title}" loading="lazy" onerror="this.style.visibility='hidden'">
         <div class="card-ep">${eps}</div>
         ${status ? `<div class="card-badge">${status}</div>` : '<div class="card-sub">SUB</div>'}
         <div class="card-overlay"><div class="card-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
@@ -582,24 +584,15 @@ async function loadAnime(page=1) {
   if (currentFilters.q)      params.set('q', currentFilters.q);
   if (currentFilters.letter) params.set('letter', currentFilters.letter);
 
-  const fetchData = async () => {
-    const r = await fetch(`https://api.jikan.moe/v4/anime?${params}`);
-    if (!r.ok) throw new Error('bad response');
-    return r.json();
-  };
+  const doFetch = () => fetch(`https://api.jikan.moe/v4/anime?${params}`).then(r => { if (!r.ok) throw new Error(); return r.json(); });
 
   try {
     let d;
-    try { d = await fetchData(); }
-    catch {
-      await new Promise(res => setTimeout(res, 1000));
-      d = await fetchData(); // retry once
-    }
+    try { d = await doFetch(); }
+    catch { await new Promise(r => setTimeout(r, 1200)); d = await doFetch(); }
+
     const seen = new Set();
-    const raw = (d.data || []).filter(a => {
-      if (seen.has(a.mal_id)) return false;
-      seen.add(a.mal_id); return true;
-    });
+    const raw = (d.data || []).filter(a => { if (seen.has(a.mal_id)) return false; seen.add(a.mal_id); return true; });
     totalPages = d.pagination?.last_visible_page || 1;
     const list = raw.length >= 6 ? raw.slice(0, Math.floor(raw.length / 6) * 6) : raw;
 
@@ -682,7 +675,7 @@ document.addEventListener('DOMContentLoaded', () => loadAnime(1));
 <!-- SCHEDULE SLIDE-OVER -->
 <div id="scheduleOverlay" onclick="closeSchedule()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;opacity:0;transition:opacity 0.3s"></div>
 
-<div id="schedulePanel" style="display:none;position:fixed;left:0;top:0;bottom:0;width:320px;background:#0a0a0a;border-right:1px solid #1c1c1c;z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;flex-direction:column;scrollbar-width:none;-ms-overflow-style:none">
+<div id="schedulePanel" style="display:none;position:fixed;left:0;top:0;bottom:0;width:320px;background:#0a0a0a;border-right:1px solid #1c1c1c;z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;flex-direction:column">
 
   <!-- Panel Header -->
   <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid #1c1c1c;flex-shrink:0">
