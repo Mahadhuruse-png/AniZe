@@ -560,7 +560,7 @@ async function loadAnime(page=1) {
     if (currentFilters.genre) url += `&genres=${currentFilters.genre}`;
     if (currentFilters.q)     url += `&q=${encodeURIComponent(currentFilters.q)}`;
   } else {
-    url = `https://api.jikan.moe/v4/seasons/now?page=${page}&limit=24&sfw=true`;
+    url = `https://api.jikan.moe/v4/anime?sfw=true&status=airing&order_by=popularity&sort=asc&page=${page}&limit=24`;
   }
 
   const doFetch = () => fetch(url).then(r => { if (!r.ok) throw new Error(); return r.json(); });
