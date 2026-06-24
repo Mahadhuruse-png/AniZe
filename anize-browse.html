@@ -586,14 +586,12 @@ async function loadAnime(page=1) {
   try {
     const r = await fetch(`https://api.jikan.moe/v4/anime?${params}`);
     const d = await r.json();
-    // Deduplicate by mal_id
     const seen = new Set();
     const raw = (d.data || []).filter(a => {
       if (seen.has(a.mal_id)) return false;
       seen.add(a.mal_id); return true;
     });
     totalPages = d.pagination?.last_visible_page || 1;
-    // Trim to nearest multiple of 6 so every row is full
     const list = raw.length >= 6 ? raw.slice(0, Math.floor(raw.length / 6) * 6) : raw;
 
     document.getElementById('browseGrid').innerHTML = list.length

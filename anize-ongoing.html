@@ -547,10 +547,10 @@ async function loadAnime(page=1) {
   renderSkeletons(24);
   document.getElementById('pagination').innerHTML = '';
 
-  const SORT_DIRECTION = { score: 'desc', popularity: 'asc', start_date: 'desc', title: 'asc', favorites: 'desc' };
+  const SORT_DIR = { score: 'desc', popularity: 'asc', start_date: 'desc', title: 'asc', favorites: 'desc' };
   const sortField = currentFilters.sort || 'popularity';
 
-  let url = `https://api.jikan.moe/v4/anime?status=airing&order_by=${sortField}&sort=${SORT_DIRECTION[sortField]||'asc'}&sfw=true&page=${page}&limit=24`;
+  let url = `https://api.jikan.moe/v4/anime?status=airing&sfw=true&page=${page}&limit=24&order_by=${sortField}&sort=${SORT_DIR[sortField] || 'asc'}`;
   if (currentFilters.type)  url += `&type=${currentFilters.type}`;
   if (currentFilters.genre) url += `&genres=${currentFilters.genre}`;
   if (currentFilters.q)     url += `&q=${encodeURIComponent(currentFilters.q)}`;
@@ -565,7 +565,6 @@ async function loadAnime(page=1) {
     });
     totalPages = d.pagination?.last_visible_page || 1;
     const total = d.pagination?.items?.total || raw.length;
-    // Trim to nearest multiple of 6 so every row is full
     const list = raw.length >= 6 ? raw.slice(0, Math.floor(raw.length / 6) * 6) : raw;
 
     document.getElementById('animeCount').textContent = `${total.toLocaleString()} anime`;
