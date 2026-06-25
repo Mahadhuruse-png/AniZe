@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AniZe — My Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #000;
+  --bg2: #0a0a0a;
+  --bg3: #111;
+  --bg4: #161616;
+  --border: #1c1c1c;
+  --border2: #2a2a2a;
+  --text: #fff;
+  --text2: #888;
+  --text3: #555;
+  --nav-h: 58px;
+  --red: #e53935;
+}
+
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; overflow-x: hidden; }
+a { text-decoration: none; color: inherit; }
+*, div { -ms-overflow-style: none; scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: rgba(0,0,0,0.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+  display: flex; align-items: center; padding: 0 2rem; gap: 2rem;
+}
+.nav-logo { font-family: 'Cinzel', serif; font-size: 1.3rem; font-weight: 900; letter-spacing: 0.06em; cursor: pointer; }
+.nav-links { display: flex; align-items: center; gap: 0.2rem; list-style: none; }
+.nav-links a { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; color: var(--text3); padding: 0.4rem 0.75rem; border-radius: 4px; text-transform: uppercase; transition: color 0.2s; }
+.nav-links a:hover, .nav-links a.active { color: var(--text); }
+.nav-search { flex: 1; max-width: 400px; margin-left: auto; position: relative; }
+.nav-search input { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 0.45rem 1rem; border-radius: 4px; outline: none; font-size: 0.75rem; font-family: 'Inter', sans-serif; }
+.nav-search input::placeholder { color: var(--text3); }
+.nav-right { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+.nav-user-btn {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: var(--bg3); border: 1px solid var(--border2);
+  color: var(--text); font-family: 'Inter', sans-serif;
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+  padding: 0.38rem 0.85rem 0.38rem 0.6rem;
+  border-radius: 3px; cursor: pointer; transition: border-color 0.2s;
+}
+.nav-user-btn:hover { border-color: var(--text3); }
+.nav-avatar {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--red); display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.btn-login { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--bg); background: var(--text); border: none; padding: 0.42rem 1rem; border-radius: 3px; cursor: pointer; transition: opacity 0.2s; }
+.btn-login:hover { opacity: 0.85; }
+
+/* PAGE */
+.page-wrap {
+  padding-top: calc(var(--nav-h) + 3rem);
+  max-width: 900px;
+  margin: 0 auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-bottom: 5rem;
+}
+
+/* PROFILE HEADER */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2.5rem;
+}
+.profile-avatar-big {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--red);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 2rem; font-weight: 900; color: #fff;
+  flex-shrink: 0;
+}
+.profile-info { flex: 1; min-width: 0; }
+.profile-username {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem; font-weight: 900;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.35rem;
+}
+.profile-email { font-size: 0.78rem; color: var(--text3); margin-bottom: 0.5rem; }
+.profile-joined { font-size: 0.7rem; color: var(--text3); letter-spacing: 0.04em; }
+.btn-logout {
+  background: none; border: 1px solid var(--border2);
+  color: var(--text3); font-family: 'Inter', sans-serif;
+  font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 0.5rem 1.1rem;
+  border-radius: 3px; cursor: pointer; transition: all 0.2s;
+  flex-shrink: 0;
+}
+.btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+/* STATS ROW */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+@media (max-width: 600px) { .stats-row { grid-template-columns: repeat(3, 1fr); } }
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 1.2rem 1rem;
+  border-radius: 3px;
+  text-align: center;
+}
+.stat-num {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem; font-weight: 900;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+}
+.stat-label {
+  font-size: 0.6rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text3);
+}
+
+/* SECTION TITLE */
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text);
+  margin-bottom: 1.2rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.section-title a { font-family: 'Inter', sans-serif; font-size: 0.65rem; color: var(--text3); letter-spacing: 0.05em; }
+.section-title a:hover { color: var(--text); }
+
+/* WATCHLIST SECTION */
+.watchlist-section { margin-bottom: 3rem; }
+
+.wl-tabs {
+  display: flex; gap: 0; border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+.wl-tab {
+  background: none; border: none; border-bottom: 2px solid transparent;
+  padding: 0.5rem 1rem; margin-bottom: -1px;
+  font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text3); cursor: pointer; transition: color 0.2s, border-color 0.2s;
+}
+.wl-tab.active { color: var(--text); border-bottom-color: var(--text); }
+
+.wl-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.wl-item {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--bg2); border: 1px solid var(--border);
+  padding: 0.75rem 1rem; border-radius: 3px;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.wl-item:hover { border-color: var(--border2); }
+.wl-item img {
+  width: 42px; height: 58px; object-fit: cover;
+  border-radius: 2px; border: 1px solid var(--border); flex-shrink: 0;
+}
+.wl-item-info { flex: 1; min-width: 0; }
+.wl-item-title { font-size: 0.82rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 0.2rem; }
+.wl-item-meta { font-size: 0.65rem; color: var(--text3); }
+.wl-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; flex-shrink: 0; }
+.wl-status-badge {
+  font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 0.18rem 0.5rem; border-radius: 2px;
+}
+.status-watching  { background: rgba(33,150,243,0.15); color: #64b5f6; border: 1px solid rgba(33,150,243,0.3); }
+.status-planned   { background: rgba(255,255,255,0.06); color: var(--text3); border: 1px solid var(--border); }
+.status-completed { background: rgba(76,175,80,0.15); color: #81c784; border: 1px solid rgba(76,175,80,0.3); }
+.status-dropped   { background: rgba(229,57,53,0.15); color: #ef9a9a; border: 1px solid rgba(229,57,53,0.3); }
+.status-on-hold   { background: rgba(255,193,7,0.12); color: #ffd54f; border: 1px solid rgba(255,193,7,0.25); }
+
+.wl-score { font-size: 0.65rem; color: var(--text3); }
+
+.wl-empty {
+  text-align: center; padding: 3rem 1rem;
+  font-size: 0.78rem; color: var(--text3);
+}
+.wl-empty a { color: var(--text2); text-decoration: underline; }
+
+/* QUICK LINKS */
+.quick-links {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+  margin-bottom: 3rem;
+}
+@media (max-width: 600px) { .quick-links { grid-template-columns: 1fr 1fr; } }
+.quick-link-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  padding: 1.2rem 1rem; border-radius: 3px;
+  display: flex; flex-direction: column; gap: 0.5rem;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.quick-link-card:hover { border-color: var(--border2); }
+.ql-icon { font-size: 1.2rem; }
+.ql-label { font-size: 0.72rem; font-weight: 600; color: var(--text2); }
+.ql-sub { font-size: 0.62rem; color: var(--text3); }
+
+/* LOADING */
+.loading-placeholder {
+  display: flex; align-items: center; justify-content: center;
+  height: 200px; color: var(--text3); font-size: 0.75rem; letter-spacing: 0.1em;
+}
+
+/* FOOTER */
+footer { border-top: 1px solid var(--border); padding: 1.4rem 2rem; display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4rem; }
+.foot-l, .foot-r { font-size: 0.68rem; color: #fff; letter-spacing: 0.04em; }
+.foot-l a { text-decoration: underline; color: #fff; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="window.location.href='anize-home.html'">ANIZE</div>
+  <ul class="nav-links">
+    <li><a href="anize-home.html">Home</a></li>
+    <li><a href="anize-trending.html">Trending</a></li>
+    <li><a href="anize-favourites.html">Favourites</a></li>
+    <li><a href="#" onclick="openBrowsePanel(event)">Browse</a></li>
+  </ul>
+  <div class="nav-search">
+    <input type="text" id="navSearch" placeholder="Quick search anime...">
+  </div>
+  <div class="nav-right" id="navRight">
+    <!-- filled by JS -->
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- PROFILE HEADER -->
+  <div class="profile-header" id="profileHeader">
+    <div class="loading-placeholder">Loading account...</div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row" id="statsRow" style="display:none">
+    <div class="stat-card">
+      <div class="stat-num" id="statTotal">0</div>
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statWatching">0</div>
+      <div class="stat-label">Watching</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statCompleted">0</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statPlanned">0</div>
+      <div class="stat-label">Planned</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statDropped">0</div>
+      <div class="stat-label">Dropped</div>
+    </div>
+  </div>
+
+  <!-- WATCHLIST -->
+  <div class="watchlist-section">
+    <div class="section-title">
+      My Watchlist
+      <a href="anize-favourites.html">View All →</a>
+    </div>
+    <div class="wl-tabs" id="wlTabs">
+      <button class="wl-tab active" onclick="filterWatchlist('all')">All</button>
+      <button class="wl-tab" onclick="filterWatchlist('watching')">Watching</button>
+      <button class="wl-tab" onclick="filterWatchlist('planned')">Planned</button>
+      <button class="wl-tab" onclick="filterWatchlist('completed')">Completed</button>
+      <button class="wl-tab" onclick="filterWatchlist('dropped')">Dropped</button>
+    </div>
+    <div class="wl-list" id="wlList">
+      <div class="loading-placeholder">Loading watchlist...</div>
+    </div>
+  </div>
+
+  <!-- QUICK LINKS -->
+  <div class="section-title">Quick Access</div>
+  <div class="quick-links">
+    <div class="quick-link-card" onclick="window.location.href='anize-home.html'">
+      <div class="ql-icon">🏠</div>
+      <div class="ql-label">Home</div>
+      <div class="ql-sub">Back to main page</div>
+    </div>
+    <div class="quick-link-card" onclick="window.location.href='anize-browse.html'">
+      <div class="ql-icon">🔍</div>
+      <div class="ql-label">Browse</div>
+      <div class="ql-sub">Search all anime</div>
+    </div>
+    <div class="quick-link-card" onclick="window.location.href='anize-trending.html'">
+      <div class="ql-icon">🔥</div>
+      <div class="ql-label">Trending</div>
+      <div class="ql-sub">What's hot right now</div>
+    </div>
+    <div class="quick-link-card" onclick="window.location.href='anize-favourites.html'">
+      <div class="ql-icon">❤️</div>
+      <div class="ql-label">Favourites</div>
+      <div class="ql-sub">Your saved anime</div>
+    </div>
+    <div class="quick-link-card" onclick="window.location.href='anize-browse.html?sort=airing'">
+      <div class="ql-icon">📡</div>
+      <div class="ql-label">Airing Now</div>
+      <div class="ql-sub">Currently airing shows</div>
+    </div>
+    <div class="quick-link-card" onclick="AniZeAuth.logout('anize-login.html')" style="border-color:#1a0a0a">
+      <div class="ql-icon">🚪</div>
+      <div class="ql-label" style="color:#ef9a9a">Sign Out</div>
+      <div class="ql-sub">Log out of AniZe</div>
+    </div>
+  </div>
+
+</div>
+
+<footer style="border-top:1px solid #1c1c1c;padding:1.4rem 2.5rem;display:flex;align-items:center;justify-content:space-between;background:#000;">
+  <div style="display:flex;flex-direction:column;gap:0.3rem">
+    <span style="font-size:0.68rem;font-weight:500;letter-spacing:0.06em;color:#ccc">Made by <span style="color:#fff;font-weight:700">Team Re:start</span></span>
+    <a href="https://discord.gg/YyQ6qZ2nf5" target="_blank" style="font-size:0.64rem;color:#bbb;letter-spacing:0.04em;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#bbb'">discord.gg/YyQ6qZ2nf5</a>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem">
+    <span style="font-size:0.68rem;color:#ccc;letter-spacing:0.04em">© 2026 AniZe. All rights reserved.</span>
+    <span style="font-size:0.6rem;color:#aaa;letter-spacing:0.03em">AniZe does not store any files on its server. All contents are provided by non-affiliated third parties.</span>
+  </div>
+</footer>
+
+<script src="auth.js"></script>
+<script>
+// Redirect to login if not logged in
+if (!AniZeAuth.isLoggedIn()) {
+  window.location.href = 'anize-login.html';
+}
+
+let allWatchlist = [];
+let activeFilter = 'all';
+
+async function loadAccount() {
+  try {
+    // Get user info
+    const user = AniZeAuth.getUser();
+    if (!user) { AniZeAuth.logout(); return; }
+
+    // Render profile header
+    const initial = (user.username || 'U')[0].toUpperCase();
+    document.getElementById('profileHeader').innerHTML = `
+      <div class="profile-avatar-big">${initial}</div>
+      <div class="profile-info">
+        <div class="profile-username">${user.username}</div>
+        <div class="profile-email">${user.email}</div>
+        <div class="profile-joined">Member of AniZe</div>
+      </div>
+      <button class="btn-logout" onclick="AniZeAuth.logout('anize-login.html')">Sign Out</button>
+    `;
+
+    // Render nav
+    document.getElementById('navRight').innerHTML = `
+      <button class="nav-user-btn" onclick="window.location.href='anize-account.html'">
+        <div class="nav-avatar">${initial}</div>
+        ${user.username}
+      </button>
+    `;
+
+    // Load watchlist
+    const watchlist = await AniZeAuth.getWatchlist();
+    allWatchlist = watchlist || [];
+
+    // Stats
+    const counts = { watching: 0, planned: 0, completed: 0, dropped: 0, 'on-hold': 0 };
+    allWatchlist.forEach(e => { if (counts[e.status] !== undefined) counts[e.status]++; });
+
+    document.getElementById('statTotal').textContent     = allWatchlist.length;
+    document.getElementById('statWatching').textContent  = counts['watching'];
+    document.getElementById('statCompleted').textContent = counts['completed'];
+    document.getElementById('statPlanned').textContent   = counts['planned'];
+    document.getElementById('statDropped').textContent   = counts['dropped'];
+    document.getElementById('statsRow').style.display    = 'grid';
+
+    renderWatchlist('all');
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById('profileHeader').innerHTML = `<div class="loading-placeholder" style="color:#ef9a9a">Failed to load account.</div>`;
+  }
+}
+
+function renderWatchlist(filter) {
+  activeFilter = filter;
+
+  // Update tab styles
+  document.querySelectorAll('.wl-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase() === filter || (filter === 'all' && btn.textContent.toLowerCase() === 'all'));
+  });
+
+  const list = filter === 'all' ? allWatchlist : allWatchlist.filter(e => e.status === filter);
+  const container = document.getElementById('wlList');
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="wl-empty">
+        ${filter === 'all'
+          ? `Nothing in your watchlist yet. <a href="anize-browse.html">Browse anime</a> to add some.`
+          : `No anime with status "${filter}".`}
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = list.slice(0, 20).map(e => {
+    const statusClass = 'status-' + e.status.replace(' ', '-');
+    const progress = e.totalEps > 0 ? `${e.progress}/${e.totalEps} eps` : e.progress > 0 ? `Ep ${e.progress}` : '';
+    const score = e.score > 0 ? `★ ${e.score}` : '';
+    return `
+      <div class="wl-item" onclick="window.location.href='anize-details.html?id=${e.animeId}'">
+        <img src="${e.image || ''}" alt="${e.title}" onerror="this.style.display='none'">
+        <div class="wl-item-info">
+          <div class="wl-item-title">${e.title}</div>
+          <div class="wl-item-meta">${[progress, score].filter(Boolean).join(' · ') || 'No progress yet'}</div>
+        </div>
+        <div class="wl-item-right">
+          <span class="wl-status-badge ${statusClass}">${e.status}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterWatchlist(filter) {
+  renderWatchlist(filter);
+}
+
+document.getElementById('navSearch').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.value.trim()) {
+    window.location.href = `anize-browse.html?q=${encodeURIComponent(e.target.value.trim())}`;
+  }
+});
+
+loadAccount();
+</script>
+
+<!-- BROWSE SLIDE-OVER -->
+<div id="browseOverlay" onclick="closeBrowsePanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;opacity:0;transition:opacity 0.3s"></div>
+<div id="browsePanel" style="display:none;position:fixed;left:0;top:0;bottom:0;width:300px;background:#0a0a0a;border-right:1px solid #1c1c1c;z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;flex-direction:column">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;letter-spacing:0.06em;color:#fff">AniZe</span>
+    <button onclick="closeBrowsePanel()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.3rem;line-height:1">✕</button>
+  </div>
+  <div style="display:flex;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <button id="bpt-menu" onclick="bpTab('menu')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:none;border:none;border-bottom:2px solid #fff;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>Menu
+    </button>
+    <button id="bpt-genre" onclick="bpTab('genre')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Genre
+    </button>
+  </div>
+  <div id="bp-menu" style="padding:1rem 1.4rem;display:flex;flex-direction:column">
+    <div onclick="window.location.href='anize-browse.html?type=movie';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">Movies <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=tv';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">TV Series <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ova';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">OVAs <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ona';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">ONAs <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=special';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">Specials <span style="color:#333">›</span></div>
+    <div style="padding:1rem 0 0.4rem;font-size:0.58rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#333">Quick Navigation</div>
+    <div onclick="window.location.href='anize-home.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Home</div>
+    <div onclick="window.location.href='anize-favourites.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Favourites</div>
+    <div onclick="window.location.href='anize-trending.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Trending</div>
+  </div>
+  <div id="bp-genre" style="display:none;flex-direction:column"><div id="bpGenreList"></div></div>
+</div>
+<script>
+const BP_GENRES = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41,'Martial Arts':17,'Military':38,'Music':19,'Psychological':40,'School':23,'Seinen':42,'Shoujo':25,'Shounen':27,'Space':29,'Vampire':32};
+function openBrowsePanel(e) {
+  if(e) e.preventDefault();
+  const overlay = document.getElementById('browseOverlay');
+  const panel = document.getElementById('browsePanel');
+  overlay.style.display='block'; panel.style.display='flex'; panel.style.flexDirection='column';
+  requestAnimationFrame(()=>{ overlay.style.opacity='1'; panel.style.transform='translateX(0)'; });
+  document.getElementById('bpGenreList').innerHTML = Object.keys(BP_GENRES).map(g =>
+    `<div onclick="window.location.href='anize-browse.html?genre=${BP_GENRES[g]}';closeBrowsePanel()" style="padding:0.65rem 1.4rem;font-size:0.8rem;color:#777;cursor:pointer;border-bottom:1px solid #111;display:flex;align-items:center;gap:0.6rem" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#777'"><span style="color:#333">•</span>${g}</div>`
+  ).join('');
+}
+function closeBrowsePanel() {
+  const overlay=document.getElementById('browseOverlay'); const panel=document.getElementById('browsePanel');
+  overlay.style.opacity='0'; panel.style.transform='translateX(-100%)';
+  setTimeout(()=>{ overlay.style.display='none'; panel.style.display='none'; },300);
+}
+function bpTab(name) {
+  ['menu','genre'].forEach(t => {
+    document.getElementById('bpt-'+t).style.color = t===name?'#fff':'#555';
+    document.getElementById('bpt-'+t).style.borderBottomColor = t===name?'#fff':'transparent';
+    document.getElementById('bp-'+t).style.display = t===name?'flex':'none';
+    document.getElementById('bp-'+t).style.flexDirection='column';
+  });
+}
+</script>
+
+</body>
+</html>
