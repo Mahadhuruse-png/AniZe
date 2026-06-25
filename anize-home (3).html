@@ -59,9 +59,8 @@ nav {
 .hero-slider {
   position: relative;
   width: 100%;
-  height: 540px;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
+  height: min(600px, 90vh);
+  background: #000;
   overflow: hidden;
   margin-bottom: 3.5rem;
 }
@@ -69,10 +68,10 @@ nav {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 0.8s ease-in-out;
+  transition: opacity 1s ease-in-out;
   display: flex;
-  align-items: center;
-  padding: 0 4rem;
+  align-items: flex-end;
+  padding: 0 0 4rem 4rem;
 }
 .hero-slide.active { opacity: 1; z-index: 2; }
 .hero-bg {
@@ -81,16 +80,50 @@ nav {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 15%;
-  transform: scale(1.08);
-  filter: brightness(0.42);
-  z-index: -1;
+  object-position: center top;
+  z-index: 0;
 }
-.hero-content { max-width: 600px; z-index: 5; }
-.hero-title { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; margin-bottom: 1rem; line-height: 1.2; letter-spacing: 0.02em; }
-.hero-synopsis { font-size: 0.82rem; color: var(--text2); line-height: 1.6; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.hero-btn { display: inline-block; background: var(--text); color: var(--bg); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; padding: 0.6rem 1.5rem; border-radius: 3px; letter-spacing: 0.1em; transition: opacity 0.2s; cursor: pointer; }
-.hero-btn:hover { opacity: 0.85; }
+/* Strong left gradient — text readable without dimming whole image */
+.hero-slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 35%, rgba(0,0,0,0.15) 65%, rgba(0,0,0,0) 100%);
+  z-index: 1;
+}
+/* Bottom fade into page */
+.hero-slide::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 130px;
+  background: linear-gradient(transparent, #000);
+  z-index: 1;
+}
+.hero-content { max-width: 560px; z-index: 5; position: relative; }
+.hero-type-badge { display: inline-flex; align-items: center; gap: 0.55rem; margin-bottom: 0.75rem; }
+.hero-type-pill { background: #e53935; color: #fff; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.12em; padding: 0.22rem 0.55rem; border-radius: 2px; text-transform: uppercase; }
+.hero-type-meta { font-size: 0.72rem; color: rgba(255,255,255,0.6); letter-spacing: 0.04em; }
+.hero-genres { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-bottom: 0.7rem; }
+.hero-genre-tag { font-size: 0.68rem; color: rgba(255,255,255,0.5); }
+.hero-genre-tag:not(:last-child)::after { content: ','; margin-right: 0.1rem; }
+.hero-title { font-family: 'Inter', sans-serif; font-size: clamp(1.6rem, 2.8vw, 2.5rem); font-weight: 800; margin-bottom: 0.6rem; line-height: 1.15; letter-spacing: -0.01em; color: #fff; text-shadow: 0 2px 16px rgba(0,0,0,0.6); }
+.hero-synopsis { font-size: 0.78rem; color: rgba(255,255,255,0.62); line-height: 1.65; margin-bottom: 0.85rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-width: 480px; }
+.hero-status-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.4rem; flex-wrap: wrap; }
+.hero-badge { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; padding: 0.2rem 0.5rem; border: 1px solid rgba(255,255,255,0.22); border-radius: 2px; color: rgba(255,255,255,0.7); text-transform: uppercase; }
+.hero-badge.hd { border-color: rgba(255,255,255,0.45); color: #fff; }
+.hero-dot-sep { color: rgba(255,255,255,0.28); font-size: 0.55rem; }
+.hero-actions { display: flex; align-items: center; gap: 0.8rem; }
+.hero-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: #e53935; color: #fff; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.65rem 1.6rem; border-radius: 50px; cursor: pointer; transition: background 0.2s, transform 0.15s; border: none; font-family: 'Inter', sans-serif; }
+.hero-btn:hover { background: #c62828; transform: scale(1.03); }
+.hero-btn svg { width: 13px; height: 13px; fill: #fff; flex-shrink: 0; }
+/* Slide counter bottom-right */
+.hero-counter { position: absolute; bottom: 1.6rem; right: 2rem; z-index: 10; display: flex; align-items: baseline; gap: 0.2rem; font-size: 0.7rem; color: rgba(255,255,255,0.4); font-weight: 600; letter-spacing: 0.05em; }
+.hero-counter .cur { color: #fff; font-size: 1.1rem; font-weight: 800; }
+/* Progress dots bottom-left */
+.hero-dots { position: absolute; bottom: 1.5rem; left: 4rem; z-index: 10; display: flex; gap: 0.45rem; align-items: center; }
+.hero-dot-el { width: 20px; height: 2px; background: rgba(255,255,255,0.2); border-radius: 2px; cursor: pointer; transition: background 0.3s, width 0.3s; }
+.hero-dot-el.active { background: #fff; width: 36px; }
 
 /* ── MAIN LAYOUT ── */
 .home-main { padding: calc(var(--nav-h) + 0rem) 0rem 2rem 0rem; max-width: 1600px; margin: 0 auto; }
@@ -255,55 +288,127 @@ function initAZ() {
   }).join('');
 }
 
-// Fetch and Handle Hero Rotation Slider — famous anime with wide banners
+// Fetch and Handle Hero Rotation Slider
 async function loadHeroSlider() {
-  // Each anime has a custom object-position so the main character face is always centered
+  // AniList IDs for each anime (different from MAL IDs)
   const PICKS = [
-    { id: 52991, banner: 'https://cdn.myanimelist.net/images/anime/1015/138006l.jpg', pos: '50% 20%' },  // Frieren
-    { id: 40748, banner: 'https://cdn.myanimelist.net/images/anime/1171/109222l.jpg', pos: '60% 15%' },  // Jujutsu Kaisen
-    { id: 38000, banner: 'https://cdn.myanimelist.net/images/anime/1286/99889l.jpg',  pos: '50% 10%' },  // Demon Slayer
-    { id: 5114,  banner: 'https://cdn.myanimelist.net/images/anime/1223/96541l.jpg',  pos: '40% 15%' },  // FMAB
-    { id: 11061, banner: 'https://cdn.myanimelist.net/images/anime/1337/99013l.jpg',  pos: '50% 10%' },  // HxH
-    { id: 1535,  banner: 'https://cdn.myanimelist.net/images/anime/1935/127974l.jpg', pos: '50% 10%' },  // Death Note
-    { id: 16498, banner: 'https://cdn.myanimelist.net/images/anime/10/47347l.jpg',    pos: '50% 15%' },  // AoT
-    { id: 47778, banner: 'https://cdn.myanimelist.net/images/anime/1887/117644l.jpg', pos: '50% 10%' },  // Bleach TYBW
+    { malId: 52991, alId: 154587, title: "Frieren: Beyond Journey's End",      type: 'TV', year: 2023 },
+    { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                      type: 'TV', year: 2020 },
+    { malId: 38000, alId: 101922, title: 'Demon Slayer: Kimetsu no Yaiba',      type: 'TV', year: 2019 },
+    { malId: 5114,  alId: 5114,   title: 'Fullmetal Alchemist: Brotherhood',    type: 'TV', year: 2009 },
+    { malId: 11061, alId: 11061,  title: 'Hunter x Hunter (2011)',               type: 'TV', year: 2011 },
+    { malId: 1535,  alId: 1535,   title: 'Death Note',                          type: 'TV', year: 2006 },
+    { malId: 16498, alId: 16498,  title: 'Attack on Titan',                     type: 'TV', year: 2013 },
+    { malId: 47778, alId: 142838, title: 'Bleach: Thousand-Year Blood War',     type: 'TV', year: 2022 },
   ];
-  try {
-    const results = await Promise.all(
-      PICKS.map(p => fetch(`https://api.jikan.moe/v4/anime/${p.id}`).then(r => r.json()).then(d => ({ ...d.data, _banner: p.banner, _pos: p.pos })).catch(() => null))
-    );
-    const items = results.filter(Boolean);
-    if (items.length === 0) return;
 
-    let sliderHtml = items.map((a, idx) => {
-      const title = a.title_english || a.title;
-      const synopsis = a.synopsis || "No summary available.";
-      const img = a._banner;
-      const pos = a._pos || '50% 15%';
+  try {
+    // Step 1: Get real wide banner images from AniList GraphQL (public, no auth)
+    const alQuery = `{${PICKS.map((p, i) => `a${i}: Media(id: ${p.alId}, type: ANIME) { bannerImage }`).join(' ')}}`;
+    const alRes = await fetch('https://graphql.anilist.co', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ query: alQuery })
+    });
+    const alJson = await alRes.json();
+    const banners = alJson?.data || {};
+
+    // Step 2: Get metadata from Jikan (staggered to avoid rate limits)
+    const jikanResults = [];
+    for (let i = 0; i < PICKS.length; i++) {
+      if (i > 0) await DELAY(250);
+      try {
+        const r = await fetch(`https://api.jikan.moe/v4/anime/${PICKS[i].malId}`);
+        const j = await r.json();
+        jikanResults.push(j.data || null);
+      } catch { jikanResults.push(null); }
+    }
+
+    const items = PICKS.map((p, i) => ({
+      ...(jikanResults[i] || {}),
+      mal_id:         p.malId,
+      _banner:        banners[`a${i}`]?.bannerImage || null,
+      _type:          p.type,
+      _year:          p.year,
+      _fallbackTitle: p.title,
+    }));
+
+    const total = items.length;
+
+    const slidesHtml = items.map((a, idx) => {
+      const title = (a.title_english && a.title_english !== 'null' && a.title_english !== 'undefined')
+        ? a.title_english
+        : (a.title || a._fallbackTitle);
+      const synopsis = (a.synopsis || '').replace(/\[Written by MAL Rewrite\]/g, '').trim();
+      const status = a.status || 'Finished';
+      const eps = a.episodes ? `${a.episodes} Episodes` : 'Ongoing';
+      const year = a._year;
+      const type = a._type;
+
+      // Banner priority: AniList wide > MAL large image
+      const imgSrc = a._banner || a.images?.jpg?.large_image_url || '';
+      const imgFallback = a.images?.jpg?.large_image_url || '';
+
       return `
-        <div class="hero-slide ${idx === 0 ? 'active' : ''}">
-          <img class="hero-bg" src="${img}" alt="" style="object-position:${pos}">
+        <div class="hero-slide${idx === 0 ? ' active' : ''}" data-index="${idx}">
+          <img class="hero-bg" src="${imgSrc}" alt="${title}"
+               loading="${idx === 0 ? 'eager' : 'lazy'}"
+               onerror="this.onerror=null;this.src='${imgFallback}'">
           <div class="hero-content">
+            <div class="hero-type-badge">
+              <span class="hero-type-pill">${type}</span>
+              <span class="hero-type-meta">${year}</span>
+            </div>
             <h1 class="hero-title">${title}</h1>
             <p class="hero-synopsis">${synopsis}</p>
-            <div class="hero-btn" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">Watch Now</div>
+            <div class="hero-status-row">
+              <span class="hero-badge hd">HD</span>
+              <span class="hero-dot-sep">•</span>
+              <span class="hero-badge">${year}</span>
+              <span class="hero-dot-sep">•</span>
+              <span class="hero-badge">${status}</span>
+              <span class="hero-dot-sep">•</span>
+              <span class="hero-badge">${eps}</span>
+            </div>
+            <div class="hero-actions">
+              <button class="hero-btn" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
+                <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Watch Now
+              </button>
+            </div>
           </div>
         </div>
       `;
     }).join('');
 
-    document.getElementById('heroSlider').innerHTML = sliderHtml;
+    // Dots
+    const dotsHtml = items.map((_, i) =>
+      `<div class="hero-dot-el${i === 0 ? ' active' : ''}" onclick="goToSlide(${i})"></div>`
+    ).join('');
 
-    let slides = document.querySelectorAll('.hero-slide');
-    let currentSlide = 0;
-    setInterval(() => {
-      if(slides.length === 0) return;
-      slides[currentSlide].classList.remove('active');
-      currentSlide = (currentSlide + 1) % slides.length;
-      slides[currentSlide].classList.add('active');
-    }, 5000);
+    document.getElementById('heroSlider').innerHTML =
+      slidesHtml +
+      `<div class="hero-dots" id="heroDots">${dotsHtml}</div>` +
+      `<div class="hero-counter"><span class="cur" id="heroCountCur">01</span> / ${String(total).padStart(2,'0')}</div>`;
 
-  } catch {
+    // Auto-rotate
+    let current = 0;
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots = document.querySelectorAll('.hero-dot-el');
+
+    window.goToSlide = function(idx) {
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      current = idx;
+      slides[current].classList.add('active');
+      dots[current].classList.add('active');
+      document.getElementById('heroCountCur').textContent = String(current + 1).padStart(2, '0');
+    };
+
+    setInterval(() => goToSlide((current + 1) % slides.length), 6000);
+
+  } catch(e) {
+    console.error('Hero slider failed:', e);
     document.getElementById('heroSlider').style.display = 'none';
   }
 }
