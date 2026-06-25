@@ -452,7 +452,7 @@ async function loadDetails() {
             return { ...r, img: rJson.data?.images?.jpg?.large_image_url || rJson.data?.images?.jpg?.image_url || '' };
           } catch { return { ...r, img: '' }; }
         }));
-        document.getElementById('relatedGrid').innerHTML = relWithImages.map(r => `
+        document.getElementById('relatedGrid').innerHTML = relWithImages.filter(r => r.img).map(r => `
           <div class="rel-card" onclick="window.location.href='anize-details.html?id=${r.mal_id}'">
             <img class="rel-thumb" src="${r.img}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
             <div class="rel-info">
