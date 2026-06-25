@@ -200,20 +200,19 @@ nav {
 
 /* QUICK LINKS */
 .quick-links {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
   margin-bottom: 3rem;
 }
-@media (max-width: 600px) { .quick-links { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 700px) { .quick-links { grid-template-columns: 1fr 1fr; } }
 .quick-link-card {
   background: var(--bg2); border: 1px solid var(--border);
   padding: 1.2rem 1rem; border-radius: 3px;
-  display: flex; flex-direction: column; gap: 0.5rem;
+  display: flex; flex-direction: column; gap: 0.4rem;
   cursor: pointer; transition: border-color 0.2s;
 }
 .quick-link-card:hover { border-color: var(--border2); }
-.ql-icon { font-size: 1.2rem; }
-.ql-label { font-size: 0.72rem; font-weight: 600; color: var(--text2); }
-.ql-sub { font-size: 0.62rem; color: var(--text3); }
+.ql-label { font-family: 'Cinzel', serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; color: var(--text); }
+.ql-sub { font-size: 0.58rem; color: var(--text3); letter-spacing: 0.02em; }
 
 /* LOADING */
 .loading-placeholder {
@@ -295,37 +294,22 @@ footer { border-top: 1px solid var(--border); padding: 1.4rem 2rem; display: fle
   </div>
 
   <!-- QUICK LINKS -->
-  <div class="section-title">Quick Access</div>
   <div class="quick-links">
     <div class="quick-link-card" onclick="window.location.href='anize-home.html'">
-      <div class="ql-icon">🏠</div>
       <div class="ql-label">Home</div>
-      <div class="ql-sub">Back to main page</div>
-    </div>
-    <div class="quick-link-card" onclick="window.location.href='anize-browse.html'">
-      <div class="ql-icon">🔍</div>
-      <div class="ql-label">Browse</div>
-      <div class="ql-sub">Search all anime</div>
+      <div class="ql-sub">anize.vercel.app/anize-home.html</div>
     </div>
     <div class="quick-link-card" onclick="window.location.href='anize-trending.html'">
-      <div class="ql-icon">🔥</div>
       <div class="ql-label">Trending</div>
-      <div class="ql-sub">What's hot right now</div>
+      <div class="ql-sub">anize.vercel.app/anize-trending.html</div>
     </div>
     <div class="quick-link-card" onclick="window.location.href='anize-favourites.html'">
-      <div class="ql-icon">❤️</div>
       <div class="ql-label">Favourites</div>
-      <div class="ql-sub">Your saved anime</div>
+      <div class="ql-sub">anize.vercel.app/anize-favourites.html</div>
     </div>
-    <div class="quick-link-card" onclick="window.location.href='anize-browse.html?sort=airing'">
-      <div class="ql-icon">📡</div>
-      <div class="ql-label">Airing Now</div>
-      <div class="ql-sub">Currently airing shows</div>
-    </div>
-    <div class="quick-link-card" onclick="AniZeAuth.logout('anize-login.html')" style="border-color:#1a0a0a">
-      <div class="ql-icon">🚪</div>
-      <div class="ql-label" style="color:#ef9a9a">Sign Out</div>
-      <div class="ql-sub">Log out of AniZe</div>
+    <div class="quick-link-card" onclick="openBrowsePanel(event)">
+      <div class="ql-label">Browse</div>
+      <div class="ql-sub">anize.vercel.app/anize-account.html</div>
     </div>
   </div>
 
