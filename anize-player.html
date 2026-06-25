@@ -420,7 +420,415 @@ nav {
   </div>
 </footer>
 
+<!-- BROWSE SLIDE-OVER (same as other pages) -->
+<div id="browseOverlay" onclick="closeBrowsePanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;opacity:0;transition:opacity 0.3s"></div>
+<div id="browsePanel" style="display:none;position:fixed;left:0;top:0;bottom:0;width:300px;background:#0a0a0a;border-right:1px solid #1c1c1c;z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;flex-direction:column">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;letter-spacing:0.06em;color:#fff">AniZe</span>
+    <button onclick="closeBrowsePanel()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.3rem;line-height:1">✕</button>
+  </div>
+  <div style="display:flex;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <button id="bpt-menu" onclick="bpTab('menu')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:none;border:none;border-bottom:2px solid #fff;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      Menu
+    </button>
+    <button id="bpt-genre" onclick="bpTab('genre')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Genre
+    </button>
+  </div>
+  <div id="bp-menu" style="padding:1rem 1.4rem;display:flex;flex-direction:column">
+    <div onclick="window.location.href='anize-browse.html?type=movie';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">Movies <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=tv';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">TV Series <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ova';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">OVAs <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ona';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">ONAs <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=special';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">Specials <span style="color:#333">›</span></div>
+    <div style="padding:1rem 0 0.4rem;font-size:0.58rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#333">Quick Navigation</div>
+    <div onclick="window.location.href='anize-home.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Home</div>
+    <div onclick="window.location.href='anize-favourites.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Favourites</div>
+    <div onclick="window.location.href='anize-trending.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Trending</div>
+  </div>
+  <div id="bp-genre" style="display:none;flex-direction:column">
+    <div id="bpGenreList"></div>
+  </div>
+</div>
 
+<script>
+// ── BROWSE PANEL ──────────────────────────────────────────────────────────────
+const BP_GENRES = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41,'Martial Arts':17,'Military':38,'Music':19,'Psychological':40,'School':23,'Seinen':42,'Shoujo':25,'Shounen':27,'Space':29,'Vampire':32};
+function openBrowsePanel(e) {
+  if(e) e.preventDefault();
+  const ov = document.getElementById('browseOverlay'), pn = document.getElementById('browsePanel');
+  ov.style.display = 'block'; pn.style.display = 'flex'; pn.style.flexDirection = 'column';
+  requestAnimationFrame(() => { ov.style.opacity='1'; pn.style.transform='translateX(0)'; });
+  document.getElementById('bpGenreList').innerHTML = Object.keys(BP_GENRES).map(g =>
+    `<div onclick="window.location.href='anize-browse.html?genre=${BP_GENRES[g]}';closeBrowsePanel()" style="padding:0.65rem 1.4rem;font-size:0.8rem;color:#777;cursor:pointer;border-bottom:1px solid #111;display:flex;align-items:center;gap:0.6rem" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#777'"><span style="color:#333">•</span>${g}</div>`
+  ).join('');
+}
+function closeBrowsePanel() {
+  const ov = document.getElementById('browseOverlay'), pn = document.getElementById('browsePanel');
+  ov.style.opacity='0'; pn.style.transform='translateX(-100%)';
+  setTimeout(() => { ov.style.display='none'; pn.style.display='none'; }, 300);
+}
+function bpTab(name) {
+  ['menu','genre'].forEach(t => {
+    document.getElementById('bpt-'+t).style.color = t===name ? '#fff' : '#555';
+    document.getElementById('bpt-'+t).style.borderBottomColor = t===name ? '#fff' : 'transparent';
+    const el = document.getElementById('bp-'+t);
+    el.style.display = t===name ? 'flex' : 'none';
+    el.style.flexDirection = 'column';
+  });
+}
+function openSchedule(e) { if(e) e.preventDefault(); }
+
+// ── SEARCH ────────────────────────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.value.trim()) {
+    window.location.href = `anize-browse.html?q=${encodeURIComponent(e.target.value.trim())}`;
+  }
+});
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const DELAY = ms => new Promise(r => setTimeout(r, ms));
+const params = new URLSearchParams(location.search);
+const MAL_ID = params.get('id');
+const EP_PARAM = parseInt(params.get('ep')) || 1;
+
+let animeData = null;
+let currentEp = EP_PARAM;
+let currentServer = 'gogoanime';
+let totalEpisodes = 0;
+let currentRangeStart = 0; // which range chunk is visible (0-indexed, step 100)
+const RANGE_SIZE = 100;
+
+// Watched episodes — stored in localStorage per anime
+function getWatched() {
+  if (!MAL_ID) return new Set();
+  try { return new Set(JSON.parse(localStorage.getItem(`watched_${MAL_ID}`) || '[]')); }
+  catch { return new Set(); }
+}
+function markWatched(ep) {
+  if (!MAL_ID) return;
+  const s = getWatched(); s.add(ep);
+  localStorage.setItem(`watched_${MAL_ID}`, JSON.stringify([...s]));
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+if (!MAL_ID) {
+  document.getElementById('breadTitle').textContent = 'Unknown Anime';
+  document.getElementById('animeInfoBar').innerHTML = '<p style="padding:1rem;font-size:0.8rem;color:#555">No anime ID provided. <a href="anize-browse.html" style="color:#888">Browse anime →</a></p>';
+  document.getElementById('epGrid').innerHTML = '';
+} else {
+  loadAnime();
+}
+
+// ── LOAD ANIME DATA ───────────────────────────────────────────────────────────
+async function loadAnime() {
+  try {
+    // Fetch full anime details
+    const res = await fetch(`https://api.jikan.moe/v4/anime/${MAL_ID}/full`);
+    const json = await res.json();
+    if (!json.data) throw new Error('No data');
+    animeData = json.data;
+
+    renderInfoBar(animeData);
+    renderEpisodeSection(animeData);
+    document.title = `AniZe — ${animeData.title_english || animeData.title}`;
+
+    // Auto-play episode from URL param
+    if (EP_PARAM > 0) selectEpisode(EP_PARAM);
+
+    // Fetch related / recommendations after a short delay (rate limit friendly)
+    await DELAY(400);
+    loadRelated(animeData);
+
+  } catch (err) {
+    console.error('Failed to load anime:', err);
+    document.getElementById('animeInfoBar').innerHTML = '<p style="padding:1.2rem;font-size:0.8rem;color:#555">Failed to load anime info. <a href="anize-browse.html" style="color:#888">Go back →</a></p>';
+  }
+}
+
+// ── RENDER INFO BAR ───────────────────────────────────────────────────────────
+function renderInfoBar(a) {
+  const title = a.title_english || a.title;
+  const synopsis = a.synopsis || 'No synopsis available.';
+  const score = a.score ? `★ ${a.score.toFixed(1)}` : 'N/A';
+  const year = a.aired?.prop?.from?.year || '';
+  const type = a.type || 'TV';
+  const status = a.status || '';
+  const eps = a.episodes ? `${a.episodes} eps` : 'Ongoing';
+  const studios = (a.studios || []).map(s => s.name).join(', ') || 'Unknown';
+
+  // Breadcrumb
+  document.getElementById('breadTitle').textContent = title;
+  document.getElementById('breadTitle').style.color = '#888';
+
+  document.getElementById('animeInfoBar').innerHTML = `
+    <h1>${title}</h1>
+    <div class="anime-meta-pills">
+      <span class="meta-pill anime-rating">${score}</span>
+      <span class="meta-pill">${type}</span>
+      ${year ? `<span class="meta-pill">${year}</span>` : ''}
+      <span class="meta-pill">${eps}</span>
+      <span class="meta-pill">${status}</span>
+      ${studios ? `<span class="meta-pill">${studios}</span>` : ''}
+    </div>
+    <div style="position:relative">
+      <div class="anime-synopsis" id="synopsisText">${synopsis}<div class="synopsis-fade" id="synFade"></div></div>
+      <span class="synopsis-toggle" id="synToggle" onclick="toggleSynopsis()">Show more ▾</span>
+    </div>
+  `;
+}
+
+function toggleSynopsis() {
+  const el = document.getElementById('synopsisText');
+  const fade = document.getElementById('synFade');
+  const btn = document.getElementById('synToggle');
+  const expanded = el.classList.toggle('expanded');
+  fade.classList.toggle('hidden', expanded);
+  btn.textContent = expanded ? 'Show less ▴' : 'Show more ▾';
+}
+
+// ── EPISODE SECTION ───────────────────────────────────────────────────────────
+function renderEpisodeSection(a) {
+  totalEpisodes = a.episodes || 0;
+
+  // If episodes unknown (airing), try to show at least some
+  // We'll render a grid — for ongoing shows with unknown ep count we show up to 9999 by watching the episode count
+  // If 0 (unknown), show a placeholder row of 12 as "partial"
+  const epCount = totalEpisodes > 0 ? totalEpisodes : 12;
+
+  renderRangeButtons(epCount);
+  renderEpGrid(epCount, 0);
+}
+
+function renderRangeButtons(total) {
+  const bar = document.getElementById('epRangeBtns');
+  if (total <= RANGE_SIZE) { bar.innerHTML = ''; return; }
+
+  let html = '';
+  for (let start = 0; start < total; start += RANGE_SIZE) {
+    const end = Math.min(start + RANGE_SIZE, total);
+    const isActive = start === currentRangeStart;
+    html += `<button class="ep-range-btn${isActive ? ' active' : ''}" onclick="switchRange(${start}, ${total})">${start+1}–${end}</button>`;
+  }
+  bar.innerHTML = html;
+}
+
+function switchRange(start, total) {
+  currentRangeStart = start;
+  document.querySelectorAll('.ep-range-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderEpGrid(total, start);
+}
+
+function renderEpGrid(total, rangeStart) {
+  const grid = document.getElementById('epGrid');
+  const watched = getWatched();
+  const end = Math.min(rangeStart + RANGE_SIZE, total);
+  let html = '';
+
+  for (let i = rangeStart + 1; i <= end; i++) {
+    const isActive = i === currentEp;
+    const isWatched = watched.has(i) && !isActive;
+    html += `<button class="ep-btn${isActive ? ' active' : ''}${isWatched ? ' watched' : ''}" onclick="selectEpisode(${i})">${i}</button>`;
+  }
+
+  // If totally unknown episode count, add a note
+  if (totalEpisodes === 0) {
+    html += `<div style="grid-column:1/-1;font-size:0.62rem;color:#444;padding:0.3rem 0">Episode count unknown — showing available slots</div>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+// ── SELECT EPISODE ────────────────────────────────────────────────────────────
+function selectEpisode(ep) {
+  currentEp = ep;
+  markWatched(ep);
+
+  // Update URL without reload
+  const url = new URL(location.href);
+  url.searchParams.set('ep', ep);
+  history.replaceState(null, '', url.toString());
+
+  // Update ep label in server bar
+  document.getElementById('serverBar').style.display = 'flex';
+  document.getElementById('currentEpLabel').textContent = ep;
+
+  // Re-render grid to update active/watched states
+  const total = totalEpisodes > 0 ? totalEpisodes : 12;
+  renderEpGrid(total, currentRangeStart);
+
+  // Load the stream
+  loadStream(ep, currentServer);
+}
+
+// ── STREAM LOADING ────────────────────────────────────────────────────────────
+// We use gogoanime embed — this is the same approach used by open-source anime sites.
+// The embed URL pattern: https://gogoplay1.com/streaming.php?id=<slug>-episode-<ep>
+// Since we only have the MAL ID, we need the anime slug. We get it from Jikan's external links.
+// Fallback: construct slug from title.
+
+async function loadStream(ep, server) {
+  const placeholder = document.getElementById('playerPlaceholder');
+  const frame = document.getElementById('playerFrame');
+
+  // Show loading state
+  placeholder.style.display = 'flex';
+  placeholder.innerHTML = `
+    <svg viewBox="0 0 24 24" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+    <h3>Loading Episode ${ep}</h3>
+    <p style="color:#444">Finding stream source...</p>
+  `;
+  frame.style.display = 'none';
+
+  // Try to get a gogoanime-style embed
+  const embedUrl = await resolveStreamUrl(ep, server);
+
+  if (embedUrl) {
+    frame.src = embedUrl;
+    frame.style.display = 'block';
+    placeholder.style.display = 'none';
+  } else {
+    placeholder.innerHTML = `
+      <svg viewBox="0 0 24 24" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <h3>Stream Not Available</h3>
+      <p>No embed found for EP ${ep} on ${server}. Try switching servers above, or check back later.</p>
+    `;
+  }
+}
+
+async function resolveStreamUrl(ep, server) {
+  if (!animeData) return null;
+
+  // Build a slug from title (standard gogoanime convention: lowercase, spaces → dashes)
+  const rawTitle = animeData.title_english || animeData.title || '';
+  const slug = rawTitle
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')    // strip special chars
+    .replace(/\s+/g, '-')             // spaces → dashes
+    .replace(/-+/g, '-')              // collapse dashes
+    .replace(/^-|-$/g, '');           // trim leading/trailing
+
+  // Try to pull a better slug from Jikan's external_links (mal sync data)
+  // Jikan v4 provides streaming links in /anime/{id}/streaming
+  let streamingSlug = slug;
+  try {
+    await DELAY(300);
+    const res = await fetch(`https://api.jikan.moe/v4/anime/${MAL_ID}/streaming`);
+    const json = await res.json();
+    const gogo = (json.data || []).find(s => s.name && s.name.toLowerCase().includes('gogo'));
+    if (gogo && gogo.url) {
+      // Extract slug from the gogoanime URL
+      const match = gogo.url.match(/category\/([^/?#]+)/);
+      if (match) streamingSlug = match[1];
+    }
+  } catch { /* use title slug fallback */ }
+
+  // Build embed URLs per server
+  const urls = {
+    'gogoanime': `https://gogoanime3.co/streaming.php?id=${encodeURIComponent(streamingSlug)}-episode-${ep}`,
+    'zoro': `https://zoro.to/watch/${streamingSlug}-episode-${ep}`,
+    '9anime': `https://9anime.to/watch/${streamingSlug}.html?ep=${ep}`
+  };
+
+  return urls[server] || urls['gogoanime'];
+}
+
+// ── SERVER SWITCH ─────────────────────────────────────────────────────────────
+function switchServer(server) {
+  currentServer = server;
+  // Update button UI
+  document.querySelectorAll('.server-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase().replace(/\s/g,'') === server.toLowerCase().replace(/\s/g,''));
+  });
+  // Reload stream for current episode
+  if (currentEp > 0) loadStream(currentEp, server);
+}
+
+// ── RELATED ANIME ─────────────────────────────────────────────────────────────
+async function loadRelated(a) {
+  const list = document.getElementById('relatedList');
+
+  // Show skeletons
+  list.innerHTML = Array(6).fill(0).map(() => `
+    <div class="related-card" style="cursor:default">
+      <div class="related-thumb-placeholder"><div class="skeleton" style="width:100%;height:100%"></div></div>
+      <div class="related-info" style="display:flex;flex-direction:column;gap:0.5rem;padding-top:0.3rem">
+        <div class="skeleton" style="height:0.8rem;width:90%"></div>
+        <div class="skeleton" style="height:0.7rem;width:60%"></div>
+        <div class="skeleton" style="height:0.7rem;width:45%"></div>
+      </div>
+    </div>
+  `).join('');
+
+  let items = [];
+
+  // Try recommendations first
+  try {
+    await DELAY(500);
+    const res = await fetch(`https://api.jikan.moe/v4/anime/${MAL_ID}/recommendations`);
+    const json = await res.json();
+    if (json.data && json.data.length > 0) {
+      items = json.data.slice(0, 12).map(r => r.entry).filter(Boolean);
+    }
+  } catch { /* fallback below */ }
+
+  // Fallback: fetch related from full data
+  if (items.length === 0 && a.relations) {
+    const related = a.relations.flatMap(r => r.entry || []).filter(e => e.type === 'anime');
+    // Fetch basic info for each related entry (max 6, staggered)
+    for (const rel of related.slice(0, 6)) {
+      try {
+        await DELAY(350);
+        const res = await fetch(`https://api.jikan.moe/v4/anime/${rel.mal_id}`);
+        const json = await res.json();
+        if (json.data) items.push(json.data);
+      } catch { /* skip */ }
+    }
+  }
+
+  if (items.length === 0) {
+    // Last resort: load top anime as suggestions
+    try {
+      await DELAY(400);
+      const res = await fetch(`https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=10&sfw=true`);
+      const json = await res.json();
+      items = (json.data || []).filter(x => x.mal_id !== parseInt(MAL_ID)).slice(0, 8);
+    } catch { /* nothing */ }
+  }
+
+  if (items.length === 0) {
+    list.innerHTML = '<p style="padding:1.2rem;font-size:0.75rem;color:#444">No recommendations found.</p>';
+    return;
+  }
+
+  list.innerHTML = items.map(item => {
+    const title = item.title_english || item.title || 'Unknown';
+    const img = item.images?.jpg?.image_url || '';
+    const type = item.type || 'TV';
+    const eps = item.episodes ? `${item.episodes} eps` : '';
+    const score = item.score ? `★ ${item.score.toFixed(1)}` : '';
+    const id = item.mal_id;
+    return `
+      <div class="related-card" onclick="window.location.href='anize-player.html?id=${id}&ep=1'">
+        ${img
+          ? `<img class="related-thumb" src="${img}" alt="" loading="lazy">`
+          : `<div class="related-thumb-placeholder"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></div>`
+        }
+        <div class="related-info">
+          <div class="related-title">${title}</div>
+          <div class="related-meta">
+            <span>${type}${eps ? ' · ' + eps : ''}</span>
+            ${score ? `<span class="related-score">${score}</span>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+</script>
 
 </body>
 </html>
