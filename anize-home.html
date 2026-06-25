@@ -81,8 +81,9 @@ nav {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center center;
-  filter: brightness(0.55);
+  object-position: 50% 15%;
+  transform: scale(1.08);
+  filter: brightness(0.42);
   z-index: -1;
 }
 .hero-content { max-width: 600px; z-index: 5; }
@@ -256,18 +257,20 @@ function initAZ() {
 
 // Fetch and Handle Hero Rotation Slider — famous anime with wide banners
 async function loadHeroSlider() {
-  // Famous anime with clear character face banners
-  // IDs: Attack on Titan, Demon Slayer, Jujutsu Kaisen, One Piece, Frieren
+  // Each anime has a custom object-position so the main character face is always centered
   const PICKS = [
-    { id: 16498, banner: 'https://cdn.myanimelist.net/images/anime/10/47347l.jpg' },   // Attack on Titan
-    { id: 38000, banner: 'https://cdn.myanimelist.net/images/anime/1286/99889l.jpg' }, // Demon Slayer
-    { id: 40748, banner: 'https://cdn.myanimelist.net/images/anime/1171/109222l.jpg' }, // Jujutsu Kaisen
-    { id: 21,    banner: 'https://cdn.myanimelist.net/images/anime/6/73245l.jpg' },    // One Piece
-    { id: 52991, banner: 'https://cdn.myanimelist.net/images/anime/1015/138006l.jpg' }, // Frieren
+    { id: 52991, banner: 'https://cdn.myanimelist.net/images/anime/1015/138006l.jpg', pos: '50% 20%' },  // Frieren
+    { id: 40748, banner: 'https://cdn.myanimelist.net/images/anime/1171/109222l.jpg', pos: '60% 15%' },  // Jujutsu Kaisen
+    { id: 38000, banner: 'https://cdn.myanimelist.net/images/anime/1286/99889l.jpg',  pos: '50% 10%' },  // Demon Slayer
+    { id: 5114,  banner: 'https://cdn.myanimelist.net/images/anime/1223/96541l.jpg',  pos: '40% 15%' },  // FMAB
+    { id: 11061, banner: 'https://cdn.myanimelist.net/images/anime/1337/99013l.jpg',  pos: '50% 10%' },  // HxH
+    { id: 1535,  banner: 'https://cdn.myanimelist.net/images/anime/1935/127974l.jpg', pos: '50% 10%' },  // Death Note
+    { id: 16498, banner: 'https://cdn.myanimelist.net/images/anime/10/47347l.jpg',    pos: '50% 15%' },  // AoT
+    { id: 47778, banner: 'https://cdn.myanimelist.net/images/anime/1887/117644l.jpg', pos: '50% 10%' },  // Bleach TYBW
   ];
   try {
     const results = await Promise.all(
-      PICKS.map(p => fetch(`https://api.jikan.moe/v4/anime/${p.id}`).then(r => r.json()).then(d => ({ ...d.data, _banner: p.banner })).catch(() => null))
+      PICKS.map(p => fetch(`https://api.jikan.moe/v4/anime/${p.id}`).then(r => r.json()).then(d => ({ ...d.data, _banner: p.banner, _pos: p.pos })).catch(() => null))
     );
     const items = results.filter(Boolean);
     if (items.length === 0) return;
@@ -276,9 +279,10 @@ async function loadHeroSlider() {
       const title = a.title_english || a.title;
       const synopsis = a.synopsis || "No summary available.";
       const img = a._banner;
+      const pos = a._pos || '50% 15%';
       return `
         <div class="hero-slide ${idx === 0 ? 'active' : ''}">
-          <img class="hero-bg" src="${img}" alt="">
+          <img class="hero-bg" src="${img}" alt="" style="object-position:${pos}">
           <div class="hero-content">
             <h1 class="hero-title">${title}</h1>
             <p class="hero-synopsis">${synopsis}</p>
