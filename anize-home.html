@@ -53,6 +53,9 @@ nav {
 .nav-links a { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; color: var(--text3); padding: 0.4rem 0.75rem; border-radius: 4px; text-transform: uppercase; transition: color 0.2s; }
 .nav-links a:hover, .nav-links a.active { color: var(--text); }
 .nav-search { flex: 1; max-width: 400px; margin-left: auto; position: relative; }
+.nav-right { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+.btn-login { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--bg); background: var(--text); border: none; padding: 0.42rem 1rem; border-radius: 3px; cursor: pointer; transition: opacity 0.2s; }
+.btn-login:hover { opacity: 0.85; }
 .nav-search input { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 0.45rem 1rem; border-radius: 4px; outline: none; font-size: 0.75rem; }
 
 /* ── HERO BANNER ROTATION ── */
@@ -220,6 +223,9 @@ footer { border-top: 1px solid var(--border); padding: 1.4rem 2rem; display: fle
   </ul>
   <div class="nav-search">
     <input type="text" id="navSearch" placeholder="Quick search anime...">
+  </div>
+  <div class="nav-right">
+    <button class="btn-login" onclick="window.location.href='anize-login.html'">Login</button>
   </div>
 </nav>
 
