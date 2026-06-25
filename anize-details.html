@@ -247,8 +247,9 @@ nav { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); backgrou
   <a href="anize-splash.html" class="nav-logo">AniZe</a>
   <ul class="nav-links">
     <li><a href="anize-home.html">Home</a></li>
-    <li><a href="anize-browse.html">New</a></li>
-    <li><a href="anize-ongoing.html">Ongoing</a></li>
+    <li><a href="anize-trending.html">Trending</a></li>
+    <li><a href="anize-favourites.html">Favourites</a></li>
+    <li><a href="#" onclick="openBrowsePanel(event)">Browse</a></li>
   </ul>
   <div class="nav-search">
     <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -342,6 +343,86 @@ nav { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); backgrou
   </div>
 </footer>
 
+
+
+
+<!-- BROWSE SLIDE-OVER -->
+<div id="browseOverlay" onclick="closeBrowsePanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;opacity:0;transition:opacity 0.3s"></div>
+
+<div id="browsePanel" style="display:none;position:fixed;left:0;top:0;bottom:0;width:300px;background:#0a0a0a;border-right:1px solid #1c1c1c;z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;flex-direction:column">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;letter-spacing:0.06em;color:#fff">AniZe</span>
+    <button onclick="closeBrowsePanel()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.3rem;line-height:1">✕</button>
+  </div>
+
+  <!-- Tabs: Menu | Genre -->
+  <div style="display:flex;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <button id="bpt-menu" onclick="bpTab('menu')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:none;border:none;border-bottom:2px solid #fff;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      Menu
+    </button>
+    <button id="bpt-genre" onclick="bpTab('genre')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Genre
+    </button>
+  </div>
+
+  <!-- Menu Panel -->
+  <div id="bp-menu" style="padding:1rem 1.4rem;display:flex;flex-direction:column">
+    <div onclick="window.location.href='anize-browse.html?type=movie';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">Movies <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=tv';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">TV Series <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ova';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">OVAs <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ona';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">ONAs <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=special';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">Specials <span style="color:#333">›</span></div>
+    <div style="padding:1rem 0 0.4rem;font-size:0.58rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#333">Quick Navigation</div>
+    <div onclick="window.location.href='anize-home.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Home</div>
+    <div onclick="window.location.href='anize-favourites.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Favourites</div>
+    <div onclick="window.location.href='anize-trending.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Trending</div>
+  </div>
+
+  <!-- Genre Panel -->
+  <div id="bp-genre" style="display:none;flex-direction:column">
+    <div id="bpGenreList"></div>
+  </div>
+
+</div>
+
+<script>
+const BP_GENRES = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41,'Martial Arts':17,'Military':38,'Music':19,'Psychological':40,'School':23,'Seinen':42,'Shoujo':25,'Shounen':27,'Space':29,'Vampire':32};
+
+function openBrowsePanel(e) {
+  if(e) e.preventDefault();
+  const overlay = document.getElementById('browseOverlay');
+  const panel = document.getElementById('browsePanel');
+  overlay.style.display = 'block';
+  panel.style.display = 'flex';
+  panel.style.flexDirection = 'column';
+  requestAnimationFrame(() => { overlay.style.opacity='1'; panel.style.transform='translateX(0)'; });
+  // Build genres
+  document.getElementById('bpGenreList').innerHTML = Object.keys(BP_GENRES).map(g =>
+    `<div onclick="window.location.href='anize-browse.html?genre=${BP_GENRES[g]}';closeBrowsePanel()" style="padding:0.65rem 1.4rem;font-size:0.8rem;color:#777;cursor:pointer;border-bottom:1px solid #111;display:flex;align-items:center;gap:0.6rem" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#777'"><span style="color:#333">•</span>${g}</div>`
+  ).join('');
+}
+
+function closeBrowsePanel() {
+  const overlay = document.getElementById('browseOverlay');
+  const panel = document.getElementById('browsePanel');
+  overlay.style.opacity = '0';
+  panel.style.transform = 'translateX(-100%)';
+  setTimeout(() => { overlay.style.display='none'; panel.style.display='none'; }, 300);
+}
+
+function bpTab(name) {
+  ['menu','genre'].forEach(t => {
+    document.getElementById('bpt-'+t).style.color = t===name ? '#fff' : '#555';
+    document.getElementById('bpt-'+t).style.borderBottomColor = t===name ? '#fff' : 'transparent';
+    document.getElementById('bp-'+t).style.display = t===name ? (t==='genre'?'flex':'flex') : 'none';
+    document.getElementById('bp-'+t).style.flexDirection = 'column';
+  });
+}
+</script>
 
 </body>
 </html>
