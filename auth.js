@@ -1,5 +1,5 @@
 (function (global) {
-  const API_BASE = 'https://anize-backend.vercel.app';
+  const API_BASE = 'https://anize-backend-ijcn.vercel.app';
   const TOKEN_KEY = 'anize_token';
   const USER_KEY  = 'anize_user';
 
