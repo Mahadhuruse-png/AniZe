@@ -346,6 +346,130 @@ nav { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); backgrou
 
 
 
+<script>
+const urlId = new URLSearchParams(window.location.search).get('id');
+
+async function loadDetails() {
+  if (!urlId) { document.getElementById('breadTitle').textContent = 'Not Found'; return; }
+
+  try {
+    // Fetch main anime data
+    const res = await fetch(`https://api.jikan.moe/v4/anime/${urlId}/full`);
+    const json = await res.json();
+    const a = json.data;
+    if (!a) return;
+
+    const title = a.title_english || a.title;
+    document.title = `AniZe — ${title}`;
+    document.getElementById('breadTitle').textContent = title;
+
+    // Hero banner
+    const bannerImg = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+    document.getElementById('heroBg').style.backgroundImage = `url('${bannerImg}')`;
+    const poster = document.getElementById('heroPoster');
+    const posterSkel = document.getElementById('heroPosterSkel');
+    poster.src = bannerImg;
+    poster.style.display = 'block';
+    posterSkel.style.display = 'none';
+
+    // Build hero text
+    const score = a.score ? `★ ${a.score.toFixed(1)}` : 'N/A';
+    const eps = a.episodes ? `${a.episodes} eps` : 'Ongoing';
+    const status = a.status || '';
+    const year = a.year || (a.aired?.prop?.from?.year) || '';
+    const genres = (a.genres || []).map(g => g.name).join(', ') || 'N/A';
+
+    document.querySelector('.hero-text').innerHTML = `
+      <div style="font-size:0.6rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#555;margin-bottom:0.6rem">${a.type || 'TV'} • ${year}</div>
+      <h1 style="font-family:'Cinzel',serif;font-size:1.8rem;font-weight:900;letter-spacing:0.04em;margin-bottom:0.5rem;line-height:1.2">${title}</h1>
+      <div style="font-size:0.72rem;color:#666;margin-bottom:0.9rem">${genres}</div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.2rem">
+        <span style="font-size:0.65rem;background:#1a1a1a;border:1px solid #2a2a2a;padding:0.25rem 0.7rem;border-radius:2px;color:#aaa">${score}</span>
+        <span style="font-size:0.65rem;background:#1a1a1a;border:1px solid #2a2a2a;padding:0.25rem 0.7rem;border-radius:2px;color:#aaa">${eps}</span>
+        <span style="font-size:0.65rem;background:#1a1a1a;border:1px solid #2a2a2a;padding:0.25rem 0.7rem;border-radius:2px;color:#aaa">${status}</span>
+      </div>
+      <div style="display:flex;gap:0.7rem">
+        <button onclick="window.location.href='anize-player.html?id=${a.mal_id}&ep=1'" style="font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;background:#fff;color:#000;border:none;padding:0.6rem 1.4rem;border-radius:3px;cursor:pointer">▶ Watch Now</button>
+        <button onclick="window.location.href='anize-details.html?id=${a.mal_id}'" style="font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;background:transparent;color:#fff;border:1px solid #333;padding:0.6rem 1.4rem;border-radius:3px;cursor:pointer">+ Watchlist</button>
+      </div>
+    `;
+
+    // Synopsis
+    const synopsis = (a.synopsis || '').replace(/\[Written by MAL Rewrite\]/g, '').trim();
+    if (synopsis) {
+      document.getElementById('synopsisText').textContent = synopsis;
+      document.getElementById('sectionSynopsis').style.display = 'block';
+    }
+
+    // Info sidebar
+    const infoRows = [
+      ['Type', a.type || 'N/A'],
+      ['Episodes', a.episodes || 'Ongoing'],
+      ['Status', a.status || 'N/A'],
+      ['Aired', a.aired?.string || 'N/A'],
+      ['Score', a.score ? `${a.score} / 10` : 'N/A'],
+      ['Rank', a.rank ? `#${a.rank}` : 'N/A'],
+      ['Members', a.members ? a.members.toLocaleString() : 'N/A'],
+      ['Studios', (a.studios || []).map(s => s.name).join(', ') || 'N/A'],
+      ['Source', a.source || 'N/A'],
+      ['Rating', a.rating || 'N/A'],
+    ];
+    document.getElementById('infoBlock').innerHTML = infoRows.map(([k, v]) =>
+      `<div class="info-row"><div class="info-key">${k}</div><div class="info-val">${v}</div></div>`
+    ).join('');
+
+    // Characters
+    try {
+      await new Promise(r => setTimeout(r, 400));
+      const cRes = await fetch(`https://api.jikan.moe/v4/anime/${urlId}/characters`);
+      const cJson = await cRes.json();
+      const chars = (cJson.data || []).slice(0, 12);
+      if (chars.length) {
+        document.getElementById('charGrid').innerHTML = chars.map(c => `
+          <div class="char-card">
+            <img class="char-img" src="${c.character?.images?.jpg?.image_url || ''}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+            <div>
+              <div class="char-name">${c.character?.name || ''}</div>
+              <div class="char-role">${c.role || ''}</div>
+            </div>
+          </div>`).join('');
+        document.getElementById('sectionChars').style.display = 'block';
+      }
+    } catch {}
+
+    // Related
+    try {
+      const related = [];
+      (a.relations || []).forEach(r => r.entry?.forEach(e => { if (e.type === 'anime') related.push(e); }));
+      if (related.length) {
+        document.getElementById('relatedGrid').innerHTML = related.slice(0, 6).map(r => `
+          <div class="rel-card" onclick="window.location.href='anize-details.html?id=${r.mal_id}'">
+            <img class="rel-thumb" src="https://cdn.myanimelist.net/images/anime/${r.mal_id}.jpg" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+            <div class="rel-info">
+              <div class="rel-title">${r.name}</div>
+              <div class="rel-type">${r.type || 'Anime'}</div>
+            </div>
+          </div>`).join('');
+      } else {
+        document.getElementById('relatedGrid').innerHTML = '<p style="font-size:0.7rem;color:#444">No related anime found.</p>';
+      }
+    } catch {}
+
+  } catch(e) {
+    console.error('Details load failed:', e);
+    document.getElementById('breadTitle').textContent = 'Failed to load';
+  }
+}
+
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.value.trim()) {
+    window.location.href = `anize-browse.html?q=${encodeURIComponent(e.target.value.trim())}`;
+  }
+});
+
+loadDetails();
+</script>
+
 <!-- BROWSE SLIDE-OVER -->
 <div id="browseOverlay" onclick="closeBrowsePanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;opacity:0;transition:opacity 0.3s"></div>
 
