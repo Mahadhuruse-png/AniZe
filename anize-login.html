@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AniZe — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #000;
+  --bg2: #0a0a0a;
+  --bg3: #111;
+  --bg4: #161616;
+  --border: #1c1c1c;
+  --border2: #2a2a2a;
+  --text: #fff;
+  --text2: #888;
+  --text3: #555;
+  --nav-h: 58px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: rgba(0,0,0,0.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+  display: flex; align-items: center; padding: 0 2rem; gap: 2rem;
+}
+.nav-logo { font-family: 'Cinzel', serif; font-size: 1.3rem; font-weight: 900; letter-spacing: 0.06em; }
+.nav-links { display: flex; align-items: center; gap: 0.2rem; list-style: none; }
+.nav-links a { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; color: var(--text3); padding: 0.4rem 0.75rem; border-radius: 4px; text-transform: uppercase; transition: color 0.2s; }
+.nav-links a:hover { color: var(--text); }
+.nav-search { flex: 1; max-width: 520px; margin-left: auto; position: relative; }
+.nav-search input { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.78rem; padding: 0.45rem 0.9rem 0.45rem 2.2rem; border-radius: 4px; outline: none; }
+.nav-search input::placeholder { color: var(--text3); }
+.nav-search svg { position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); width: 13px; height: 13px; stroke: var(--text3); fill: none; pointer-events: none; }
+.nav-right { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+.btn-login { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--bg); background: var(--text); border: none; padding: 0.42rem 1rem; border-radius: 3px; cursor: pointer; transition: opacity 0.2s; }
+.btn-login:hover { opacity: 0.85; }
+
+/* PAGE */
+.page {
+  min-height: 100vh;
+  padding-top: var(--nav-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle background ink strokes like splash page */
+.page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 80% 50%, #0d0d0d 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 20% 30%, #0a0a0a 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* MODAL CARD */
+.card {
+  position: relative;
+  z-index: 2;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 400px;
+  padding: 2.2rem 2rem 2rem;
+  margin: 2rem;
+}
+
+.card-header {
+  margin-bottom: 1.6rem;
+}
+
+.card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+}
+
+.card-sub {
+  font-size: 0.72rem;
+  color: var(--text3);
+  letter-spacing: 0.02em;
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.6rem;
+  gap: 0;
+}
+
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.6rem 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  margin-bottom: -1px;
+}
+
+.tab-btn.active {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+/* FORM */
+.form { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.input-wrap {
+  position: relative;
+}
+
+.input-wrap input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  padding: 0.75rem 1rem;
+  border-radius: 3px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-wrap input:focus { border-color: var(--border2); }
+.input-wrap input::placeholder { color: var(--text3); }
+
+.input-wrap .eye-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text3);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.input-wrap .eye-btn:hover { color: var(--text2); }
+.input-wrap .eye-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; }
+
+/* FORGOT */
+.forgot-row {
+  text-align: right;
+  margin-top: -0.2rem;
+}
+.forgot-row a {
+  font-size: 0.65rem;
+  color: var(--text3);
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+.forgot-row a:hover { color: var(--text2); }
+
+/* SUBMIT BTN */
+.submit-btn {
+  width: 100%;
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  padding: 0.75rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-top: 0.3rem;
+  transition: opacity 0.2s;
+}
+.submit-btn:hover { opacity: 0.88; }
+
+/* SWITCH LINK */
+.switch-row {
+  text-align: center;
+  font-size: 0.68rem;
+  color: var(--text3);
+  margin-top: 1rem;
+  letter-spacing: 0.02em;
+}
+.switch-row button {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  letter-spacing: 0.02em;
+  padding: 0;
+  margin-left: 0.25rem;
+}
+
+/* ERROR / SUCCESS MSG */
+.msg {
+  font-size: 0.68rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 3px;
+  display: none;
+  letter-spacing: 0.02em;
+}
+.msg.error { background: #1a0000; border: 1px solid #3a0000; color: #ff6b6b; display: block; }
+.msg.success { background: #001a00; border: 1px solid #003a00; color: #6bff6b; display: block; }
+
+/* PANEL TOGGLE */
+.panel { display: none; }
+.panel.active { display: flex; flex-direction: column; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="anize-home.html" class="nav-logo">AniZe</a>
+  <ul class="nav-links">
+    <li><a href="anize-home.html">Home</a></li>
+    <li><a href="anize-trending.html">Trending</a></li>
+    <li><a href="anize-favourites.html">Favourites</a></li>
+    <li><a href="#" onclick="openBrowsePanel(event)">Browse</a></li>
+  </ul>
+  <div class="nav-search">
+    <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" placeholder="Search anime..." autocomplete="off"/>
+  </div>
+  <div class="nav-right">
+    <button class="btn-login" onclick="showTab('signin')">Login</button>
+  </div>
+</nav>
+
+<!-- PAGE -->
+<div class="page">
+  <div class="card">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-signin" onclick="showTab('signin')">Sign In</button>
+      <button class="tab-btn" id="tab-signup" onclick="showTab('signup')">Sign Up</button>
+    </div>
+
+    <!-- SIGN IN PANEL -->
+    <div class="panel active" id="panel-signin">
+      <div class="card-header">
+        <div class="card-title">Sign In</div>
+        <div class="card-sub">Welcome back!</div>
+      </div>
+      <div class="form">
+        <div id="signin-msg" class="msg"></div>
+        <div class="input-wrap">
+          <input type="email" id="signin-email" placeholder="Email" autocomplete="off"/>
+        </div>
+        <div class="input-wrap">
+          <input type="password" id="signin-pass" placeholder="Password"/>
+          <button class="eye-btn" onclick="togglePass('signin-pass', this)">
+            <svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="forgot-row"><a href="#">Forgot Password?</a></div>
+        <button class="submit-btn" onclick="handleSignIn()">Sign In</button>
+        <div class="switch-row">
+          Don't have an account?<button onclick="showTab('signup')">Sign up</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIGN UP PANEL -->
+    <div class="panel" id="panel-signup">
+      <div class="card-header">
+        <div class="card-title">Sign Up</div>
+        <div class="card-sub">Create an account to explore more features.</div>
+      </div>
+      <div class="form">
+        <div id="signup-msg" class="msg"></div>
+        <div class="input-wrap">
+          <input type="text" id="signup-user" placeholder="Username" autocomplete="off"/>
+        </div>
+        <div class="input-wrap">
+          <input type="email" id="signup-email" placeholder="Email" autocomplete="off"/>
+        </div>
+        <div class="input-wrap">
+          <input type="password" id="signup-pass" placeholder="Password"/>
+          <button class="eye-btn" onclick="togglePass('signup-pass', this)">
+            <svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="input-wrap">
+          <input type="password" id="signup-pass2" placeholder="Repeat your password"/>
+          <button class="eye-btn" onclick="togglePass('signup-pass2', this)">
+            <svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <button class="submit-btn" onclick="handleSignUp()">Sign Up</button>
+        <div class="switch-row">
+          Already have an account?<button onclick="showTab('signin')">Sign in</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function showTab(tab) {
+  ['signin','signup'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+  });
+}
+
+function togglePass(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const isText = input.type === 'text';
+  input.type = isText ? 'password' : 'text';
+  btn.querySelector('svg').style.opacity = isText ? '1' : '0.4';
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg ' + type;
+}
+
+function handleSignIn() {
+  const email = document.getElementById('signin-email').value.trim();
+  const pass  = document.getElementById('signin-pass').value;
+  if (!email || !pass) { showMsg('signin-msg', 'Please fill in all fields.', 'error'); return; }
+  // Backend not connected yet — placeholder
+  showMsg('signin-msg', 'Backend not connected yet. Coming soon!', 'error');
+}
+
+function handleSignUp() {
+  const user  = document.getElementById('signup-user').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass  = document.getElementById('signup-pass').value;
+  const pass2 = document.getElementById('signup-pass2').value;
+  if (!user || !email || !pass || !pass2) { showMsg('signup-msg', 'Please fill in all fields.', 'error'); return; }
+  if (pass !== pass2) { showMsg('signup-msg', 'Passwords do not match.', 'error'); return; }
+  if (pass.length < 6) { showMsg('signup-msg', 'Password must be at least 6 characters.', 'error'); return; }
+  // Backend not connected yet — placeholder
+  showMsg('signup-msg', 'Backend not connected yet. Coming soon!', 'error');
+}
+</script>
+
+<!-- BROWSE SLIDE-OVER -->
+<div id="browseOverlay" onclick="closeBrowsePanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;opacity:0;transition:opacity 0.3s"></div>
+<div id="browsePanel" style="display:none;position:fixed;left:0;top:0;bottom:0;width:300px;background:#0a0a0a;border-right:1px solid #1c1c1c;z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;flex-direction:column">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;letter-spacing:0.06em;color:#fff">AniZe</span>
+    <button onclick="closeBrowsePanel()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.3rem;line-height:1">✕</button>
+  </div>
+  <div style="display:flex;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <button id="bpt-menu" onclick="bpTab('menu')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:none;border:none;border-bottom:2px solid #fff;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>Menu
+    </button>
+    <button id="bpt-genre" onclick="bpTab('genre')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Genre
+    </button>
+  </div>
+  <div id="bp-menu" style="padding:1rem 1.4rem;display:flex;flex-direction:column">
+    <div onclick="window.location.href='anize-browse.html?type=movie';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">Movies <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=tv';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">TV Series <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ova';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">OVAs <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ona';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">ONAs <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=special';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">Specials <span style="color:#333">›</span></div>
+    <div style="padding:1rem 0 0.4rem;font-size:0.58rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#333">Quick Navigation</div>
+    <div onclick="window.location.href='anize-home.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Home</div>
+    <div onclick="window.location.href='anize-favourites.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Favourites</div>
+    <div onclick="window.location.href='anize-trending.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Trending</div>
+  </div>
+  <div id="bp-genre" style="display:none;flex-direction:column"><div id="bpGenreList"></div></div>
+</div>
+
+<script>
+const BP_GENRES = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41,'Martial Arts':17,'Military':38,'Music':19,'Psychological':40,'School':23,'Seinen':42,'Shoujo':25,'Shounen':27,'Space':29,'Vampire':32};
+function openBrowsePanel(e) {
+  if(e) e.preventDefault();
+  const overlay = document.getElementById('browseOverlay');
+  const panel = document.getElementById('browsePanel');
+  overlay.style.display = 'block'; panel.style.display = 'flex'; panel.style.flexDirection = 'column';
+  requestAnimationFrame(() => { overlay.style.opacity='1'; panel.style.transform='translateX(0)'; });
+  document.getElementById('bpGenreList').innerHTML = Object.keys(BP_GENRES).map(g =>
+    `<div onclick="window.location.href='anize-browse.html?genre=${BP_GENRES[g]}';closeBrowsePanel()" style="padding:0.65rem 1.4rem;font-size:0.8rem;color:#777;cursor:pointer;border-bottom:1px solid #111;display:flex;align-items:center;gap:0.6rem" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#777'"><span style="color:#333">•</span>${g}</div>`
+  ).join('');
+}
+function closeBrowsePanel() {
+  const overlay = document.getElementById('browseOverlay'); const panel = document.getElementById('browsePanel');
+  overlay.style.opacity = '0'; panel.style.transform = 'translateX(-100%)';
+  setTimeout(() => { overlay.style.display='none'; panel.style.display='none'; }, 300);
+}
+function bpTab(name) {
+  ['menu','genre'].forEach(t => {
+    document.getElementById('bpt-'+t).style.color = t===name ? '#fff' : '#555';
+    document.getElementById('bpt-'+t).style.borderBottomColor = t===name ? '#fff' : 'transparent';
+    document.getElementById('bp-'+t).style.display = t===name ? 'flex' : 'none';
+    document.getElementById('bp-'+t).style.flexDirection = 'column';
+  });
+}
+</script>
+
+</body>
+</html>
