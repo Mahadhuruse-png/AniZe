@@ -555,12 +555,12 @@ async function loadAnime(page=1) {
   if (currentFilters.q || currentFilters.type || currentFilters.genre) {
     const SORT_DIR = { score: 'desc', popularity: 'asc', start_date: 'desc', title: 'asc', favorites: 'desc' };
     const sortField = currentFilters.sort || 'popularity';
-    url = `https://api.jikan.moe/v4/anime?sfw=true&page=${page}&limit=24&order_by=${sortField}&sort=${SORT_DIR[sortField]||'asc'}`;
+    url = `https://anize-backend-ijcn.vercel.app/api/jikan?path=anime&sfw=true&page=${page}&limit=24&order_by=${sortField}&sort=${SORT_DIR[sortField]||'asc'}`;
     if (currentFilters.type)  url += `&type=${currentFilters.type}`;
     if (currentFilters.genre) url += `&genres=${currentFilters.genre}`;
     if (currentFilters.q)     url += `&q=${encodeURIComponent(currentFilters.q)}`;
   } else {
-    url = `https://api.jikan.moe/v4/anime?sfw=true&order_by=popularity&sort=asc&page=${page}&limit=24`;
+    url = `https://anize-backend-ijcn.vercel.app/api/jikan?path=anime&sfw=true&order_by=popularity&sort=asc&page=${page}&limit=24`;
   }
 
   const doFetch = () => fetch(url).then(r => { if (!r.ok) throw new Error(); return r.json(); });
@@ -741,9 +741,8 @@ function bpTab(name) {
   var avatar = document.createElement('div');
   avatar.style.cssText = 'width:22px;height:22px;border-radius:50%;background:#e53935;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:800;color:#fff;flex-shrink:0;';
   avatar.textContent = initial;
-  var name = document.createTextNode(user.username);
   btn.appendChild(avatar);
-  btn.appendChild(name);
+  btn.appendChild(document.createTextNode(user.username));
   nr.innerHTML = '';
   nr.appendChild(btn);
 })();

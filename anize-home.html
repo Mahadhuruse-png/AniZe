@@ -311,7 +311,7 @@ async function loadHeroSlider() {
   try {
     // Step 1: Get real wide banner images from AniList GraphQL (public, no auth)
     const alQuery = `{${PICKS.map((p, i) => `a${i}: Media(id: ${p.alId}, type: ANIME) { bannerImage }`).join(' ')}}`;
-    const alRes = await fetch('https://graphql.anilist.co', {
+    const alRes = await fetch('https://anize-backend-ijcn.vercel.app/api/anilist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ query: alQuery })
@@ -324,7 +324,7 @@ async function loadHeroSlider() {
     for (let i = 0; i < PICKS.length; i++) {
       if (i > 0) await DELAY(250);
       try {
-        const r = await fetch(`https://api.jikan.moe/v4/anime/${PICKS[i].malId}`);
+        const r = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=anime/${PICKS[i].malId}`);
         const j = await r.json();
         jikanResults.push(j.data || null);
       } catch { jikanResults.push(null); }
@@ -422,7 +422,7 @@ async function loadHeroSlider() {
 // Fetch and render the numbered Trending strip (top airing by popularity)
 async function loadTrending() {
   try {
-    const res = await fetch(`https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=10&sfw=true`);
+    const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=bypopularity&limit=10&sfw=true`);
     const json = await res.json();
     const data = (json.data || []).filter(a => a.type === 'TV' || a.type === 'Movie' || a.type === 'ONA');
 
@@ -464,10 +464,10 @@ async function fetchWithRetry(url, retries = 2, delayMs = 600) {
 
 async function loadFourColumns() {
   const configurations = [
-    { id: 'colFav', url: `https://api.jikan.moe/v4/top/anime?filter=favorite&limit=5&sfw=true` },
-    { id: 'colComp', url: `https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=5&sfw=true` },
-    { id: 'colView', url: `https://api.jikan.moe/v4/top/anime?limit=5&sfw=true` },
-    { id: 'colNew', url: `https://api.jikan.moe/v4/seasons/now?limit=5&sfw=true` }
+    { id: 'colFav', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=favorite&limit=5&sfw=true` },
+    { id: 'colComp', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=bypopularity&limit=5&sfw=true` },
+    { id: 'colView', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&limit=5&sfw=true` },
+    { id: 'colNew', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=seasons/now&limit=5&sfw=true` }
   ];
 
   for (const col of configurations) {
@@ -619,9 +619,8 @@ function bpTab(name) {
   var avatar = document.createElement('div');
   avatar.style.cssText = 'width:22px;height:22px;border-radius:50%;background:#e53935;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:800;color:#fff;flex-shrink:0;';
   avatar.textContent = initial;
-  var name = document.createTextNode(user.username);
   btn.appendChild(avatar);
-  btn.appendChild(name);
+  btn.appendChild(document.createTextNode(user.username));
   nr.innerHTML = '';
   nr.appendChild(btn);
 })();

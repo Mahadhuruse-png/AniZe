@@ -526,7 +526,7 @@ if (!MAL_ID) {
 async function loadAnime() {
   try {
     // Fetch full anime details
-    const res = await fetch(`https://api.jikan.moe/v4/anime/${MAL_ID}/full`);
+    const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=anime/${MAL_ID}/full`);
     const json = await res.json();
     if (!json.data) throw new Error('No data');
     animeData = json.data;
@@ -716,7 +716,7 @@ async function resolveStreamUrl(ep, server) {
   let streamingSlug = slug;
   try {
     await DELAY(300);
-    const res = await fetch(`https://api.jikan.moe/v4/anime/${MAL_ID}/streaming`);
+    const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=anime/${MAL_ID}/streaming`);
     const json = await res.json();
     const gogo = (json.data || []).find(s => s.name && s.name.toLowerCase().includes('gogo'));
     if (gogo && gogo.url) {
@@ -768,7 +768,7 @@ async function loadRelated(a) {
   // Try recommendations first
   try {
     await DELAY(500);
-    const res = await fetch(`https://api.jikan.moe/v4/anime/${MAL_ID}/recommendations`);
+    const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=anime/${MAL_ID}/recommendations`);
     const json = await res.json();
     if (json.data && json.data.length > 0) {
       items = json.data.slice(0, 12).map(r => r.entry).filter(Boolean);
@@ -782,7 +782,7 @@ async function loadRelated(a) {
     for (const rel of related.slice(0, 6)) {
       try {
         await DELAY(350);
-        const res = await fetch(`https://api.jikan.moe/v4/anime/${rel.mal_id}`);
+        const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=anime/${rel.mal_id}`);
         const json = await res.json();
         if (json.data) items.push(json.data);
       } catch { /* skip */ }
@@ -793,7 +793,7 @@ async function loadRelated(a) {
     // Last resort: load top anime as suggestions
     try {
       await DELAY(400);
-      const res = await fetch(`https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=10&sfw=true`);
+      const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=bypopularity&limit=10&sfw=true`);
       const json = await res.json();
       items = (json.data || []).filter(x => x.mal_id !== parseInt(MAL_ID)).slice(0, 8);
     } catch { /* nothing */ }
@@ -860,9 +860,8 @@ async function loadRelated(a) {
   var avatar = document.createElement('div');
   avatar.style.cssText = 'width:22px;height:22px;border-radius:50%;background:#e53935;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:800;color:#fff;flex-shrink:0;';
   avatar.textContent = initial;
-  var name = document.createTextNode(user.username);
   btn.appendChild(avatar);
-  btn.appendChild(name);
+  btn.appendChild(document.createTextNode(user.username));
   nr.innerHTML = '';
   nr.appendChild(btn);
 })();
