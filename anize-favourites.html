@@ -710,19 +710,6 @@ function bpTab(name) {
 </script>
 
 
-<script src="auth.js"></script>
-<script>
-(function() {
-  if (typeof AniZeAuth !== 'undefined' && AniZeAuth.isLoggedIn()) {
-    var user = AniZeAuth.getUser();
-    if (!user) return;
-    var initial = user.username[0].toUpperCase();
-    var nr = document.getElementById('navRight');
-    if (!nr) return;
-    nr.innerHTML = '<button onclick="window.location.href='anize-account.html'" style="display:flex;align-items:center;gap:0.5rem;background:#111;border:1px solid #2a2a2a;color:#fff;font-family:Inter,sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.05em;padding:0.38rem 0.85rem 0.38rem 0.6rem;border-radius:3px;cursor:pointer;"><div style="width:22px;height:22px;border-radius:50%;background:#e53935;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:800;color:#fff;">' + initial + '</div>' + user.username + '</button>';
-  }
-})();
-</script>
 
 <script src="auth.js"></script>
 <script>

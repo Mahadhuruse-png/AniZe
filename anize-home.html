@@ -77,6 +77,8 @@ nav {
   padding: 0 0 4rem 4rem;
 }
 .hero-slide.active { opacity: 1; z-index: 2; }
+
+.hero-bg-cover { object-position: right center !important; }
 .hero-bg {
   position: absolute;
   inset: 0;
@@ -301,16 +303,16 @@ async function loadHeroSlider() {
     { malId: 52991, alId: 154587, title: "Frieren: Beyond Journey's End",      type: 'TV', year: 2023 },
     { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                      type: 'TV', year: 2020 },
     { malId: 38000, alId: 101922, title: 'Demon Slayer: Kimetsu no Yaiba',      type: 'TV', year: 2019 },
-    { malId: 5114,  alId: 5114,   title: 'Fullmetal Alchemist: Brotherhood',    type: 'TV', year: 2009 },
-    { malId: 11061, alId: 11061,  title: 'Hunter x Hunter (2011)',               type: 'TV', year: 2011 },
-    { malId: 1535,  alId: 1535,   title: 'Death Note',                          type: 'TV', year: 2006 },
+    { malId: 44511, alId: 127230, title: 'Chainsaw Man',                         type: 'TV', year: 2022 },
+    { malId: 50265, alId: 140960, title: 'Spy x Family',                         type: 'TV', year: 2022 },
+    { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen Season 2',              type: 'TV', year: 2023 },
     { malId: 16498, alId: 16498,  title: 'Attack on Titan',                     type: 'TV', year: 2013 },
     { malId: 41467, alId: 116674, title: 'Bleach: Thousand-Year Blood War',     type: 'TV', year: 2022 },
   ];
 
   try {
     // Step 1: Get real wide banner images from AniList GraphQL (public, no auth)
-    const alQuery = `{${PICKS.map((p, i) => `a${i}: Media(id: ${p.alId}, type: ANIME) { bannerImage }`).join(' ')}}`;
+    const alQuery = `{${PICKS.map((p, i) => `a${i}: Media(id: ${p.alId}, type: ANIME) { bannerImage coverImage { extraLarge } }`).join(' ')}}`;
     const alRes = await fetch('https://anize-backend-ijcn.vercel.app/api/anilist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -334,6 +336,7 @@ async function loadHeroSlider() {
       ...(jikanResults[i] || {}),
       mal_id:         p.malId,
       _banner:        banners[`a${i}`]?.bannerImage || null,
+      _alCover:       banners[`a${i}`]?.coverImage?.extraLarge || null,
       _type:          p.type,
       _year:          p.year,
       _fallbackTitle: p.title,
@@ -352,12 +355,13 @@ async function loadHeroSlider() {
       const type = a._type;
 
       // Banner priority: AniList wide > MAL large image
-      const imgSrc = a._banner || a.images?.jpg?.large_image_url || '';
+      const hasBanner = !!a._banner;
+      const imgSrc = a._banner || a._alCover || a.images?.jpg?.large_image_url || '';
       const imgFallback = a.images?.jpg?.large_image_url || '';
 
       return `
         <div class="hero-slide${idx === 0 ? ' active' : ''}" data-index="${idx}">
-          <img class="hero-bg" src="${imgSrc}" alt="${title}"
+          <img class="hero-bg${hasBanner ? '' : ' hero-bg-cover'}" src="${imgSrc}" alt="${title}"
                loading="${idx === 0 ? 'eager' : 'lazy'}"
                onerror="this.onerror=null;this.src='${imgFallback}'">
           <div class="hero-content">
@@ -590,19 +594,6 @@ function bpTab(name) {
 </script>
 
 
-<script src="auth.js"></script>
-<script>
-(function() {
-  if (typeof AniZeAuth !== 'undefined' && AniZeAuth.isLoggedIn()) {
-    var user = AniZeAuth.getUser();
-    if (!user) return;
-    var initial = user.username[0].toUpperCase();
-    var nr = document.getElementById('navRight');
-    if (!nr) return;
-    nr.innerHTML = '<button onclick="window.location.href='anize-account.html'" style="display:flex;align-items:center;gap:0.5rem;background:#111;border:1px solid #2a2a2a;color:#fff;font-family:Inter,sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.05em;padding:0.38rem 0.85rem 0.38rem 0.6rem;border-radius:3px;cursor:pointer;"><div style="width:22px;height:22px;border-radius:50%;background:#e53935;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:800;color:#fff;">' + initial + '</div>' + user.username + '</button>';
-  }
-})();
-</script>
 
 <script src="auth.js"></script>
 <script>
