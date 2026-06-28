@@ -53,13 +53,16 @@ nav {
 .nav-links a { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; color: var(--text3); padding: 0.4rem 0.75rem; border-radius: 4px; text-transform: uppercase; transition: color 0.2s; }
 .nav-links a:hover, .nav-links a.active { color: var(--text); }
 .nav-search { flex: 1; max-width: 400px; margin-left: auto; position: relative; }
+.nav-right { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+.btn-login { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--bg); background: var(--text); border: none; padding: 0.42rem 1rem; border-radius: 3px; cursor: pointer; transition: opacity 0.2s; }
+.btn-login:hover { opacity: 0.85; }
 .nav-search input { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 0.45rem 1rem; border-radius: 4px; outline: none; font-size: 0.75rem; }
 
 /* ── HERO BANNER ROTATION ── */
 .hero-slider {
   position: relative;
   width: 100%;
-  height: min(600px, 90vh);
+  height: 580px;
   background: #000;
   overflow: hidden;
   margin-bottom: 3.5rem;
@@ -71,17 +74,20 @@ nav {
   transition: opacity 1s ease-in-out;
   display: flex;
   align-items: flex-end;
-  padding: 0 0 4rem 4rem;
+  padding: 0 0 3rem 3rem;
 }
 .hero-slide.active { opacity: 1; z-index: 2; }
+
+.hero-bg-cover { object-fit: contain !important; object-position: center center !important; }
 .hero-bg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center top;
+  object-fit: contain;
+  object-position: right center;
   z-index: 0;
+  filter: brightness(0.85);
 }
 /* Strong left gradient — text readable without dimming whole image */
 .hero-slide::before {
@@ -221,6 +227,9 @@ footer { border-top: 1px solid var(--border); padding: 1.4rem 2rem; display: fle
   <div class="nav-search">
     <input type="text" id="navSearch" placeholder="Quick search anime...">
   </div>
+  <div class="nav-right" id="navRight">
+    <button class="btn-login" onclick="window.location.href='anize-login.html'">Login</button>
+  </div>
 </nav>
 
 
@@ -277,6 +286,31 @@ footer { border-top: 1px solid var(--border); padding: 1.4rem 2rem; display: fle
 const EXCLUDE_GENRES = "9,12,26,28,35,73"; 
 const DELAY = (ms) => new Promise(res => setTimeout(res, ms));
 
+// Batch-fetch high-res AniList covers for a list of MAL ids in a single GraphQL call.
+// AniList lets you query directly by idMal, so no separate id-mapping step is needed.
+// Returns { [mal_id]: extraLargeCoverUrl }, and never throws — failures just return {}.
+async function fetchAniListCovers(malIds) {
+  const ids = [...new Set(malIds.filter(Boolean))];
+  if (!ids.length) return {};
+  try {
+    const query = `{${ids.map((id, i) => `m${i}: Media(idMal: ${id}, type: ANIME) { idMal coverImage { extraLarge } }`).join(' ')}}`;
+    const res = await fetch('https://anize-backend-ijcn.vercel.app/api/anilist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ query })
+    });
+    const json = await res.json();
+    const data = json?.data || {};
+    const map = {};
+    Object.values(data).forEach(m => {
+      if (m && m.idMal) map[m.idMal] = m.coverImage?.extraLarge || null;
+    });
+    return map;
+  } catch {
+    return {};
+  }
+}
+
 // Render Alphabet
 function initAZ() {
   const container = document.getElementById('azList');
@@ -290,51 +324,76 @@ function initAZ() {
 
 // Fetch and Handle Hero Rotation Slider
 async function loadHeroSlider() {
-  // AniList banner images are real wide cinematic key art (1900x400+)
-  // Much better than MAL portrait thumbnails
+  // AniList IDs for each anime (different from MAL IDs)
   const PICKS = [
-    { id: 52991, banner: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/154587-COqSSWBKBMIM.jpg', type: 'TV', year: 2023 },  // Frieren
-    { id: 40748, banner: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/113415-ZheK4RaBJoHQ.jpg', type: 'TV', year: 2020 },  // JJK
-    { id: 38000, banner: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/101922-YfZhKBUDDS6L.jpg', type: 'TV', year: 2019 },  // Demon Slayer
-    { id: 5114,  banner: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/5114-KgONQHGMEWB4.jpg',  type: 'TV', year: 2009 },  // FMAB
-    { id: 11061, banner: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/11061-sfkNBM4CIXM1.jpg', type: 'TV', year: 2011 },  // HxH
-    { id: 1535,  banner: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/1535-M3GLHsF6iFrd.jpg',  type: 'TV', year: 2006 },  // Death Note
-    { id: 16498, banner: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/16498-8jpFCOcDmneX.jpg', type: 'TV', year: 2013 },  // AoT
-    { id: 47778, banner: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/41467-HNO7YxfBBM10.jpg', type: 'TV', year: 2022 },  // Bleach TYBW
+    { malId: 52991, alId: 154587, title: "Frieren: Beyond Journey's End",      type: 'TV', year: 2023 },
+    { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                      type: 'TV', year: 2020 },
+    { malId: 38000, alId: 101922, title: 'Demon Slayer: Kimetsu no Yaiba',      type: 'TV', year: 2019 },
+    { malId: 44511, alId: 127230, title: 'Chainsaw Man',                         type: 'TV', year: 2022 },
+    { malId: 50265, alId: 140960, title: 'Spy x Family',                         type: 'TV', year: 2022 },
+    { malId: 51009, alId: 145064, title: 'Jujutsu Kaisen Season 2',              type: 'TV', year: 2023 },
+    { malId: 16498, alId: 16498,  title: 'Attack on Titan',                     type: 'TV', year: 2013 },
+    { malId: 41467, alId: 116674, title: 'Bleach: Thousand-Year Blood War',     type: 'TV', year: 2022 },
   ];
 
   try {
-    const results = await Promise.all(
-      PICKS.map(p =>
-        fetch(`https://api.jikan.moe/v4/anime/${p.id}`)
-          .then(r => r.json())
-          .then(d => ({ ...d.data, _banner: p.banner, _type: p.type, _year: p.year }))
-          .catch(() => null)
-      )
-    );
-    const items = results.filter(Boolean);
-    if (items.length === 0) return;
+    // Step 1: Get real wide banner images from AniList GraphQL (public, no auth)
+    const alQuery = `{${PICKS.map((p, i) => `a${i}: Media(id: ${p.alId}, type: ANIME) { bannerImage coverImage { extraLarge } }`).join(' ')}}`;
+    const alRes = await fetch('https://anize-backend-ijcn.vercel.app/api/anilist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ query: alQuery })
+    });
+    const alJson = await alRes.json();
+    const banners = alJson?.data || {};
+
+    // Step 2: Get metadata from Jikan (staggered to avoid rate limits)
+    const jikanResults = [];
+    for (let i = 0; i < PICKS.length; i++) {
+      if (i > 0) await DELAY(250);
+      try {
+        const r = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=anime/${PICKS[i].malId}`);
+        const j = await r.json();
+        jikanResults.push(j.data || null);
+      } catch { jikanResults.push(null); }
+    }
+
+    const items = PICKS.map((p, i) => ({
+      ...(jikanResults[i] || {}),
+      mal_id:         p.malId,
+      _banner:        banners[`a${i}`]?.bannerImage || null,
+      _alCover:       banners[`a${i}`]?.coverImage?.extraLarge || null,
+      _type:          p.type,
+      _year:          p.year,
+      _fallbackTitle: p.title,
+    }));
 
     const total = items.length;
 
     const slidesHtml = items.map((a, idx) => {
-      const title = a.title_english || a.title;
+      const title = (a.title_english && a.title_english !== 'null' && a.title_english !== 'undefined')
+        ? a.title_english
+        : (a.title || a._fallbackTitle);
       const synopsis = (a.synopsis || '').replace(/\[Written by MAL Rewrite\]/g, '').trim();
-      const genres = (a.genres || []).slice(0, 3).map(g => `<span class="hero-genre-tag">${g.name}</span>`).join('');
       const status = a.status || 'Finished';
       const eps = a.episodes ? `${a.episodes} Episodes` : 'Ongoing';
-      const year = a._year || (a.aired?.prop?.from?.year || '');
-      const type = a._type || a.type || 'TV';
-      const num = String(idx + 1).padStart(2, '0');
+      const year = a._year;
+      const type = a._type;
+
+      // Banner priority: AniList wide > MAL large image
+      const hasBanner = !!a._banner;
+      const imgSrc = a._banner || a._alCover || a.images?.jpg?.large_image_url || '';
+      const imgFallback = a.images?.jpg?.large_image_url || '';
 
       return `
         <div class="hero-slide${idx === 0 ? ' active' : ''}" data-index="${idx}">
-          <img class="hero-bg" src="${a._banner}" alt="${title}" loading="${idx === 0 ? 'eager' : 'lazy'}">
+          <img class="hero-bg${hasBanner ? '' : ' hero-bg-cover'}" src="${imgSrc}" alt="${title}"
+               loading="${idx === 0 ? 'eager' : 'lazy'}"
+               onerror="this.onerror=null;this.src='${imgFallback}'">
           <div class="hero-content">
             <div class="hero-type-badge">
               <span class="hero-type-pill">${type}</span>
-              <span class="hero-type-meta">${year}${genres ? ' &nbsp;' : ''}</span>
-              <div class="hero-genres">${genres}</div>
+              <span class="hero-type-meta">${year}</span>
             </div>
             <h1 class="hero-title">${title}</h1>
             <p class="hero-synopsis">${synopsis}</p>
@@ -382,11 +441,10 @@ async function loadHeroSlider() {
       document.getElementById('heroCountCur').textContent = String(current + 1).padStart(2, '0');
     };
 
-    setInterval(() => {
-      goToSlide((current + 1) % slides.length);
-    }, 6000);
+    setInterval(() => goToSlide((current + 1) % slides.length), 6000);
 
   } catch(e) {
+    console.error('Hero slider failed:', e);
     document.getElementById('heroSlider').style.display = 'none';
   }
 }
@@ -394,13 +452,15 @@ async function loadHeroSlider() {
 // Fetch and render the numbered Trending strip (top airing by popularity)
 async function loadTrending() {
   try {
-    const res = await fetch(`https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=10&sfw=true`);
+    const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=bypopularity&limit=10&sfw=true`);
     const json = await res.json();
     const data = (json.data || []).filter(a => a.type === 'TV' || a.type === 'Movie' || a.type === 'ONA');
 
+    const covers = await fetchAniListCovers(data.map(a => a.mal_id));
+
     document.getElementById('trendingStrip').innerHTML = data.map((a, idx) => {
       const title = a.title_english || a.title;
-      const img = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+      const img = covers[a.mal_id] || a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
       return `
         <div class="trending-item" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
 
@@ -436,10 +496,10 @@ async function fetchWithRetry(url, retries = 2, delayMs = 600) {
 
 async function loadFourColumns() {
   const configurations = [
-    { id: 'colFav', url: `https://api.jikan.moe/v4/top/anime?filter=favorite&limit=5&sfw=true` },
-    { id: 'colComp', url: `https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=5&sfw=true` },
-    { id: 'colView', url: `https://api.jikan.moe/v4/top/anime?limit=5&sfw=true` },
-    { id: 'colNew', url: `https://api.jikan.moe/v4/seasons/now?limit=5&sfw=true` }
+    { id: 'colFav', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=favorite&limit=5&sfw=true` },
+    { id: 'colComp', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=bypopularity&limit=5&sfw=true` },
+    { id: 'colView', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&limit=5&sfw=true` },
+    { id: 'colNew', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=seasons/now&limit=5&sfw=true` }
   ];
 
   for (const col of configurations) {
@@ -450,11 +510,13 @@ async function loadFourColumns() {
         document.getElementById(col.id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>';
         continue;
       }
+      const covers = await fetchAniListCovers(items.map(a => a.mal_id));
       document.getElementById(col.id).innerHTML = items.map(a => {
         const title = a.title_english || a.title;
+        const img = covers[a.mal_id] || a.images?.jpg?.image_url || '';
         return `
           <div class="metric-row" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
-            <img class="m-img" src="${a.images?.jpg?.image_url}" alt="" loading="lazy">
+            <img class="m-img" src="${img}" alt="" loading="lazy">
             <div class="m-info">
               <div class="m-title">${title}</div>
               <div class="m-meta">${a.type || 'TV'} • ${a.score ? `★ ${a.score.toFixed(1)}` : 'N/A'}</div>
@@ -561,5 +623,28 @@ function bpTab(name) {
 }
 </script>
 
+
+
+<script src="auth.js"></script>
+<script>
+(function() {
+  if (typeof AniZeAuth === 'undefined' || !AniZeAuth.isLoggedIn()) return;
+  var user = AniZeAuth.getUser();
+  if (!user) return;
+  var initial = user.username[0].toUpperCase();
+  var nr = document.getElementById('navRight');
+  if (!nr) return;
+  var btn = document.createElement('button');
+  btn.style.cssText = 'display:flex;align-items:center;gap:0.5rem;background:#111;border:1px solid #2a2a2a;color:#fff;font-family:Inter,sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.05em;padding:0.38rem 0.85rem 0.38rem 0.6rem;border-radius:3px;cursor:pointer;';
+  btn.onclick = function() { window.location.href = 'anize-account.html'; };
+  var avatar = document.createElement('div');
+  avatar.style.cssText = 'width:22px;height:22px;border-radius:50%;background:#e53935;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:800;color:#fff;flex-shrink:0;';
+  avatar.textContent = initial;
+  btn.appendChild(avatar);
+  btn.appendChild(document.createTextNode(user.username));
+  nr.innerHTML = '';
+  nr.appendChild(btn);
+})();
+</script>
 </body>
 </html>
