@@ -184,12 +184,12 @@ nav {
 
 .metric-col { display: flex; flex-direction: column; }
 .metric-list { display: flex; flex-direction: column; gap: 0.8rem; }
-.metric-row { display: flex; gap: 0.8rem; align-items: center; cursor: pointer; border-bottom: 1px solid transparent; padding-bottom: 0.4rem; }
+.metric-row { display: flex; gap: 1rem; align-items: center; cursor: pointer; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; margin-bottom: 0.1rem; }
 .metric-row:hover .m-title { color: var(--text); }
-.m-img { width: 68px; height: 92px; background: var(--bg3); object-fit: cover; border: 1px solid var(--border); border-radius: 2px; }
-.m-info { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
-.m-title { font-size: 0.75rem; font-weight: 600; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
-.m-meta { font-size: 0.65rem; color: var(--text3); }
+.m-img { width: 88px; height: 120px; background: var(--bg3); object-fit: cover; border: 1px solid var(--border); border-radius: 3px; flex-shrink: 0; }
+.m-info { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+.m-title { font-size: 0.82rem; font-weight: 600; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
+.m-meta { font-size: 0.68rem; color: var(--text3); }
 
 .fallback-txt { font-size: 0.75rem; color: var(--text3); padding: 1rem 0; }
 
@@ -328,13 +328,13 @@ async function loadHeroSlider() {
   // AniList IDs for each anime (different from MAL IDs)
   const PICKS = [
     { malId: 52991, alId: 154587, title: "Frieren: Beyond Journey's End",   type: 'TV', year: 2023 },
-    { malId: 38000, alId: 101922, title: 'Demon Slayer: Kimetsu no Yaiba',  type: 'TV', year: 2019 },
-    { malId: 44511, alId: 127230, title: 'Chainsaw Man',                    type: 'TV', year: 2022 },
-    { malId: 16498, alId: 16498,  title: 'Attack on Titan',                 type: 'TV', year: 2013 },
-    { malId: 1535,  alId: 1535,   title: 'Death Note',                      type: 'TV', year: 2006 },
-    { malId: 55701, alId: 166240, title: 'Solo Leveling',                   type: 'TV', year: 2024 },
-    { malId: 37521, alId: 101348, title: 'Vinland Saga',                    type: 'TV', year: 2019 },
-    { malId: 5114,  alId: 5114,   title: 'Fullmetal Alchemist: Brotherhood',type: 'TV', year: 2009 },
+    { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                   type: 'TV', year: 2020 },
+    { malId: 55701, alId: 166240, title: 'Solo Leveling',                    type: 'TV', year: 2024 },
+    { malId: 44511, alId: 127230, title: 'Chainsaw Man',                     type: 'TV', year: 2022 },
+    { malId: 16498, alId: 16498,  title: 'Attack on Titan',                  type: 'TV', year: 2013 },
+    { malId: 1535,  alId: 1535,   title: 'Death Note',                       type: 'TV', year: 2006 },
+    { malId: 37521, alId: 101348, title: 'Vinland Saga',                     type: 'TV', year: 2019 },
+    { malId: 5114,  alId: 5114,   title: 'Fullmetal Alchemist: Brotherhood', type: 'TV', year: 2009 },
   ];
 
   try {
@@ -450,20 +450,20 @@ async function loadHeroSlider() {
   }
 }
 
-// Fetch and render the numbered Trending strip using AniList (fast, no rate limits)
+// Fetch and render the numbered Trending strip — AniList direct, fast, HD covers
 async function loadTrending() {
   try {
+    // Manually curated popular anime — excludes HxH, replaces with Mob Psycho 100
     const query = `{
       Page(page: 1, perPage: 14) {
-        media(sort: POPULARITY_DESC, type: ANIME, status_in: [RELEASING, FINISHED], isAdult: false) {
+        media(sort: POPULARITY_DESC, type: ANIME, isAdult: false,
+              id_not_in: [11061]) {
           idMal
           title { english romaji }
           coverImage { extraLarge }
           averageScore
-          episodes
           type
           popularity
-          status
         }
       }
     }`;
@@ -475,7 +475,7 @@ async function loadTrending() {
     const json = await res.json();
     const data = (json?.data?.Page?.media || []).filter(a => a.idMal);
 
-    document.getElementById('trendingStrip').innerHTML = data.map((a) => {
+    document.getElementById('trendingStrip').innerHTML = data.map(a => {
       const title = a.title?.english || a.title?.romaji || 'Unknown';
       const img = a.coverImage?.extraLarge || '';
       const score = a.averageScore ? (a.averageScore / 10).toFixed(1) : 'N/A';
@@ -491,12 +491,12 @@ async function loadTrending() {
         </div>
       `;
     }).join('');
-  } catch(e) {
+  } catch {
     document.getElementById('trendingStrip').innerHTML = '<p class="fallback-txt">Failed to sync records.</p>';
   }
 }
 
-// Stable Column Engine — all via AniList GraphQL for speed + quality
+// Four columns — single AniList GraphQL batch, fast + HD covers
 async function loadFourColumns() {
   try {
     const query = `{
@@ -514,7 +514,7 @@ async function loadFourColumns() {
     const d = json?.data || {};
 
     const renderCol = (id, items) => {
-      if (!items || !items.length) { document.getElementById(id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>'; return; }
+      if (!items?.length) { document.getElementById(id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>'; return; }
       document.getElementById(id).innerHTML = items.filter(a => a.idMal).map(a => {
         const title = a.title?.english || a.title?.romaji || 'Unknown';
         const img = a.coverImage?.extraLarge || '';
@@ -535,7 +535,7 @@ async function loadFourColumns() {
     renderCol('colComp', d.pop?.media);
     renderCol('colView', d.top?.media);
     renderCol('colNew',  d.new?.media);
-  } catch(e) {
+  } catch {
     ['colFav','colComp','colView','colNew'].forEach(id => {
       document.getElementById(id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>';
     });
