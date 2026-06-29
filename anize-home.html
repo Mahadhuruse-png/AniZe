@@ -295,7 +295,7 @@ async function fetchAniListCovers(malIds) {
   if (!ids.length) return {};
   try {
     const query = `{${ids.map((id, i) => `m${i}: Media(idMal: ${id}, type: ANIME) { idMal coverImage { extraLarge } }`).join(' ')}}`;
-    const res = await fetch('https://graphql.anilist.co', {
+    const res = await fetch('https://anize-backend-ijcn.vercel.app/api/anilist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ query })
@@ -326,22 +326,23 @@ function initAZ() {
 // Fetch and Handle Hero Rotation Slider
 async function loadHeroSlider() {
   // AniList IDs for each anime (different from MAL IDs)
-  const PICKS = [
-    { malId: 59978, alId: 182255, title: "Frieren: Beyond Journey's End Season 2", type: 'TV', year: 2026 },
-    { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                type: 'TV', year: 2020 },
-    { malId: 38000, alId: 101922, title: 'Demon Slayer: Kimetsu no Yaiba',type: 'TV', year: 2019 },
-    { malId: 44511, alId: 127230, title: 'Chainsaw Man',                  type: 'TV', year: 2022 },
-    { malId: 16498, alId: 16498,  title: 'Attack on Titan',               type: 'TV', year: 2013 },
-    { malId: 1535,  alId: 1535,   title: 'Death Note',                    type: 'TV', year: 2006 },
-    { malId: 37521, alId: 101348, title: 'Vinland Saga',                  type: 'TV', year: 2019 },
-    { malId: 54857, alId: 163134, title: 'Re:ZERO -Starting Life in Another World- Season 3', type: 'TV', year: 2024 },
-    { malId: 60636, alId: 185874, title: 'BLEACH: Sennen Kessen-hen - Kashin-tan', type: 'TV', year: 2026 },
+    const PICKS = [
+    { malId: 60072, alId: 199221, title: 'Dr. STONE: SCIENCE FUTURE Part 3',              type: 'TV',    year: 2025 },
+    { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                                type: 'TV',    year: 2020 },
+    { malId: 57342, alId: 178788, title: 'Demon Slayer: Infinity Castle',                  type: 'Movie', year: 2025 },
+    { malId: 44511, alId: 127230, title: 'Chainsaw Man',                                   type: 'TV',    year: 2022 },
+    { malId: 38524, alId: 104578, title: 'Attack on Titan Season 3 Part 2',                type: 'TV',    year: 2019 },
+    { malId: 1535,  alId: 1535,   title: 'Death Note',                                     type: 'TV',    year: 2006 },
+    { malId: 37521, alId: 101348, title: 'Vinland Saga',                                   type: 'TV',    year: 2019 },
+    { malId: 55791, alId: 171627, title: 'Chainsaw Man: Reze Arc',                         type: 'Movie', year: 2025 },
+    { malId: 32935, alId: 21698,  title: 'Haikyuu!! Season 3',                             type: 'TV',    year: 2016 },
+    { malId: 36098, alId: 99750,  title: 'I Want to Eat Your Pancreas',                    type: 'Movie', year: 2018 },
   ];
 
   try {
     // Step 1: Get real wide banner images DIRECTLY from AniList (no backend needed)
     const alQuery = `{${PICKS.map((p, i) => `a${i}: Media(id: ${p.alId}, type: ANIME) { bannerImage coverImage { extraLarge } }`).join(' ')}}`;
-    const alRes = await fetch('https://graphql.anilist.co', {
+    const alRes = await fetch('https://anize-backend-ijcn.vercel.app/api/anilist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ query: alQuery })
@@ -354,7 +355,7 @@ async function loadHeroSlider() {
     for (let i = 0; i < PICKS.length; i++) {
       if (i > 0) await DELAY(350);
       try {
-        const r = await fetch(`https://api.jikan.moe/v4/anime/${PICKS[i].malId}`);
+        const r = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=anime/${PICKS[i].malId}`);
         const j = await r.json();
         jikanResults.push(j.data || null);
       } catch { jikanResults.push(null); }
@@ -454,7 +455,7 @@ async function loadHeroSlider() {
 // Fetch and render the numbered Trending strip (top airing by popularity)
 async function loadTrending() {
   try {
-    const res = await fetch(`https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=10&sfw=true`);
+    const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=bypopularity&limit=10&sfw=true`);
     const json = await res.json();
     const data = (json.data || []).filter(a => a.type === 'TV' || a.type === 'Movie' || a.type === 'ONA');
 
@@ -498,10 +499,10 @@ async function fetchWithRetry(url, retries = 2, delayMs = 600) {
 
 async function loadFourColumns() {
   const configurations = [
-    { id: 'colFav', url: `https://api.jikan.moe/v4/top/anime?filter=favorite&limit=5&sfw=true` },
-    { id: 'colComp', url: `https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=5&sfw=true` },
-    { id: 'colView', url: `https://api.jikan.moe/v4/top/anime?limit=5&sfw=true` },
-    { id: 'colNew', url: `https://api.jikan.moe/v4/seasons/now?limit=5&sfw=true` }
+    { id: 'colFav', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=favorite&limit=5&sfw=true` },
+    { id: 'colComp', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=bypopularity&limit=5&sfw=true` },
+    { id: 'colView', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&limit=5&sfw=true` },
+    { id: 'colNew', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=seasons/now&limit=5&sfw=true` }
   ];
 
   for (const col of configurations) {
@@ -624,6 +625,7 @@ function bpTab(name) {
   });
 }
 </script>
+
 
 
 
