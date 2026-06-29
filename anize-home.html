@@ -327,14 +327,14 @@ function initAZ() {
 async function loadHeroSlider() {
   // AniList IDs for each anime (different from MAL IDs)
   const PICKS = [
-    { malId: 52991, alId: 154587, title: "Frieren: Beyond Journey's End",      type: 'TV', year: 2023 },
-    { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                      type: 'TV', year: 2020 },
-    { malId: 38000, alId: 101922, title: 'Demon Slayer: Kimetsu no Yaiba',      type: 'TV', year: 2019 },
-    { malId: 44511, alId: 127230, title: 'Chainsaw Man',                         type: 'TV', year: 2022 },
-    { malId: 16498, alId: 16498,  title: 'Attack on Titan',                     type: 'TV', year: 2013 },
-    { malId: 50265, alId: 140960, title: 'Spy x Family',                       type: 'TV', year: 2022 },
-    { malId: 1535,  alId: 1535,   title: 'Death Note',                          type: 'TV', year: 2006 },
-    { malId: 51009, alId: 145064, title: 'Jujutsu Kaisen Season 2',             type: 'TV', year: 2023 },
+    { malId: 52991, alId: 154587, title: "Frieren: Beyond Journey's End",   type: 'TV', year: 2023 },
+    { malId: 38000, alId: 101922, title: 'Demon Slayer: Kimetsu no Yaiba',  type: 'TV', year: 2019 },
+    { malId: 44511, alId: 127230, title: 'Chainsaw Man',                    type: 'TV', year: 2022 },
+    { malId: 16498, alId: 16498,  title: 'Attack on Titan',                 type: 'TV', year: 2013 },
+    { malId: 1535,  alId: 1535,   title: 'Death Note',                      type: 'TV', year: 2006 },
+    { malId: 55701, alId: 166240, title: 'Solo Leveling',                   type: 'TV', year: 2024 },
+    { malId: 37521, alId: 101348, title: 'Vinland Saga',                    type: 'TV', year: 2019 },
+    { malId: 5114,  alId: 5114,   title: 'Fullmetal Alchemist: Brotherhood',type: 'TV', year: 2009 },
   ];
 
   try {
@@ -450,84 +450,95 @@ async function loadHeroSlider() {
   }
 }
 
-// Fetch and render the numbered Trending strip (top airing by popularity)
+// Fetch and render the numbered Trending strip using AniList (fast, no rate limits)
 async function loadTrending() {
   try {
-    const res = await fetch(`https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=10&sfw=true`);
+    const query = `{
+      Page(page: 1, perPage: 14) {
+        media(sort: POPULARITY_DESC, type: ANIME, status_in: [RELEASING, FINISHED], isAdult: false) {
+          idMal
+          title { english romaji }
+          coverImage { extraLarge }
+          averageScore
+          episodes
+          type
+          popularity
+          status
+        }
+      }
+    }`;
+    const res = await fetch('https://graphql.anilist.co', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ query })
+    });
     const json = await res.json();
-    const data = (json.data || []).filter(a => a.type === 'TV' || a.type === 'Movie' || a.type === 'ONA');
+    const data = (json?.data?.Page?.media || []).filter(a => a.idMal);
 
-    const covers = await fetchAniListCovers(data.map(a => a.mal_id));
-
-    document.getElementById('trendingStrip').innerHTML = data.map((a, idx) => {
-      const title = a.title_english || a.title;
-      const img = covers[a.mal_id] || a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+    document.getElementById('trendingStrip').innerHTML = data.map((a) => {
+      const title = a.title?.english || a.title?.romaji || 'Unknown';
+      const img = a.coverImage?.extraLarge || '';
+      const score = a.averageScore ? (a.averageScore / 10).toFixed(1) : 'N/A';
+      const pop = a.popularity > 1000000 ? (a.popularity/1000000).toFixed(1)+'M' : Math.round(a.popularity/1000)+'K';
       return `
-        <div class="trending-item" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
-
+        <div class="trending-item" onclick="window.location.href='anize-details.html?id=${a.idMal}'">
           <div class="thumb">
             <img src="${img}" alt="" loading="lazy">
-            <div class="ep-tag">${a.score ? `★ ${a.score.toFixed(1)}` : 'N/A'}</div>
+            <div class="ep-tag">★ ${score}</div>
           </div>
           <div class="title">${title}</div>
-          <div class="meta">${a.type || 'TV'} • ${a.members ? (a.members > 1000000 ? (a.members/1000000).toFixed(1)+'M' : Math.round(a.members/1000)+'K') : ''}</div>
+          <div class="meta">${a.type || 'TV'} • ${pop}</div>
         </div>
       `;
     }).join('');
-  } catch {
+  } catch(e) {
     document.getElementById('trendingStrip').innerHTML = '<p class="fallback-txt">Failed to sync records.</p>';
   }
 }
 
-// Stable Column Engine
-async function fetchWithRetry(url, retries = 2, delayMs = 600) {
-  for (let i = 0; i <= retries; i++) {
-    try {
-      const res = await fetch(url);
-      if (res.status === 429) { await DELAY(delayMs * (i + 1)); continue; }
-      const json = await res.json();
-      if (json && json.data) return json.data;
-    } catch {
-      if (i === retries) return [];
-      await DELAY(delayMs);
-    }
-  }
-  return [];
-}
-
+// Stable Column Engine — all via AniList GraphQL for speed + quality
 async function loadFourColumns() {
-  const configurations = [
-    { id: 'colFav', url: `https://api.jikan.moe/v4/top/anime?filter=favorite&limit=5&sfw=true` },
-    { id: 'colComp', url: `https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=5&sfw=true` },
-    { id: 'colView', url: `https://api.jikan.moe/v4/top/anime?limit=5&sfw=true` },
-    { id: 'colNew', url: `https://api.jikan.moe/v4/seasons/now?limit=5&sfw=true` }
-  ];
+  try {
+    const query = `{
+      fav:  Page(page:1,perPage:5){ media(sort:FAVOURITES_DESC, type:ANIME, isAdult:false){ idMal title{english romaji} coverImage{extraLarge} averageScore type } }
+      pop:  Page(page:1,perPage:5){ media(sort:POPULARITY_DESC, type:ANIME, isAdult:false){ idMal title{english romaji} coverImage{extraLarge} averageScore type } }
+      top:  Page(page:1,perPage:5){ media(sort:SCORE_DESC,      type:ANIME, isAdult:false){ idMal title{english romaji} coverImage{extraLarge} averageScore type } }
+      new:  Page(page:1,perPage:5){ media(sort:START_DATE_DESC, type:ANIME, isAdult:false, status:RELEASING){ idMal title{english romaji} coverImage{extraLarge} averageScore type } }
+    }`;
+    const res = await fetch('https://graphql.anilist.co', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ query })
+    });
+    const json = await res.json();
+    const d = json?.data || {};
 
-  for (const col of configurations) {
-    try {
-      await DELAY(400);
-      const items = await fetchWithRetry(col.url);
-      if (!items || items.length === 0) {
-        document.getElementById(col.id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>';
-        continue;
-      }
-      const covers = await fetchAniListCovers(items.map(a => a.mal_id));
-      document.getElementById(col.id).innerHTML = items.map(a => {
-        const title = a.title_english || a.title;
-        const img = covers[a.mal_id] || a.images?.jpg?.image_url || '';
+    const renderCol = (id, items) => {
+      if (!items || !items.length) { document.getElementById(id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>'; return; }
+      document.getElementById(id).innerHTML = items.filter(a => a.idMal).map(a => {
+        const title = a.title?.english || a.title?.romaji || 'Unknown';
+        const img = a.coverImage?.extraLarge || '';
+        const score = a.averageScore ? (a.averageScore / 10).toFixed(1) : 'N/A';
         return `
-          <div class="metric-row" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
+          <div class="metric-row" onclick="window.location.href='anize-details.html?id=${a.idMal}'">
             <img class="m-img" src="${img}" alt="" loading="lazy">
             <div class="m-info">
               <div class="m-title">${title}</div>
-              <div class="m-meta">${a.type || 'TV'} • ${a.score ? `★ ${a.score.toFixed(1)}` : 'N/A'}</div>
+              <div class="m-meta">${a.type || 'TV'} • ★ ${score}</div>
             </div>
           </div>
         `;
       }).join('');
-    } catch {
-      document.getElementById(col.id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>';
-    }
+    };
+
+    renderCol('colFav',  d.fav?.media);
+    renderCol('colComp', d.pop?.media);
+    renderCol('colView', d.top?.media);
+    renderCol('colNew',  d.new?.media);
+  } catch(e) {
+    ['colFav','colComp','colView','colNew'].forEach(id => {
+      document.getElementById(id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>';
+    });
   }
 }
 
