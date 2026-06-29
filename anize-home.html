@@ -62,8 +62,8 @@ nav {
 .hero-slider {
   position: relative;
   width: 100%;
-  height: 75vh;
-  min-height: 500px;
+  aspect-ratio: 16 / 9;
+  max-height: 85vh;
   background: #000;
   overflow: hidden;
   margin-bottom: 3.5rem;
@@ -79,14 +79,14 @@ nav {
 }
 .hero-slide.active { opacity: 1; z-index: 2; }
 
-.hero-bg-cover { object-fit: cover !important; object-position: center 20% !important; }
+.hero-bg-cover { object-fit: cover !important; object-position: center center !important; }
 .hero-bg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 20%;
+  object-position: center center;
   z-index: 0;
   filter: brightness(0.82);
 }
