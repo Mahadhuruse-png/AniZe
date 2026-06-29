@@ -62,8 +62,8 @@ nav {
 .hero-slider {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
-  max-height: 85vh;
+  aspect-ratio: 19 / 7;
+  max-height: 80vh;
   background: #000;
   overflow: hidden;
   margin-bottom: 3.5rem;
@@ -338,9 +338,9 @@ async function loadHeroSlider() {
   ];
 
   try {
-    // Step 1: Get real wide banner images from AniList GraphQL (public, no auth)
+    // Step 1: Get real wide banner images DIRECTLY from AniList (no backend needed)
     const alQuery = `{${PICKS.map((p, i) => `a${i}: Media(id: ${p.alId}, type: ANIME) { bannerImage coverImage { extraLarge } }`).join(' ')}}`;
-    const alRes = await fetch('https://anize-backend-ijcn.vercel.app/api/anilist', {
+    const alRes = await fetch('https://graphql.anilist.co', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ query: alQuery })
