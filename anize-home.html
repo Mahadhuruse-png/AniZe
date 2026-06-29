@@ -295,7 +295,7 @@ async function fetchAniListCovers(malIds) {
   if (!ids.length) return {};
   try {
     const query = `{${ids.map((id, i) => `m${i}: Media(idMal: ${id}, type: ANIME) { idMal coverImage { extraLarge } }`).join(' ')}}`;
-    const res = await fetch('https://anize-backend-ijcn.vercel.app/api/anilist', {
+    const res = await fetch('https://graphql.anilist.co', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ query })
@@ -331,10 +331,10 @@ async function loadHeroSlider() {
     { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                      type: 'TV', year: 2020 },
     { malId: 38000, alId: 101922, title: 'Demon Slayer: Kimetsu no Yaiba',      type: 'TV', year: 2019 },
     { malId: 44511, alId: 127230, title: 'Chainsaw Man',                         type: 'TV', year: 2022 },
-    { malId: 50265, alId: 140960, title: 'Spy x Family',                         type: 'TV', year: 2022 },
-    { malId: 51009, alId: 145064, title: 'Jujutsu Kaisen Season 2',              type: 'TV', year: 2023 },
     { malId: 16498, alId: 16498,  title: 'Attack on Titan',                     type: 'TV', year: 2013 },
-    { malId: 41467, alId: 116674, title: 'Bleach: Thousand-Year Blood War',     type: 'TV', year: 2022 },
+    { malId: 11061, alId: 11061,  title: 'Hunter x Hunter',                     type: 'TV', year: 2011 },
+    { malId: 1535,  alId: 1535,   title: 'Death Note',                          type: 'TV', year: 2006 },
+    { malId: 21,    alId: 21,     title: 'One Piece',                           type: 'TV', year: 1999 },
   ];
 
   try {
@@ -348,12 +348,12 @@ async function loadHeroSlider() {
     const alJson = await alRes.json();
     const banners = alJson?.data || {};
 
-    // Step 2: Get metadata from Jikan (staggered to avoid rate limits)
+    // Step 2: Get metadata from Jikan DIRECTLY (no backend)
     const jikanResults = [];
     for (let i = 0; i < PICKS.length; i++) {
-      if (i > 0) await DELAY(250);
+      if (i > 0) await DELAY(350);
       try {
-        const r = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=anime/${PICKS[i].malId}`);
+        const r = await fetch(`https://api.jikan.moe/v4/anime/${PICKS[i].malId}`);
         const j = await r.json();
         jikanResults.push(j.data || null);
       } catch { jikanResults.push(null); }
@@ -453,7 +453,7 @@ async function loadHeroSlider() {
 // Fetch and render the numbered Trending strip (top airing by popularity)
 async function loadTrending() {
   try {
-    const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=bypopularity&limit=10&sfw=true`);
+    const res = await fetch(`https://api.jikan.moe/v4/top/anime&filter=bypopularity&limit=10&sfw=true`);
     const json = await res.json();
     const data = (json.data || []).filter(a => a.type === 'TV' || a.type === 'Movie' || a.type === 'ONA');
 
@@ -497,10 +497,10 @@ async function fetchWithRetry(url, retries = 2, delayMs = 600) {
 
 async function loadFourColumns() {
   const configurations = [
-    { id: 'colFav', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=favorite&limit=5&sfw=true` },
-    { id: 'colComp', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=bypopularity&limit=5&sfw=true` },
-    { id: 'colView', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&limit=5&sfw=true` },
-    { id: 'colNew', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=seasons/now&limit=5&sfw=true` }
+    { id: 'colFav', url: `https://api.jikan.moe/v4/top/anime&filter=favorite&limit=5&sfw=true` },
+    { id: 'colComp', url: `https://api.jikan.moe/v4/top/anime&filter=bypopularity&limit=5&sfw=true` },
+    { id: 'colView', url: `https://api.jikan.moe/v4/top/anime&limit=5&sfw=true` },
+    { id: 'colNew', url: `https://api.jikan.moe/v4/seasons/now&limit=5&sfw=true` }
   ];
 
   for (const col of configurations) {
