@@ -184,12 +184,12 @@ nav {
 
 .metric-col { display: flex; flex-direction: column; }
 .metric-list { display: flex; flex-direction: column; gap: 0.8rem; }
-.metric-row { display: flex; gap: 1rem; align-items: center; cursor: pointer; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; margin-bottom: 0.1rem; }
+.metric-row { display: flex; gap: 0.8rem; align-items: center; cursor: pointer; border-bottom: 1px solid transparent; padding-bottom: 0.4rem; }
 .metric-row:hover .m-title { color: var(--text); }
-.m-img { width: 88px; height: 120px; background: var(--bg3); object-fit: cover; border: 1px solid var(--border); border-radius: 3px; flex-shrink: 0; }
-.m-info { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
-.m-title { font-size: 0.82rem; font-weight: 600; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
-.m-meta { font-size: 0.68rem; color: var(--text3); }
+.m-img { width: 68px; height: 92px; background: var(--bg3); object-fit: cover; border: 1px solid var(--border); border-radius: 2px; }
+.m-info { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.m-title { font-size: 0.75rem; font-weight: 600; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
+.m-meta { font-size: 0.65rem; color: var(--text3); }
 
 .fallback-txt { font-size: 0.75rem; color: var(--text3); padding: 1rem 0; }
 
@@ -327,14 +327,14 @@ function initAZ() {
 async function loadHeroSlider() {
   // AniList IDs for each anime (different from MAL IDs)
   const PICKS = [
-    { malId: 52991, alId: 154587, title: "Frieren: Beyond Journey's End",   type: 'TV', year: 2023 },
-    { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                   type: 'TV', year: 2020 },
-    { malId: 55701, alId: 166240, title: 'Solo Leveling',                    type: 'TV', year: 2024 },
-    { malId: 44511, alId: 127230, title: 'Chainsaw Man',                     type: 'TV', year: 2022 },
-    { malId: 16498, alId: 16498,  title: 'Attack on Titan',                  type: 'TV', year: 2013 },
-    { malId: 1535,  alId: 1535,   title: 'Death Note',                       type: 'TV', year: 2006 },
-    { malId: 37521, alId: 101348, title: 'Vinland Saga',                     type: 'TV', year: 2019 },
-    { malId: 5114,  alId: 5114,   title: 'Fullmetal Alchemist: Brotherhood', type: 'TV', year: 2009 },
+    { malId: 52991, alId: 154587, title: "Frieren: Beyond Journey's End", type: 'TV', year: 2023 },
+    { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                type: 'TV', year: 2020 },
+    { malId: 55701, alId: 166240, title: 'Solo Leveling',                 type: 'TV', year: 2024 },
+    { malId: 44511, alId: 127230, title: 'Chainsaw Man',                  type: 'TV', year: 2022 },
+    { malId: 16498, alId: 16498,  title: 'Attack on Titan',               type: 'TV', year: 2013 },
+    { malId: 1535,  alId: 1535,   title: 'Death Note',                    type: 'TV', year: 2006 },
+    { malId: 37521, alId: 101348, title: 'Vinland Saga',                  type: 'TV', year: 2019 },
+    { malId: 49596, alId: 139775, title: 'Blue Lock',                     type: 'TV', year: 2022 },
   ];
 
   try {
@@ -450,44 +450,27 @@ async function loadHeroSlider() {
   }
 }
 
-// Fetch and render the numbered Trending strip — AniList direct, fast, HD covers
+// Fetch and render the numbered Trending strip (top airing by popularity)
 async function loadTrending() {
   try {
-    // Manually curated popular anime — excludes HxH, replaces with Mob Psycho 100
-    const query = `{
-      Page(page: 1, perPage: 14) {
-        media(sort: POPULARITY_DESC, type: ANIME, isAdult: false,
-              id_not_in: [11061]) {
-          idMal
-          title { english romaji }
-          coverImage { extraLarge }
-          averageScore
-          type
-          popularity
-        }
-      }
-    }`;
-    const res = await fetch('https://graphql.anilist.co', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ query })
-    });
+    const res = await fetch(`https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=10&sfw=true`);
     const json = await res.json();
-    const data = (json?.data?.Page?.media || []).filter(a => a.idMal);
+    const data = (json.data || []).filter(a => a.type === 'TV' || a.type === 'Movie' || a.type === 'ONA');
 
-    document.getElementById('trendingStrip').innerHTML = data.map(a => {
-      const title = a.title?.english || a.title?.romaji || 'Unknown';
-      const img = a.coverImage?.extraLarge || '';
-      const score = a.averageScore ? (a.averageScore / 10).toFixed(1) : 'N/A';
-      const pop = a.popularity > 1000000 ? (a.popularity/1000000).toFixed(1)+'M' : Math.round(a.popularity/1000)+'K';
+    const covers = await fetchAniListCovers(data.map(a => a.mal_id));
+
+    document.getElementById('trendingStrip').innerHTML = data.map((a, idx) => {
+      const title = a.title_english || a.title;
+      const img = covers[a.mal_id] || a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
       return `
-        <div class="trending-item" onclick="window.location.href='anize-details.html?id=${a.idMal}'">
+        <div class="trending-item" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
+
           <div class="thumb">
             <img src="${img}" alt="" loading="lazy">
-            <div class="ep-tag">★ ${score}</div>
+            <div class="ep-tag">${a.score ? `★ ${a.score.toFixed(1)}` : 'N/A'}</div>
           </div>
           <div class="title">${title}</div>
-          <div class="meta">${a.type || 'TV'} • ${pop}</div>
+          <div class="meta">${a.type || 'TV'} • ${a.members ? (a.members > 1000000 ? (a.members/1000000).toFixed(1)+'M' : Math.round(a.members/1000)+'K') : ''}</div>
         </div>
       `;
     }).join('');
@@ -496,49 +479,55 @@ async function loadTrending() {
   }
 }
 
-// Four columns — single AniList GraphQL batch, fast + HD covers
-async function loadFourColumns() {
-  try {
-    const query = `{
-      fav:  Page(page:1,perPage:5){ media(sort:FAVOURITES_DESC, type:ANIME, isAdult:false){ idMal title{english romaji} coverImage{extraLarge} averageScore type } }
-      pop:  Page(page:1,perPage:5){ media(sort:POPULARITY_DESC, type:ANIME, isAdult:false){ idMal title{english romaji} coverImage{extraLarge} averageScore type } }
-      top:  Page(page:1,perPage:5){ media(sort:SCORE_DESC,      type:ANIME, isAdult:false){ idMal title{english romaji} coverImage{extraLarge} averageScore type } }
-      new:  Page(page:1,perPage:5){ media(sort:START_DATE_DESC, type:ANIME, isAdult:false, status:RELEASING){ idMal title{english romaji} coverImage{extraLarge} averageScore type } }
-    }`;
-    const res = await fetch('https://graphql.anilist.co', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ query })
-    });
-    const json = await res.json();
-    const d = json?.data || {};
+// Stable Column Engine
+async function fetchWithRetry(url, retries = 2, delayMs = 600) {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const res = await fetch(url);
+      if (res.status === 429) { await DELAY(delayMs * (i + 1)); continue; }
+      const json = await res.json();
+      if (json && json.data) return json.data;
+    } catch {
+      if (i === retries) return [];
+      await DELAY(delayMs);
+    }
+  }
+  return [];
+}
 
-    const renderCol = (id, items) => {
-      if (!items?.length) { document.getElementById(id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>'; return; }
-      document.getElementById(id).innerHTML = items.filter(a => a.idMal).map(a => {
-        const title = a.title?.english || a.title?.romaji || 'Unknown';
-        const img = a.coverImage?.extraLarge || '';
-        const score = a.averageScore ? (a.averageScore / 10).toFixed(1) : 'N/A';
+async function loadFourColumns() {
+  const configurations = [
+    { id: 'colFav', url: `https://api.jikan.moe/v4/top/anime?filter=favorite&limit=5&sfw=true` },
+    { id: 'colComp', url: `https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=5&sfw=true` },
+    { id: 'colView', url: `https://api.jikan.moe/v4/top/anime?limit=5&sfw=true` },
+    { id: 'colNew', url: `https://api.jikan.moe/v4/seasons/now?limit=5&sfw=true` }
+  ];
+
+  for (const col of configurations) {
+    try {
+      await DELAY(400);
+      const items = await fetchWithRetry(col.url);
+      if (!items || items.length === 0) {
+        document.getElementById(col.id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>';
+        continue;
+      }
+      const covers = await fetchAniListCovers(items.map(a => a.mal_id));
+      document.getElementById(col.id).innerHTML = items.map(a => {
+        const title = a.title_english || a.title;
+        const img = covers[a.mal_id] || a.images?.jpg?.image_url || '';
         return `
-          <div class="metric-row" onclick="window.location.href='anize-details.html?id=${a.idMal}'">
+          <div class="metric-row" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
             <img class="m-img" src="${img}" alt="" loading="lazy">
             <div class="m-info">
               <div class="m-title">${title}</div>
-              <div class="m-meta">${a.type || 'TV'} • ★ ${score}</div>
+              <div class="m-meta">${a.type || 'TV'} • ${a.score ? `★ ${a.score.toFixed(1)}` : 'N/A'}</div>
             </div>
           </div>
         `;
       }).join('');
-    };
-
-    renderCol('colFav',  d.fav?.media);
-    renderCol('colComp', d.pop?.media);
-    renderCol('colView', d.top?.media);
-    renderCol('colNew',  d.new?.media);
-  } catch {
-    ['colFav','colComp','colView','colNew'].forEach(id => {
-      document.getElementById(id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>';
-    });
+    } catch {
+      document.getElementById(col.id).innerHTML = '<p class="fallback-txt">Nothing to show.</p>';
+    }
   }
 }
 
