@@ -107,6 +107,52 @@ nav {
   flex-shrink: 0;
 }
 .btn-logout:hover { border-color: var(--red); color: var(--red); }
+.profile-actions { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+.btn-gear {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: 1px solid var(--border2);
+  color: var(--text3); border-radius: 3px; cursor: pointer;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.btn-gear:hover { border-color: var(--text3); color: var(--text); }
+
+/* SETTINGS MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px); z-index: 300; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s;
+}
+.modal-box {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 6px; width: 100%; max-width: 420px;
+  max-height: 85vh; overflow-y: auto;
+  padding: 1.8rem; transform: scale(0.96); transition: transform 0.2s;
+}
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.modal-title { font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.06em; }
+.modal-close { background: none; border: none; color: var(--text3); font-size: 1.2rem; cursor: pointer; line-height: 1; }
+.modal-close:hover { color: var(--text); }
+.modal-section { margin-bottom: 1.8rem; }
+.modal-section:last-child { margin-bottom: 0; }
+.modal-section-title { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 0.9rem; }
+.form-field { margin-bottom: 0.8rem; }
+.form-field label { display: block; font-size: 0.65rem; color: var(--text3); letter-spacing: 0.04em; margin-bottom: 0.35rem; }
+.form-field input {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text); padding: 0.55rem 0.75rem; border-radius: 3px;
+  outline: none; font-size: 0.8rem; font-family: 'Inter', sans-serif;
+}
+.form-field input:focus { border-color: var(--border2); }
+.modal-msg { font-size: 0.7rem; margin-bottom: 0.6rem; min-height: 1em; }
+.modal-msg.error { color: #ef9a9a; }
+.modal-msg.success { color: #81c784; }
+.btn-save {
+  font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--bg); background: var(--text); border: none;
+  padding: 0.55rem 1.1rem; border-radius: 3px; cursor: pointer; transition: opacity 0.2s;
+}
+.btn-save:hover { opacity: 0.85; }
 
 /* STATS ROW */
 .stats-row {
@@ -311,6 +357,49 @@ footer { border-top: 1px solid var(--border); padding: 1.4rem 2rem; display: fle
 
 </div>
 
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsOverlay" onclick="if(event.target===this) closeSettings()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Account Settings</div>
+      <button class="modal-close" onclick="closeSettings()">✕</button>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Profile</div>
+      <div class="modal-msg" id="profileMsg"></div>
+      <div class="form-field">
+        <label>Username</label>
+        <input type="text" id="settingsUsername">
+      </div>
+      <div class="form-field">
+        <label>Email</label>
+        <input type="email" id="settingsEmail">
+      </div>
+      <button class="btn-save" onclick="handleProfileSave()">Save Profile</button>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Change Password</div>
+      <div class="modal-msg" id="passwordMsg"></div>
+      <div class="form-field">
+        <label>Current Password</label>
+        <input type="password" id="settingsCurrentPass">
+      </div>
+      <div class="form-field">
+        <label>New Password</label>
+        <input type="password" id="settingsNewPass">
+      </div>
+      <div class="form-field">
+        <label>Confirm New Password</label>
+        <input type="password" id="settingsNewPass2">
+      </div>
+      <button class="btn-save" onclick="handlePasswordSave()">Update Password</button>
+    </div>
+
+  </div>
+</div>
+
 <footer style="border-top:1px solid #1c1c1c;padding:1.4rem 2.5rem;display:flex;align-items:center;justify-content:space-between;background:#000;">
   <div style="display:flex;flex-direction:column;gap:0.3rem">
     <span style="font-size:0.68rem;font-weight:500;letter-spacing:0.06em;color:#ccc">Made by <span style="color:#fff;font-weight:700">Team Re:start</span></span>
@@ -347,7 +436,12 @@ async function loadAccount() {
         <div class="profile-email">${user.email}</div>
         <div class="profile-joined">Member of AniZe</div>
       </div>
-      <button class="btn-logout" onclick="AniZeAuth.logout('anize-login.html')">Sign Out</button>
+      <div class="profile-actions">
+        <button class="btn-gear" onclick="openSettings()" title="Account Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <button class="btn-logout" onclick="AniZeAuth.logout('anize-login.html')">Sign Out</button>
+      </div>
     `;
 
     // Render nav
@@ -423,6 +517,67 @@ function renderWatchlist(filter) {
 
 function filterWatchlist(filter) {
   renderWatchlist(filter);
+}
+
+function openSettings() {
+  const user = AniZeAuth.getUser();
+  document.getElementById('settingsUsername').value = user?.username || '';
+  document.getElementById('settingsEmail').value = user?.email || '';
+  document.getElementById('settingsCurrentPass').value = '';
+  document.getElementById('settingsNewPass').value = '';
+  document.getElementById('settingsNewPass2').value = '';
+  showSettingsMsg('profileMsg', '', '');
+  showSettingsMsg('passwordMsg', '', '');
+  const overlay = document.getElementById('settingsOverlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => {
+    overlay.style.opacity = '1';
+    overlay.querySelector('.modal-box').style.transform = 'scale(1)';
+  });
+}
+
+function closeSettings() {
+  const overlay = document.getElementById('settingsOverlay');
+  overlay.style.opacity = '0';
+  overlay.querySelector('.modal-box').style.transform = 'scale(0.96)';
+  setTimeout(() => { overlay.style.display = 'none'; }, 200);
+}
+
+function showSettingsMsg(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'modal-msg' + (type ? ' ' + type : '');
+}
+
+async function handleProfileSave() {
+  const username = document.getElementById('settingsUsername').value.trim();
+  const email = document.getElementById('settingsEmail').value.trim();
+  if (!username || !email) { showSettingsMsg('profileMsg', 'Please fill in both fields.', 'error'); return; }
+  try {
+    await AniZeAuth.updateProfile(username, email);
+    showSettingsMsg('profileMsg', 'Profile updated!', 'success');
+    loadAccount();
+  } catch (err) {
+    showSettingsMsg('profileMsg', err.message || 'Failed to update profile.', 'error');
+  }
+}
+
+async function handlePasswordSave() {
+  const current = document.getElementById('settingsCurrentPass').value;
+  const next = document.getElementById('settingsNewPass').value;
+  const next2 = document.getElementById('settingsNewPass2').value;
+  if (!current || !next || !next2) { showSettingsMsg('passwordMsg', 'Please fill in all fields.', 'error'); return; }
+  if (next !== next2) { showSettingsMsg('passwordMsg', 'New passwords do not match.', 'error'); return; }
+  if (next.length < 6) { showSettingsMsg('passwordMsg', 'New password must be at least 6 characters.', 'error'); return; }
+  try {
+    await AniZeAuth.changePassword(current, next);
+    showSettingsMsg('passwordMsg', 'Password updated!', 'success');
+    document.getElementById('settingsCurrentPass').value = '';
+    document.getElementById('settingsNewPass').value = '';
+    document.getElementById('settingsNewPass2').value = '';
+  } catch (err) {
+    showSettingsMsg('passwordMsg', err.message || 'Failed to update password.', 'error');
+  }
 }
 
 document.getElementById('navSearch').addEventListener('keydown', e => {

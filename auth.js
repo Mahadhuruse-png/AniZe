@@ -58,6 +58,18 @@
     async removeFromWatchlist(animeId) {
       await apiFetch(`/api/user/watchlist/${animeId}`, { method: 'DELETE' });
       return true;
+    },
+
+    async updateProfile(username, email) {
+      const data = await apiFetch('/api/auth/update', { method: 'PUT', body: JSON.stringify({ username, email }) });
+      const token = localStorage.getItem(TOKEN_KEY);
+      saveSession(token, data.user);
+      return data.user;
+    },
+
+    async changePassword(currentPassword, newPassword) {
+      const data = await apiFetch('/api/auth/password', { method: 'PUT', body: JSON.stringify({ currentPassword, newPassword }) });
+      return data;
     }
   };
 
