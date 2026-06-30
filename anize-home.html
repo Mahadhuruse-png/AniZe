@@ -158,7 +158,13 @@ nav {
 .az-list a { background: var(--bg3); border: 1px solid var(--border); padding: 0.4rem 0.75rem; font-size: 0.7rem; font-weight: 600; border-radius: 3px; color: var(--text2); transition: all 0.2s; }
 .az-list a:hover { color: var(--bg); background: var(--text); border-color: var(--text); }
 
-.trending-strip { display: flex; gap: 1.2rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 3.5rem; align-items: flex-start; }
+.trending-strip { display: flex; gap: 1.2rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 3.5rem; align-items: flex-start; scroll-behavior: smooth; }
+.trending-wrap { position: relative; }
+.trend-arrow { position: absolute; top: 0; bottom: 0.5rem; width: 44px; display: flex; align-items: center; justify-content: center; background: linear-gradient(to right, var(--bg) 40%, transparent); border: none; cursor: pointer; z-index: 5; color: #fff; opacity: 0; transition: opacity 0.2s; }
+.trending-wrap:hover .trend-arrow { opacity: 1; }
+.trend-arrow.left { left: 0; }
+.trend-arrow.right { right: 0; background: linear-gradient(to left, var(--bg) 40%, transparent); }
+.trend-arrow svg { width: 22px; height: 22px; }
 .trending-item { position: relative; flex: 0 0 190px; width: 190px; cursor: pointer; }
 .trending-item:hover .thumb img { transform: scale(1.04); filter: brightness(0.85); }
 .trending-item:hover .title { color: var(--text); }
@@ -208,7 +214,15 @@ nav {
   <div class="content-padding">
     <section id="trendingSection">
       <h2 class="section-title">Trending Now <a href="anize-browse.html?sort=popularity" class="more-link">More →</a></h2>
-      <div class="trending-strip" id="trendingStrip"></div>
+      <div class="trending-wrap">
+        <button class="trend-arrow left" onclick="scrollTrending(-1)" aria-label="Scroll left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="trending-strip" id="trendingStrip"></div>
+        <button class="trend-arrow right" onclick="scrollTrending(1)" aria-label="Scroll right">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
     </section>
 
     <section class="columns-wrapper">
@@ -311,6 +325,13 @@ async function fetchAniListCovers(malIds) {
   }
 }
 
+// Scroll the Trending strip left/right when an arrow is clicked
+function scrollTrending(dir) {
+  const strip = document.getElementById('trendingStrip');
+  if (!strip) return;
+  strip.scrollBy({ left: dir * 600, behavior: 'smooth' });
+}
+
 function initAZ() {
   const container = document.getElementById('azList');
   const letters = ['All', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')];
@@ -323,16 +344,16 @@ function initAZ() {
 
 async function loadHeroSlider() {
   const PICKS = [
-    { malId: 62568, alId: 199221, title: 'Dr. STONE: SCIENCE FUTURE Part 3',              type: 'TV',    year: 2026 },
-    { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                                type: 'TV',    year: 2020 },
-    { malId: 57342, alId: 178788, title: 'Demon Slayer: Infinity Castle',                  type: 'Movie', year: 2025 },
-    { malId: 44511, alId: 171627, title: 'Chainsaw Man',                                   type: 'TV',    year: 2022 },
     { malId: 38524, alId: 104578, title: 'Attack on Titan Season 3 Part 2',                type: 'TV',    year: 2019 },
-    { malId: 1535,  alId: 1535,   title: 'Death Note',                                     type: 'TV',    year: 2006 },
+    { malId: 44511, alId: 171627, title: 'Chainsaw Man',                                   type: 'TV',    year: 2022 },
+    { malId: 59192, alId: 178788, title: 'Demon Slayer: Infinity Castle',                  type: 'Movie', year: 2025 },
+    { malId: 62568, alId: 199221, title: 'Dr. STONE: SCIENCE FUTURE Part 3',              type: 'TV',    year: 2026 },
     { malId: 37521, alId: 101348, title: 'Vinland Saga',                                   type: 'TV',    year: 2019 },
     { malId: 1735,  alId: 1735,   title: 'Naruto: Shippuden',                              type: 'TV',    year: 2007 },
     { malId: 32935, alId: 21698,  title: 'Haikyuu!! Season 3',                             type: 'TV',    year: 2016 },
     { malId: 36098, alId: 99750,  title: 'I Want to Eat Your Pancreas',                    type: 'Movie', year: 2018 },
+    { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                                type: 'TV',    year: 2020 },
+    { malId: 1535,  alId: 1535,   title: 'Death Note',                                     type: 'TV',    year: 2006 },
   ];
 
   try {
@@ -446,25 +467,57 @@ async function loadHeroSlider() {
   }
 }
 
+// Curated Trending strip — user-picked anime in a fixed order.
+// Only AniList IDs are hardcoded; MAL id, cover art, episodes, and score are
+// all resolved live from AniList itself (idMal field), so there's no risk
+// of a mismatched MAL id like we hit before — AniList is the source of truth.
 async function loadTrending() {
+  const TREND_PICKS = [
+    { alId: 21,     fallback: 'ONE PIECE' },
+    { alId: 137667, fallback: 'Lord of Mysteries' },
+    { alId: 108465, fallback: 'Mushoku Tensei: Jobless Reincarnation' },
+    { alId: 166617, fallback: 'Fate/strange Fake' },
+    { alId: 185874, fallback: 'BLEACH: Sennen Kessen-hen - Kashin-tan' },
+    { alId: 189046, fallback: 'Re:ZERO -Starting Life in Another World- Season 4' },
+    { alId: 167152, fallback: 'Sentenced to Be a Hero' },
+    { alId: 147105, fallback: 'Witch Hat Atelier' },
+    { alId: 97938,  fallback: 'BORUTO: NARUTO NEXT GENERATIONS' },
+    { alId: 206914, fallback: 'NIPPON SANGOKU' },
+    { alId: 182205, fallback: 'That Time I Got Reincarnated as a Slime Season 4' },
+    { alId: 182300, fallback: 'Wistoria: Wand and Sword Season 2' },
+    { alId: 182255, fallback: "Frieren: Beyond Journey's End Season 2" },
+    { alId: 180745, fallback: 'Classroom of the Elite 4th Season' },
+    { alId: 195600, fallback: 'Yomi no Tsugai' },
+  ];
+
   try {
-    const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=bypopularity&limit=10&sfw=true`);
+    const query = `{${TREND_PICKS.map((p, i) =>
+      `t${i}: Media(id: ${p.alId}, type: ANIME) { idMal title { romaji english } coverImage { extraLarge } format episodes averageScore popularity }`
+    ).join(' ')}}`;
+
+    const res = await fetch('https://anize-backend-ijcn.vercel.app/api/anilist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ query })
+    });
     const json = await res.json();
-    const data = (json.data || []).filter(a => a.type === 'TV' || a.type === 'Movie' || a.type === 'ONA');
+    const data = json?.data || {};
 
-    const covers = await fetchAniListCovers(data.map(a => a.mal_id));
-
-    document.getElementById('trendingStrip').innerHTML = data.map((a, idx) => {
-      const title = a.title_english || a.title;
-      const img = covers[a.mal_id] || a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+    document.getElementById('trendingStrip').innerHTML = TREND_PICKS.map((p, idx) => {
+      const m = data[`t${idx}`];
+      const malId = m?.idMal || '';
+      const title = (m?.title?.english || m?.title?.romaji || p.fallback);
+      const img = m?.coverImage?.extraLarge || '';
+      const score = m?.averageScore ? (m.averageScore / 10).toFixed(1) : 'N/A';
+      const pop = m?.popularity ? (m.popularity > 1000000 ? (m.popularity/1000000).toFixed(1)+'M' : Math.round(m.popularity/1000)+'K') : '';
       return `
-        <div class="trending-item" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
+        <div class="trending-item" onclick="window.location.href='anize-details.html?id=${malId}'">
           <div class="thumb">
             <img src="${img}" alt="" loading="lazy">
-            <div class="ep-tag">${a.score ? `★ ${a.score.toFixed(1)}` : 'N/A'}</div>
+            <div class="ep-tag">${score !== 'N/A' ? `★ ${score}` : 'N/A'}</div>
           </div>
           <div class="title">${title}</div>
-          <div class="meta">${a.type || 'TV'} • ${a.members ? (a.members > 1000000 ? (a.members/1000000).toFixed(1)+'M' : Math.round(a.members/100)+'K') : ''}</div>
+          <div class="meta">${m?.format || 'TV'} • ${pop}</div>
         </div>
       `;
     }).join('');
