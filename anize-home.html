@@ -140,7 +140,7 @@ nav {
 .more-link { font-size: 0.65rem; font-family: 'Inter', sans-serif; color: var(--text3); letter-spacing: 0.05em; transition: color 0.2s; }
 .more-link:hover { color: var(--text); }
 
-/* ── GRID SYSTEM (Balanced 14 Items) ── */
+/* ── GRID SYSTEM ── */
 .anime-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -192,27 +192,6 @@ nav {
 .m-meta { font-size: 0.65rem; color: var(--text3); }
 
 .fallback-txt { font-size: 0.75rem; color: var(--text3); padding: 1rem 0; }
-
-/* ── LEFT SLIDE OVER SCHEDULE DRAWER ── */
-.drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 150; backdrop-filter: blur(4px); }
-.drawer-overlay.active { opacity: 1; visibility: visible; }
-.drawer { position: fixed; top: 0; left: -340px; bottom: 0; width: 340px; background: var(--bg2); border-right: 1px solid var(--border); z-index: 160; transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
-.drawer.active { left: 0; }
-.drawer-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-.drawer-title { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 700; }
-.drawer-close { background: none; border: none; color: var(--text2); font-size: 1.2rem; cursor: pointer; }
-.drawer-content { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
-
-.sched-day-block { border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
-.sched-day-name { font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--text); margin-bottom: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; border-left: 2px solid var(--text); padding-left: 0.5rem; }
-.sched-item { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; cursor: pointer; font-size: 0.75rem; color: var(--text2); }
-.sched-item:hover { color: var(--text); }
-.sched-time { color: var(--text3); font-weight: 600; margin-right: 0.5rem; }
-
-/* ── FOOTER ── */
-footer { border-top: 1px solid var(--border); padding: 1.4rem 2rem; display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4rem; }
-.foot-l, .foot-r { font-size: 0.68rem; color: #fff; letter-spacing: 0.04em; }
-.foot-l a { text-decoration: underline; color: #fff; font-weight: 500; }
 </style>
 </head>
 <body>
@@ -232,7 +211,6 @@ footer { border-top: 1px solid var(--border); padding: 1.4rem 2rem; display: fle
     <button class="btn-login" onclick="window.location.href='anize-login.html'">Login</button>
   </div>
 </nav>
-
 
 <main class="home-main">
   <section class="hero-slider" id="heroSlider">
@@ -268,7 +246,6 @@ footer { border-top: 1px solid var(--border); padding: 1.4rem 2rem; display: fle
       <h2 class="section-title" style="margin-bottom:0.3rem;">Browse Alphabetically</h2>
       <ul class="az-list" id="azList"></ul>
     </section>
-    <p style="font-size:0.62rem;color:var(--text3);text-align:center;margin-top:-2.5rem;margin-bottom:3.5rem;letter-spacing:0.1em"></p>
   </div>
 </main>
 
@@ -283,13 +260,53 @@ footer { border-top: 1px solid var(--border); padding: 1.4rem 2rem; display: fle
   </div>
 </footer>
 
+<!-- BROWSE SLIDE-OVER PANEL -->
+<div id="browseOverlay" onclick="closeBrowsePanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;opacity:0;transition:opacity 0.3s"></div>
+
+<div id="browsePanel" style="display:none;position:fixed;left:0;top:0;bottom:0;width:300px;background:#0a0a0a;border-right:1px solid #1c1c1c;z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;flex-direction:column">
+  <!-- Panel Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;letter-spacing:0.06em;color:#fff">AniZe</span>
+    <button onclick="closeBrowsePanel()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.3rem;line-height:1">✕</button>
+  </div>
+
+  <!-- Tabs: Menu | Genre -->
+  <div style="display:flex;border-bottom:1px solid #1c1c1c;flex-shrink:0">
+    <button id="bpt-menu" onclick="bpTab('menu')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:none;border:none;border-bottom:2px solid #fff;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      Menu
+    </button>
+    <button id="bpt-genre" onclick="bpTab('genre')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Genre
+    </button>
+  </div>
+
+  <!-- Menu Content View -->
+  <div id="bp-menu" style="padding:1rem 1.4rem;display:flex;flex-direction:column">
+    <div onclick="window.location.href='anize-browse.html?type=movie';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">Movies <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=tv';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">TV Series <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ova';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">OVAs <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=ona';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">ONAs <span style="color:#333">›</span></div>
+    <div onclick="window.location.href='anize-browse.html?type=special';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">Specials <span style="color:#333">›</span></div>
+    <div style="padding:1rem 0 0.4rem;font-size:0.58rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#333">Quick Navigation</div>
+    <div onclick="window.location.href='anize-home.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Home</div>
+    <div onclick="window.location.href='anize-favourites.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Favourites</div>
+    <div onclick="window.location.href='anize-trending.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Trending</div>
+  </div>
+
+  <!-- Genre Content View -->
+  <div id="bp-genre" style="display:none;flex-direction:column">
+    <div id="bpGenreList"></div>
+  </div>
+</div>
+
 <script>
 const EXCLUDE_GENRES = "9,12,26,28,35,73"; 
 const DELAY = (ms) => new Promise(res => setTimeout(res, ms));
+const BP_GENRES = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41,'Martial Arts':17,'Military':38,'Music':19,'Psychological':40,'School':23,'Seinen':42,'Shoujo':25,'Shounen':27,'Space':29,'Vampire':32};
 
 // Batch-fetch high-res AniList covers for a list of MAL ids in a single GraphQL call.
-// AniList lets you query directly by idMal, so no separate id-mapping step is needed.
-// Returns { [mal_id]: extraLargeCoverUrl }, and never throws — failures just return {}.
 async function fetchAniListCovers(malIds) {
   const ids = [...new Set(malIds.filter(Boolean))];
   if (!ids.length) return {};
@@ -312,7 +329,7 @@ async function fetchAniListCovers(malIds) {
   }
 }
 
-// Render Alphabet
+// Render Alphabet Component
 function initAZ() {
   const container = document.getElementById('azList');
   const letters = ['All', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')];
@@ -325,8 +342,7 @@ function initAZ() {
 
 // Fetch and Handle Hero Rotation Slider
 async function loadHeroSlider() {
-  // AniList IDs for each anime (different from MAL IDs)
-    const PICKS = [
+  const PICKS = [
     { malId: 60072, alId: 199221, title: 'Dr. STONE: SCIENCE FUTURE Part 3',              type: 'TV',    year: 2025 },
     { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                                type: 'TV',    year: 2020 },
     { malId: 57342, alId: 178788, title: 'Demon Slayer: Infinity Castle',                  type: 'Movie', year: 2025 },
@@ -340,7 +356,6 @@ async function loadHeroSlider() {
   ];
 
   try {
-    // Step 1: Get real wide banner images DIRECTLY from AniList (no backend needed)
     const alQuery = `{${PICKS.map((p, i) => `a${i}: Media(id: ${p.alId}, type: ANIME) { bannerImage coverImage { extraLarge } }`).join(' ')}}`;
     const alRes = await fetch('https://anize-backend-ijcn.vercel.app/api/anilist', {
       method: 'POST',
@@ -350,7 +365,6 @@ async function loadHeroSlider() {
     const alJson = await alRes.json();
     const banners = alJson?.data || {};
 
-    // Step 2: Get metadata from Jikan DIRECTLY (no backend)
     const jikanResults = [];
     for (let i = 0; i < PICKS.length; i++) {
       if (i > 0) await DELAY(350);
@@ -383,7 +397,6 @@ async function loadHeroSlider() {
       const year = a._year;
       const type = a._type;
 
-      // Banner priority: AniList wide > MAL large image
       const hasBanner = !!a._banner;
       const imgSrc = a._banner || a._alCover || a.images?.jpg?.large_image_url || '';
       const imgFallback = a.images?.jpg?.large_image_url || '';
@@ -420,7 +433,6 @@ async function loadHeroSlider() {
       `;
     }).join('');
 
-    // Dots
     const dotsHtml = items.map((_, i) =>
       `<div class="hero-dot-el${i === 0 ? ' active' : ''}" onclick="goToSlide(${i})"></div>`
     ).join('');
@@ -430,12 +442,12 @@ async function loadHeroSlider() {
       `<div class="hero-dots" id="heroDots">${dotsHtml}</div>` +
       `<div class="hero-counter"><span class="cur" id="heroCountCur">01</span> / ${String(total).padStart(2,'0')}</div>`;
 
-    // Auto-rotate
     let current = 0;
     const slides = document.querySelectorAll('.hero-slide');
     const dots = document.querySelectorAll('.hero-dot-el');
 
     window.goToSlide = function(idx) {
+      if (!slides[current] || !dots[current]) return;
       slides[current].classList.remove('active');
       dots[current].classList.remove('active');
       current = idx;
@@ -444,7 +456,9 @@ async function loadHeroSlider() {
       document.getElementById('heroCountCur').textContent = String(current + 1).padStart(2, '0');
     };
 
-    setInterval(() => goToSlide((current + 1) % slides.length), 6000);
+    setInterval(() => {
+      if(slides.length > 0) goToSlide((current + 1) % slides.length);
+    }, 6000);
 
   } catch(e) {
     console.error('Hero slider failed:', e);
@@ -452,7 +466,7 @@ async function loadHeroSlider() {
   }
 }
 
-// Fetch and render the numbered Trending strip (top airing by popularity)
+// Fetch and render horizontal Trending strip
 async function loadTrending() {
   try {
     const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=bypopularity&limit=10&sfw=true`);
@@ -466,13 +480,12 @@ async function loadTrending() {
       const img = covers[a.mal_id] || a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
       return `
         <div class="trending-item" onclick="window.location.href='anize-details.html?id=${a.mal_id}'">
-
           <div class="thumb">
             <img src="${img}" alt="" loading="lazy">
             <div class="ep-tag">${a.score ? `★ ${a.score.toFixed(1)}` : 'N/A'}</div>
           </div>
           <div class="title">${title}</div>
-          <div class="meta">${a.type || 'TV'} • ${a.members ? (a.members > 1000000 ? (a.members/1000000).toFixed(1)+'M' : Math.round(a.members/1000)+'K') : ''}</div>
+          <div class="meta">${a.type || 'TV'} • ${a.members ? (a.members > 1000000 ? (a.members/1000000).toFixed(1)+'M' : Math.round(a.members/100)+'K') : ''}</div>
         </div>
       `;
     }).join('');
@@ -481,7 +494,7 @@ async function loadTrending() {
   }
 }
 
-// Stable Column Engine
+// Fetch Engine with Status 429 Backoff Retry Handling
 async function fetchWithRetry(url, retries = 2, delayMs = 600) {
   for (let i = 0; i <= retries; i++) {
     try {
@@ -497,6 +510,7 @@ async function fetchWithRetry(url, retries = 2, delayMs = 600) {
   return [];
 }
 
+// Render the 4 Multi-Metric Bottom Columns
 async function loadFourColumns() {
   const configurations = [
     { id: 'colFav', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=favorite&limit=5&sfw=true` },
@@ -533,67 +547,7 @@ async function loadFourColumns() {
   }
 }
 
-// Load Drawer Schedule Content Separately
-let scheduleLoaded = false;
-document.getElementById('navSearch').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && e.target.value.trim().length > 0) {
-    window.location.href = `anize-browse.html?q=${encodeURIComponent(e.target.value.trim())}`;
-  }
-});
-
-// Init Execution
-initAZ();
-loadHeroSlider();
-loadTrending();
-loadFourColumns();
-</script>
-
-<!-- BROWSE SLIDE-OVER -->
-<div id="browseOverlay" onclick="closeBrowsePanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;opacity:0;transition:opacity 0.3s"></div>
-
-<div id="browsePanel" style="display:none;position:fixed;left:0;top:0;bottom:0;width:300px;background:#0a0a0a;border-right:1px solid #1c1c1c;z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;flex-direction:column">
-
-  <!-- Header -->
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid #1c1c1c;flex-shrink:0">
-    <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;letter-spacing:0.06em;color:#fff">AniZe</span>
-    <button onclick="closeBrowsePanel()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.3rem;line-height:1">✕</button>
-  </div>
-
-  <!-- Tabs: Menu | Genre -->
-  <div style="display:flex;border-bottom:1px solid #1c1c1c;flex-shrink:0">
-    <button id="bpt-menu" onclick="bpTab('menu')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:none;border:none;border-bottom:2px solid #fff;cursor:pointer">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      Menu
-    </button>
-    <button id="bpt-genre" onclick="bpTab('genre')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Genre
-    </button>
-  </div>
-
-  <!-- Menu Panel -->
-  <div id="bp-menu" style="padding:1rem 1.4rem;display:flex;flex-direction:column">
-    <div onclick="window.location.href='anize-browse.html?type=movie';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">Movies <span style="color:#333">›</span></div>
-    <div onclick="window.location.href='anize-browse.html?type=tv';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">TV Series <span style="color:#333">›</span></div>
-    <div onclick="window.location.href='anize-browse.html?type=ova';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">OVAs <span style="color:#333">›</span></div>
-    <div onclick="window.location.href='anize-browse.html?type=ona';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">ONAs <span style="color:#333">›</span></div>
-    <div onclick="window.location.href='anize-browse.html?type=special';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">Specials <span style="color:#333">›</span></div>
-    <div style="padding:1rem 0 0.4rem;font-size:0.58rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#333">Quick Navigation</div>
-    <div onclick="window.location.href='anize-home.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Home</div>
-    <div onclick="window.location.href='anize-favourites.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Favourites</div>
-    <div onclick="window.location.href='anize-trending.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Trending</div>
-  </div>
-
-  <!-- Genre Panel -->
-  <div id="bp-genre" style="display:none;flex-direction:column">
-    <div id="bpGenreList"></div>
-  </div>
-
-</div>
-
-<script>
-const BP_GENRES = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41,'Martial Arts':17,'Military':38,'Music':19,'Psychological':40,'School':23,'Seinen':42,'Shoujo':25,'Shounen':27,'Space':29,'Vampire':32};
-
+// Open Left Navigation Slide Drawer
 function openBrowsePanel(e) {
   if(e) e.preventDefault();
   const overlay = document.getElementById('browseOverlay');
@@ -602,12 +556,14 @@ function openBrowsePanel(e) {
   panel.style.display = 'flex';
   panel.style.flexDirection = 'column';
   requestAnimationFrame(() => { overlay.style.opacity='1'; panel.style.transform='translateX(0)'; });
-  // Build genres
+  
+  // Render Genres List Template dynamically
   document.getElementById('bpGenreList').innerHTML = Object.keys(BP_GENRES).map(g =>
     `<div onclick="window.location.href='anize-browse.html?genre=${BP_GENRES[g]}';closeBrowsePanel()" style="padding:0.65rem 1.4rem;font-size:0.8rem;color:#777;cursor:pointer;border-bottom:1px solid #111;display:flex;align-items:center;gap:0.6rem" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#777'"><span style="color:#333">•</span>${g}</div>`
   ).join('');
 }
 
+// Close Slide Over Drawer
 function closeBrowsePanel() {
   const overlay = document.getElementById('browseOverlay');
   const panel = document.getElementById('browsePanel');
@@ -616,21 +572,33 @@ function closeBrowsePanel() {
   setTimeout(() => { overlay.style.display='none'; panel.style.display='none'; }, 300);
 }
 
+// Handle Drawer Navigation Inner Tab Swapping
 function bpTab(name) {
   ['menu','genre'].forEach(t => {
     document.getElementById('bpt-'+t).style.color = t===name ? '#fff' : '#555';
     document.getElementById('bpt-'+t).style.borderBottomColor = t===name ? '#fff' : 'transparent';
-    document.getElementById('bp-'+t).style.display = t===name ? (t==='genre'?'flex':'flex') : 'none';
+    document.getElementById('bp-'+t).style.display = t===name ? 'flex' : 'none';
     document.getElementById('bp-'+t).style.flexDirection = 'column';
   });
 }
+
+// Quick Search Input Event
+document.getElementById('navSearch').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.value.trim().length > 0) {
+    window.location.href = `anize-browse.html?q=${encodeURIComponent(e.target.value.trim())}`;
+  }
+});
+
+// Init Sequential Runtime Operations
+initAZ();
+loadHeroSlider();
+loadTrending();
+loadFourColumns();
 </script>
-
-
-
 
 <script src="auth.js"></script>
 <script>
+// Authentication Navigation Injection State Update
 (function() {
   if (typeof AniZeAuth === 'undefined' || !AniZeAuth.isLoggedIn()) return;
   var user = AniZeAuth.getUser();
