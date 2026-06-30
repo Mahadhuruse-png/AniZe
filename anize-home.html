@@ -23,7 +23,6 @@
 body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; overflow-x: hidden; }
 a { text-decoration: none; color: inherit; }
 
-/* Global Scrollbar Hider to keep layout clean */
 body, div, aside, main, section, ul {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
@@ -34,7 +33,6 @@ body::-webkit-scrollbar, div::-webkit-scrollbar, aside::-webkit-scrollbar, main:
   height: 0 !important;
 }
 
-/* ── NAVBAR ── */
 nav {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -58,7 +56,6 @@ nav {
 .btn-login:hover { opacity: 0.85; }
 .nav-search input { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 0.45rem 1rem; border-radius: 4px; outline: none; font-size: 0.75rem; }
 
-/* ── HERO BANNER ROTATION ── */
 .hero-slider {
   position: relative;
   width: 100%;
@@ -90,7 +87,6 @@ nav {
   z-index: 0;
   filter: brightness(0.82);
 }
-/* Strong left gradient — text readable without dimming whole image */
 .hero-slide::before {
   content: '';
   position: absolute;
@@ -98,7 +94,6 @@ nav {
   background: linear-gradient(to right, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 35%, rgba(0,0,0,0.15) 65%, rgba(0,0,0,0) 100%);
   z-index: 1;
 }
-/* Bottom fade into page */
 .hero-slide::after {
   content: '';
   position: absolute;
@@ -124,15 +119,12 @@ nav {
 .hero-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: #e53935; color: #fff; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.65rem 1.6rem; border-radius: 50px; cursor: pointer; transition: background 0.2s, transform 0.15s; border: none; font-family: 'Inter', sans-serif; }
 .hero-btn:hover { background: #c62828; transform: scale(1.03); }
 .hero-btn svg { width: 13px; height: 13px; fill: #fff; flex-shrink: 0; }
-/* Slide counter bottom-right */
 .hero-counter { position: absolute; bottom: 1.6rem; right: 2rem; z-index: 10; display: flex; align-items: baseline; gap: 0.2rem; font-size: 0.7rem; color: rgba(255,255,255,0.4); font-weight: 600; letter-spacing: 0.05em; }
 .hero-counter .cur { color: #fff; font-size: 1.1rem; font-weight: 800; }
-/* Progress dots bottom-left */
 .hero-dots { position: absolute; bottom: 1.5rem; left: 4rem; z-index: 10; display: flex; gap: 0.45rem; align-items: center; }
 .hero-dot-el { width: 20px; height: 2px; background: rgba(255,255,255,0.2); border-radius: 2px; cursor: pointer; transition: background 0.3s, width 0.3s; }
 .hero-dot-el.active { background: #fff; width: 36px; }
 
-/* ── MAIN LAYOUT ── */
 .home-main { padding: calc(var(--nav-h) + 0rem) 0rem 2rem 0rem; max-width: 1600px; margin: 0 auto; }
 .content-padding { padding: 0 2rem; }
 
@@ -140,7 +132,6 @@ nav {
 .more-link { font-size: 0.65rem; font-family: 'Inter', sans-serif; color: var(--text3); letter-spacing: 0.05em; transition: color 0.2s; }
 .more-link:hover { color: var(--text); }
 
-/* ── GRID SYSTEM ── */
 .anime-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -162,13 +153,11 @@ nav {
 .title { font-size: 0.75rem; font-weight: 600; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.2s; }
 .meta { font-size: 0.65rem; color: var(--text3); margin-top: 0.15rem; }
 
-/* ── A-Z ALPHABET COMPONENT ── */
 .az-container { background: var(--bg2); border: 1px solid var(--border); padding: 1.5rem; border-radius: 4px; margin-bottom: 3.5rem; margin-top: 2rem; }
 .az-list { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; margin-top: 1rem; }
 .az-list a { background: var(--bg3); border: 1px solid var(--border); padding: 0.4rem 0.75rem; font-size: 0.7rem; font-weight: 600; border-radius: 3px; color: var(--text2); transition: all 0.2s; }
 .az-list a:hover { color: var(--bg); background: var(--text); border-color: var(--text); }
 
-/* ── TRENDING STRIP (numbered, horizontal scroll) ── */
 .trending-strip { display: flex; gap: 1.2rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 3.5rem; align-items: flex-start; }
 .trending-item { position: relative; flex: 0 0 190px; width: 190px; cursor: pointer; }
 .trending-item:hover .thumb img { transform: scale(1.04); filter: brightness(0.85); }
@@ -177,7 +166,6 @@ nav {
 .trending-item .thumb img { width: 190px; height: 280px; object-fit: cover; }
 .trending-rank { display: none; }
 
-/* ── 4 COLUMN METRICS SECTIONS ── */
 .columns-wrapper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 4rem; }
 @media (max-width: 1200px) { .columns-wrapper { grid-template-columns: repeat(2, 1fr); gap: 2rem; } }
 @media (max-width: 600px) { .columns-wrapper { grid-template-columns: 1fr; } }
@@ -260,17 +248,14 @@ nav {
   </div>
 </footer>
 
-<!-- BROWSE SLIDE-OVER PANEL -->
 <div id="browseOverlay" onclick="closeBrowsePanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;opacity:0;transition:opacity 0.3s"></div>
 
 <div id="browsePanel" style="display:none;position:fixed;left:0;top:0;bottom:0;width:300px;background:#0a0a0a;border-right:1px solid #1c1c1c;z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;flex-direction:column">
-  <!-- Panel Header -->
   <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid #1c1c1c;flex-shrink:0">
     <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;letter-spacing:0.06em;color:#fff">AniZe</span>
     <button onclick="closeBrowsePanel()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.3rem;line-height:1">✕</button>
   </div>
 
-  <!-- Tabs: Menu | Genre -->
   <div style="display:flex;border-bottom:1px solid #1c1c1c;flex-shrink:0">
     <button id="bpt-menu" onclick="bpTab('menu')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.9rem 0.5rem;font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:none;border:none;border-bottom:2px solid #fff;cursor:pointer">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -282,7 +267,6 @@ nav {
     </button>
   </div>
 
-  <!-- Menu Content View -->
   <div id="bp-menu" style="padding:1rem 1.4rem;display:flex;flex-direction:column">
     <div onclick="window.location.href='anize-browse.html?type=movie';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">Movies <span style="color:#333">›</span></div>
     <div onclick="window.location.href='anize-browse.html?type=tv';closeBrowsePanel()" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #1c1c1c;font-size:0.85rem;color:#aaa;cursor:pointer" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">TV Series <span style="color:#333">›</span></div>
@@ -295,7 +279,6 @@ nav {
     <div onclick="window.location.href='anize-trending.html';closeBrowsePanel()" style="padding:0.55rem 0;font-size:0.78rem;color:#555;cursor:pointer;border-bottom:1px solid #111" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#555'">Trending</div>
   </div>
 
-  <!-- Genre Content View -->
   <div id="bp-genre" style="display:none;flex-direction:column">
     <div id="bpGenreList"></div>
   </div>
@@ -306,7 +289,6 @@ const EXCLUDE_GENRES = "9,12,26,28,35,73";
 const DELAY = (ms) => new Promise(res => setTimeout(res, ms));
 const BP_GENRES = {'Action':1,'Adventure':2,'Comedy':4,'Drama':8,'Fantasy':10,'Horror':14,'Isekai':62,'Mecha':18,'Mystery':7,'Romance':22,'Sci-Fi':24,'Slice of Life':36,'Sports':30,'Supernatural':37,'Thriller':41,'Martial Arts':17,'Military':38,'Music':19,'Psychological':40,'School':23,'Seinen':42,'Shoujo':25,'Shounen':27,'Space':29,'Vampire':32};
 
-// Batch-fetch high-res AniList covers for a list of MAL ids in a single GraphQL call.
 async function fetchAniListCovers(malIds) {
   const ids = [...new Set(malIds.filter(Boolean))];
   if (!ids.length) return {};
@@ -329,7 +311,6 @@ async function fetchAniListCovers(malIds) {
   }
 }
 
-// Render Alphabet Component
 function initAZ() {
   const container = document.getElementById('azList');
   const letters = ['All', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')];
@@ -340,17 +321,16 @@ function initAZ() {
   }).join('');
 }
 
-// Fetch and Handle Hero Rotation Slider
 async function loadHeroSlider() {
   const PICKS = [
     { malId: 60072, alId: 199221, title: 'Dr. STONE: SCIENCE FUTURE Part 3',              type: 'TV',    year: 2025 },
     { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                                type: 'TV',    year: 2020 },
     { malId: 57342, alId: 178788, title: 'Demon Slayer: Infinity Castle',                  type: 'Movie', year: 2025 },
-    { malId: 44511, alId: 127230, title: 'Chainsaw Man',                                   type: 'TV',    year: 2022 },
+    { malId: 44511, alId: 171627, title: 'Chainsaw Man',                                   type: 'TV',    year: 2022 },
     { malId: 38524, alId: 104578, title: 'Attack on Titan Season 3 Part 2',                type: 'TV',    year: 2019 },
     { malId: 1535,  alId: 1535,   title: 'Death Note',                                     type: 'TV',    year: 2006 },
     { malId: 37521, alId: 101348, title: 'Vinland Saga',                                   type: 'TV',    year: 2019 },
-    { malId: 55791, alId: 171627, title: 'Chainsaw Man: Reze Arc',                         type: 'Movie', year: 2025 },
+    { malId: 1735,  alId: 1735,   title: 'Naruto: Shippuden',                              type: 'TV',    year: 2007 },
     { malId: 32935, alId: 21698,  title: 'Haikyuu!! Season 3',                             type: 'TV',    year: 2016 },
     { malId: 36098, alId: 99750,  title: 'I Want to Eat Your Pancreas',                    type: 'Movie', year: 2018 },
   ];
@@ -466,7 +446,6 @@ async function loadHeroSlider() {
   }
 }
 
-// Fetch and render horizontal Trending strip
 async function loadTrending() {
   try {
     const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=bypopularity&limit=10&sfw=true`);
@@ -494,7 +473,6 @@ async function loadTrending() {
   }
 }
 
-// Fetch Engine with Status 429 Backoff Retry Handling
 async function fetchWithRetry(url, retries = 2, delayMs = 600) {
   for (let i = 0; i <= retries; i++) {
     try {
@@ -510,7 +488,6 @@ async function fetchWithRetry(url, retries = 2, delayMs = 600) {
   return [];
 }
 
-// Render the 4 Multi-Metric Bottom Columns
 async function loadFourColumns() {
   const configurations = [
     { id: 'colFav', url: `https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=favorite&limit=5&sfw=true` },
@@ -547,7 +524,6 @@ async function loadFourColumns() {
   }
 }
 
-// Open Left Navigation Slide Drawer
 function openBrowsePanel(e) {
   if(e) e.preventDefault();
   const overlay = document.getElementById('browseOverlay');
@@ -557,13 +533,11 @@ function openBrowsePanel(e) {
   panel.style.flexDirection = 'column';
   requestAnimationFrame(() => { overlay.style.opacity='1'; panel.style.transform='translateX(0)'; });
   
-  // Render Genres List Template dynamically
   document.getElementById('bpGenreList').innerHTML = Object.keys(BP_GENRES).map(g =>
     `<div onclick="window.location.href='anize-browse.html?genre=${BP_GENRES[g]}';closeBrowsePanel()" style="padding:0.65rem 1.4rem;font-size:0.8rem;color:#777;cursor:pointer;border-bottom:1px solid #111;display:flex;align-items:center;gap:0.6rem" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#777'"><span style="color:#333">•</span>${g}</div>`
   ).join('');
 }
 
-// Close Slide Over Drawer
 function closeBrowsePanel() {
   const overlay = document.getElementById('browseOverlay');
   const panel = document.getElementById('browsePanel');
@@ -572,7 +546,6 @@ function closeBrowsePanel() {
   setTimeout(() => { overlay.style.display='none'; panel.style.display='none'; }, 300);
 }
 
-// Handle Drawer Navigation Inner Tab Swapping
 function bpTab(name) {
   ['menu','genre'].forEach(t => {
     document.getElementById('bpt-'+t).style.color = t===name ? '#fff' : '#555';
@@ -582,14 +555,12 @@ function bpTab(name) {
   });
 }
 
-// Quick Search Input Event
 document.getElementById('navSearch').addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && e.target.value.trim().length > 0) {
     window.location.href = `anize-browse.html?q=${encodeURIComponent(e.target.value.trim())}`;
   }
 });
 
-// Init Sequential Runtime Operations
 initAZ();
 loadHeroSlider();
 loadTrending();
@@ -598,7 +569,6 @@ loadFourColumns();
 
 <script src="auth.js"></script>
 <script>
-// Authentication Navigation Injection State Update
 (function() {
   if (typeof AniZeAuth === 'undefined' || !AniZeAuth.isLoggedIn()) return;
   var user = AniZeAuth.getUser();
