@@ -346,11 +346,11 @@ async function loadHeroSlider() {
     { malId: 60072, alId: 199221, title: 'Dr. STONE: SCIENCE FUTURE Part 3',              type: 'TV',    year: 2025 },
     { malId: 40748, alId: 113415, title: 'Jujutsu Kaisen',                                type: 'TV',    year: 2020 },
     { malId: 57342, alId: 178788, title: 'Demon Slayer: Infinity Castle',                  type: 'Movie', year: 2025 },
-    { malId: 57745, alId: 125116, title: 'Tsue to Tsurugi no Wistoria',                    type: 'TV',    year: 2024 },
+    { malId: 44511, alId: 127230, title: 'Chainsaw Man',                                   type: 'TV',    year: 2022 },
     { malId: 38524, alId: 104578, title: 'Attack on Titan Season 3 Part 2',                type: 'TV',    year: 2019 },
     { malId: 1535,  alId: 1535,   title: 'Death Note',                                     type: 'TV',    year: 2006 },
     { malId: 37521, alId: 101348, title: 'Vinland Saga',                                   type: 'TV',    year: 2019 },
-    { malId: 55791, alId: 171627, title: 'Chainsaw Man: Reze-hen',                         type: 'Movie', year: 2025 },
+    { malId: 55791, alId: 171627, title: 'Chainsaw Man: Reze Arc',                         type: 'Movie', year: 2025 },
     { malId: 32935, alId: 21698,  title: 'Haikyuu!! Season 3',                             type: 'TV',    year: 2016 },
     { malId: 36098, alId: 99750,  title: 'I Want to Eat Your Pancreas',                    type: 'Movie', year: 2018 },
   ];
@@ -559,7 +559,7 @@ function openBrowsePanel(e) {
   
   // Render Genres List Template dynamically
   document.getElementById('bpGenreList').innerHTML = Object.keys(BP_GENRES).map(g =>
-    `<div onclick="window.location.href='anize-browse.html?genre=${BP_GENRES[g]}';closeBrowsePanel()" style="padding:0.65rem 1.4rem;font-size:0.8rem;color:#777;cursor:border-bottom:1px solid #111;display:flex;align-items:center;gap:0.6rem" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#777'"><span style="color:#333">•</span>${g}</div>`
+    `<div onclick="window.location.href='anize-browse.html?genre=${BP_GENRES[g]}';closeBrowsePanel()" style="padding:0.65rem 1.4rem;font-size:0.8rem;color:#777;cursor:pointer;border-bottom:1px solid #111;display:flex;align-items:center;gap:0.6rem" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#777'"><span style="color:#333">•</span>${g}</div>`
   ).join('');
 }
 
