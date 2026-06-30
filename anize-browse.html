@@ -529,7 +529,7 @@ function renderSkeletons(count) {
 }
 
 function animeCard(a) {
-  const img   = a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
+  const img   = a._alCover || a.images?.jpg?.large_image_url || a.images?.jpg?.image_url || '';
   const title = a.title || 'Unknown';
   const eps   = a.episodes ? `EP ${a.episodes}` : 'Ongoing';
   const type  = a.type || 'TV';
@@ -545,6 +545,28 @@ function animeCard(a) {
       <div class="card-title">${title}</div>
       <div class="card-type">${type}</div>
     </div>`;
+}
+
+// Upgrade Jikan cover thumbnails to AniList's higher-res extraLarge art.
+// Same self-correcting pattern as the home page: we pass the MAL id we already
+// trust and ask AniList "what's your art for this id" rather than guessing a URL.
+async function upgradeCoversWithAniList(items) {
+  const ids = [...new Set(items.map(a => a.mal_id).filter(Boolean))];
+  if (!ids.length) return items;
+  try {
+    const query = `{${ids.map((id, i) => `m${i}: Media(idMal: ${id}, type: ANIME) { idMal coverImage { extraLarge } }`).join(' ')}}`;
+    const res = await fetch('https://anize-backend-ijcn.vercel.app/api/anilist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ query })
+    });
+    const json = await res.json();
+    const data = json?.data || {};
+    const map = {};
+    Object.values(data).forEach(m => { if (m && m.idMal) map[m.idMal] = m.coverImage?.extraLarge || null; });
+    items.forEach(a => { a._alCover = map[a.mal_id] || null; });
+  } catch { /* keep Jikan covers as fallback */ }
+  return items;
 }
 
 function buildPagination() {
@@ -594,7 +616,8 @@ async function loadAnime(page=1) {
     const seen = new Set();
     const raw = (d.data || []).filter(a => { if (seen.has(a.mal_id)) return false; seen.add(a.mal_id); return true; });
     totalPages = d.pagination?.last_visible_page || 1;
-    const list = raw.length >= 5 ? raw.slice(0, Math.floor(raw.length / 5) * 5) : raw;
+    let list = raw.length >= 5 ? raw.slice(0, Math.floor(raw.length / 5) * 5) : raw;
+    list = await upgradeCoversWithAniList(list);
 
     document.getElementById('browseGrid').innerHTML = list.length
       ? list.map(animeCard).join('')
