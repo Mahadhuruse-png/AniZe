@@ -21,7 +21,7 @@
   --red: #e53935;
 }
 
-body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; overflow-x: hidden; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; }
 a { text-decoration: none; color: inherit; }
 *, div { -ms-overflow-style: none; scrollbar-width: none; }
 *::-webkit-scrollbar { display: none; }
@@ -63,9 +63,11 @@ nav {
 
 /* PAGE */
 .page-wrap {
+  flex: 1;
   padding-top: calc(var(--nav-h) + 3rem);
   max-width: 1500px;
   margin: 0 auto;
+  width: 100%;
   padding-left: 2rem;
   padding-right: 2rem;
   padding-bottom: 5rem;
@@ -150,7 +152,7 @@ nav {
 
 </div>
 
-<footer style="border-top:1px solid #1c1c1c;padding:1.4rem 2.5rem;display:flex;align-items:center;justify-content:space-between;background:#000;">
+<footer style="border-top:1px solid #1c1c1c;padding:1.4rem 2.5rem;display:flex;align-items:center;justify-content:space-between;background:#000;flex-shrink:0;">
   <div style="display:flex;flex-direction:column;gap:0.3rem">
     <span style="font-size:0.68rem;font-weight:500;letter-spacing:0.06em;color:#ccc">Made by <span style="color:#fff;font-weight:700">Team Re:start</span></span>
     <a href="https://discord.gg/YyQ6qZ2nf5" target="_blank" style="font-size:0.64rem;color:#bbb;letter-spacing:0.04em;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#bbb'">discord.gg/YyQ6qZ2nf5</a>
