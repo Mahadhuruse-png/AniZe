@@ -70,6 +70,16 @@
     async changePassword(currentPassword, newPassword) {
       const data = await apiFetch('/api/auth/password', { method: 'PUT', body: JSON.stringify({ currentPassword, newPassword }) });
       return data;
+    },
+
+    async forgotPassword(email) {
+      const data = await apiFetch('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
+      return data;
+    },
+
+    async resetPassword(token, newPassword) {
+      const data = await apiFetch('/api/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) });
+      return data;
     }
   };
 

@@ -297,7 +297,7 @@ nav {
             <svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
         </div>
-        <div class="forgot-row"><a href="#">Forgot Password?</a></div>
+        <div class="forgot-row"><a href="#" onclick="handleForgotPassword(event)">Forgot Password?</a></div>
         <button id="btn-signin" class="submit-btn" onclick="handleSignIn()">Sign In</button>
         <div class="switch-row">
           Don't have an account?<button onclick="showTab('signup')">Sign up</button>
@@ -378,6 +378,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   if (AniZeAuth.isLoggedIn()) window.location.href = 'anize-home.html';
 });
+
+async function handleForgotPassword(e) {
+  if (e) e.preventDefault();
+  const email = document.getElementById('signin-email').value.trim();
+  if (!email) {
+    showMsg('signin-msg', 'Enter your email above first, then click "Forgot Password?"', 'error');
+    return;
+  }
+  showMsg('signin-msg', 'Sending reset link…', '');
+  try {
+    await AniZeAuth.forgotPassword(email);
+    showMsg('signin-msg', 'If an account exists for that email, a reset link has been sent.', 'success');
+  } catch (err) {
+    showMsg('signin-msg', err.message || 'Something went wrong. Try again.', 'error');
+  }
+}
 
 async function handleSignIn() {
   const email = document.getElementById('signin-email').value.trim();
