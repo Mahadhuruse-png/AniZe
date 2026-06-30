@@ -106,12 +106,14 @@ nav { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); backgrou
 .btn-watchlist:hover { color: #fff; border-color: #555; }
 
 .wl-menu-item {
-  display: block; width: 100%; text-align: left;
-  background: none; border: none; border-radius: 2px;
-  color: #aaa; font-family: 'Inter', sans-serif; font-size: 0.7rem;
-  padding: 0.5rem 0.6rem; cursor: pointer; transition: background 0.15s, color 0.15s;
+  display: inline-flex; align-items: center; justify-content: center;
+  white-space: nowrap;
+  background: none; border: 1px solid #2a2a2a; border-radius: 50px;
+  color: #aaa; font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 0.85rem; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.wl-menu-item:hover { background: #1a1a1a; color: #fff; }
+.wl-menu-item:hover { background: #1a1a1a; color: #fff; border-color: #444; }
 
 /* CONTENT AREA */
 .content-wrap {
@@ -496,13 +498,15 @@ async function loadDetails() {
         <button onclick="window.location.href='anize-player.html?id=${a.mal_id}&ep=1'" style="font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;background:#fff;color:#000;border:none;padding:0.6rem 1.4rem;border-radius:3px;cursor:pointer">▶ Watch Now</button>
         <div style="position:relative;display:inline-block">
           <button id="watchlistBtn" onclick="toggleWatchlistMenu(event)" style="font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;background:transparent;color:#fff;border:1px solid #333;padding:0.6rem 1.4rem;border-radius:3px;cursor:pointer">+ Watchlist</button>
-          <div id="watchlistMenu" style="display:none;position:absolute;top:calc(100% + 0.4rem);left:0;background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:0.4rem;z-index:50;min-width:170px;box-shadow:0 8px 24px rgba(0,0,0,0.5)">
-            <button class="wl-menu-item" onclick="setWatchlistStatus('watching')">Watching</button>
-            <button class="wl-menu-item" onclick="setWatchlistStatus('planned')">Planned</button>
-            <button class="wl-menu-item" onclick="setWatchlistStatus('completed')">Completed</button>
-            <button class="wl-menu-item" onclick="setWatchlistStatus('dropped')">Dropped</button>
-            <div id="wlRemoveRow" style="display:none;border-top:1px solid #2a2a2a;margin-top:0.3rem;padding-top:0.3rem">
-              <button class="wl-menu-item" style="color:#ef9a9a" onclick="removeWatchlistEntry()">Remove from Watchlist</button>
+          <div id="watchlistMenu" style="display:none;position:absolute;top:calc(100% + 0.4rem);left:0;background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:0.5rem;z-index:50;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.5)">
+            <div style="display:flex;gap:0.4rem">
+              <button class="wl-menu-item" onclick="setWatchlistStatus('watching')">Watching</button>
+              <button class="wl-menu-item" onclick="setWatchlistStatus('planned')">Planned</button>
+              <button class="wl-menu-item" onclick="setWatchlistStatus('completed')">Completed</button>
+              <button class="wl-menu-item" onclick="setWatchlistStatus('dropped')">Dropped</button>
+            </div>
+            <div id="wlRemoveRow" style="display:none;border-top:1px solid #2a2a2a;margin-top:0.5rem;padding-top:0.5rem">
+              <button class="wl-menu-item" style="color:#ef9a9a;width:100%" onclick="removeWatchlistEntry()">Remove from Watchlist</button>
             </div>
           </div>
         </div>
