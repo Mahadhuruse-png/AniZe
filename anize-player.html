@@ -367,8 +367,8 @@ nav {
       <span class="server-label">Server</span>
       <div class="server-btns" id="serverBtns">
         <button class="server-btn active" onclick="switchServer('gogoanime')">Server 1</button>
-        <button class="server-btn" onclick="switchServer('zoro')">Server 2</button>
-        <button class="server-btn" onclick="switchServer('9anime')">Server 3</button>
+        <button class="server-btn" style="opacity:0.3;cursor:not-allowed" disabled>Server 2</button>
+        <button class="server-btn" style="opacity:0.3;cursor:not-allowed" disabled>Server 3</button>
       </div>
       <span style="font-size:0.6rem;color:#333;margin-left:auto">EP <span id="currentEpLabel">—</span></span>
     </div>
@@ -590,21 +590,14 @@ function toggleSynopsis() {
 }
 
 // ── EPISODE SECTION ───────────────────────────────────────────────────────────
-async function renderEpisodeSection(a) {
+function renderEpisodeSection(a) {
   totalEpisodes = a.episodes || 0;
 
-  if (totalEpisodes === 0) {
-    try {
-      await DELAY(400);
-      const r = await fetch(`https://api.jikan.moe/v4/anime/${MAL_ID}/episodes`);
-      const j = await r.json();
-      if (j.pagination?.items?.total) totalEpisodes = j.pagination.items.total;
-      else if (j.pagination?.last_visible_page) totalEpisodes = j.pagination.last_visible_page * 100;
-    } catch {}
-  }
+  // If episodes unknown (airing), try to show at least some
+  // We'll render a grid — for ongoing shows with unknown ep count we show up to 9999 by watching the episode count
+  // If 0 (unknown), show a placeholder row of 12 as "partial"
+  const epCount = totalEpisodes > 0 ? totalEpisodes : 12;
 
-  const epCount = totalEpisodes > 0 ? totalEpisodes : 100;
-  currentRangeStart = 0;
   renderRangeButtons(epCount);
   renderEpGrid(epCount, 0);
 }
@@ -613,29 +606,19 @@ function renderRangeButtons(total) {
   const bar = document.getElementById('epRangeBtns');
   if (total <= RANGE_SIZE) { bar.innerHTML = ''; return; }
 
-  const rangeStart = currentRangeStart;
-  const rangeEnd = Math.min(rangeStart + RANGE_SIZE, total);
-  const hasPrev = rangeStart > 0;
-  const hasNext = rangeEnd < total;
-
-  bar.innerHTML = `
-    <button class="ep-range-btn${hasPrev ? '' : ' disabled'}" onclick="shiftRange(-1, ${total})" ${hasPrev ? '' : 'disabled'} style="padding:0.28rem 0.5rem">‹</button>
-    <span style="font-size:0.65rem;color:#888;padding:0 0.3rem">${rangeStart+1}–${rangeEnd}</span>
-    <button class="ep-range-btn${hasNext ? '' : ' disabled'}" onclick="shiftRange(1, ${total})" ${hasNext ? '' : 'disabled'} style="padding:0.28rem 0.5rem">›</button>
-  `;
-}
-
-function shiftRange(dir, total) {
-  const newStart = currentRangeStart + (dir * RANGE_SIZE);
-  if (newStart < 0 || newStart >= total) return;
-  currentRangeStart = newStart;
-  renderRangeButtons(total);
-  renderEpGrid(total, currentRangeStart);
+  let html = '';
+  for (let start = 0; start < total; start += RANGE_SIZE) {
+    const end = Math.min(start + RANGE_SIZE, total);
+    const isActive = start === currentRangeStart;
+    html += `<button class="ep-range-btn${isActive ? ' active' : ''}" onclick="switchRange(${start}, ${total})">${start+1}–${end}</button>`;
+  }
+  bar.innerHTML = html;
 }
 
 function switchRange(start, total) {
   currentRangeStart = start;
-  renderRangeButtons(total);
+  document.querySelectorAll('.ep-range-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
   renderEpGrid(total, start);
 }
 
@@ -674,7 +657,7 @@ function selectEpisode(ep) {
   document.getElementById('currentEpLabel').textContent = ep;
 
   // Re-render grid to update active/watched states
-  const total = totalEpisodes > 0 ? totalEpisodes : 100;
+  const total = totalEpisodes > 0 ? totalEpisodes : 12;
   renderEpGrid(total, currentRangeStart);
 
   // Load the stream
@@ -718,6 +701,7 @@ async function loadStream(ep, server) {
 
 async function resolveStreamUrl(ep, server) {
   if (!animeData) return null;
+  if (server !== 'gogoanime') return null;
 
   // Build a slug from title (standard gogoanime convention: lowercase, spaces → dashes)
   const rawTitle = animeData.title_english || animeData.title || '';
@@ -745,9 +729,9 @@ async function resolveStreamUrl(ep, server) {
 
   // Build embed URLs per server
   const urls = {
-    'gogoanime': `https://gogoanime3.co/streaming.php?id=${encodeURIComponent(streamingSlug)}-episode-${ep}`,
-    'zoro': `https://zoro.to/watch/${streamingSlug}-episode-${ep}`,
-    '9anime': `https://9anime.to/watch/${streamingSlug}.html?ep=${ep}`
+    'gogoanime': `https://gogoanime3.co/${streamingSlug}-episode-${ep}`,
+    'zoro': null,
+    '9anime': null
   };
 
   return urls[server] || urls['gogoanime'];
