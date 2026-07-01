@@ -359,7 +359,7 @@ nav {
         <h3>Select an Episode</h3>
         <p>Choose an episode from the list below to start watching. Stream links are loaded on demand.</p>
       </div>
-      <iframe id="playerFrame" style="display:none" allowfullscreen allow="autoplay; fullscreen; encrypted-media; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"></iframe>
+      <iframe id="playerFrame" style="display:none" allowfullscreen allow="autoplay; fullscreen"></iframe>
     </div>
 
     <!-- SERVER SELECT -->
@@ -590,14 +590,22 @@ function toggleSynopsis() {
 }
 
 // ── EPISODE SECTION ───────────────────────────────────────────────────────────
-function renderEpisodeSection(a) {
+async function renderEpisodeSection(a) {
   totalEpisodes = a.episodes || 0;
 
-  // If episodes unknown (airing), try to show at least some
-  // We'll render a grid — for ongoing shows with unknown ep count we show up to 9999 by watching the episode count
-  // If 0 (unknown), show a placeholder row of 12 as "partial"
-  const epCount = totalEpisodes > 0 ? totalEpisodes : 12;
+  // For ongoing shows fetch real episode count from Jikan
+  if (totalEpisodes === 0) {
+    try {
+      await DELAY(350);
+      const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=anime/${MAL_ID}/episodes`);
+      const json = await res.json();
+      if (json.pagination && json.pagination.items && json.pagination.items.total) {
+        totalEpisodes = json.pagination.items.total;
+      }
+    } catch { /* fallback */ }
+  }
 
+  const epCount = totalEpisodes > 0 ? totalEpisodes : 100;
   renderRangeButtons(epCount);
   renderEpGrid(epCount, 0);
 }
@@ -635,7 +643,7 @@ function renderEpGrid(total, rangeStart) {
   }
 
   // If totally unknown episode count, add a note
-  if (totalEpisodes === 0) {
+  if (totalEpisodes === 0 && rangeStart === 0) {
     html += `<div style="grid-column:1/-1;font-size:0.62rem;color:#444;padding:0.3rem 0">Episode count unknown — showing available slots</div>`;
   }
 
@@ -728,7 +736,7 @@ async function resolveStreamUrl(ep, server) {
 
   // Build embed URLs per server
   const urls = {
-    'gogoanime': `https://gogoanime3.co/streaming.php?id=${encodeURIComponent(streamingSlug)}-episode-${ep}&alias=${encodeURIComponent(streamingSlug)}`,
+    'gogoanime': `https://gogoanime3.co/streaming.php?id=${encodeURIComponent(streamingSlug)}-episode-${ep}`,
     'zoro': `https://zoro.to/watch/${streamingSlug}-episode-${ep}`,
     '9anime': `https://9anime.to/watch/${streamingSlug}.html?ep=${ep}`
   };
