@@ -359,7 +359,7 @@ nav {
         <h3>Select an Episode</h3>
         <p>Choose an episode from the list below to start watching. Stream links are loaded on demand.</p>
       </div>
-      <iframe id="playerFrame" style="display:none" allowfullscreen allow="autoplay; fullscreen"></iframe>
+      <iframe id="playerFrame" style="display:none" allowfullscreen allow="autoplay; fullscreen; encrypted-media; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"></iframe>
     </div>
 
     <!-- SERVER SELECT -->
@@ -728,7 +728,7 @@ async function resolveStreamUrl(ep, server) {
 
   // Build embed URLs per server
   const urls = {
-    'gogoanime': `https://gogoanime3.co/streaming.php?id=${encodeURIComponent(streamingSlug)}-episode-${ep}`,
+    'gogoanime': `https://gogoanime3.co/streaming.php?id=${encodeURIComponent(streamingSlug)}-episode-${ep}&alias=${encodeURIComponent(streamingSlug)}`,
     'zoro': `https://zoro.to/watch/${streamingSlug}-episode-${ep}`,
     '9anime': `https://9anime.to/watch/${streamingSlug}.html?ep=${ep}`
   };
