@@ -532,15 +532,14 @@ async function loadAnime() {
     animeData = json.data;
 
     renderInfoBar(animeData);
-    renderEpisodeSection(animeData);
+    await renderEpisodeSection(animeData);
     document.title = `AniZe — ${animeData.title_english || animeData.title}`;
 
     // Auto-play episode from URL param
     if (EP_PARAM > 0) selectEpisode(EP_PARAM);
 
-    // Fetch related / recommendations after a short delay (rate limit friendly)
-    await DELAY(400);
-    loadRelated(animeData);
+    // Load related after 3s to avoid hitting Jikan rate limits
+    setTimeout(() => loadRelated(animeData), 3000);
 
   } catch (err) {
     console.error('Failed to load anime:', err);
@@ -590,23 +589,14 @@ function toggleSynopsis() {
 }
 
 // ── EPISODE SECTION ───────────────────────────────────────────────────────────
-async function renderEpisodeSection(a) {
+function renderEpisodeSection(a) {
   totalEpisodes = a.episodes || 0;
 
-  // For ongoing shows, fetch real episode count from Jikan
-  if (totalEpisodes === 0) {
-    try {
-      await DELAY(400);
-      const r = await fetch(`https://api.jikan.moe/v4/anime/${MAL_ID}/episodes`);
-      const j = await r.json();
-      if (j.pagination?.items?.total) {
-        totalEpisodes = j.pagination.items.total;
-      }
-    } catch {}
-  }
+  // If episodes unknown (airing), try to show at least some
+  // We'll render a grid — for ongoing shows with unknown ep count we show up to 9999 by watching the episode count
+  // If 0 (unknown), show a placeholder row of 12 as "partial"
+  const epCount = totalEpisodes > 0 ? totalEpisodes : 12;
 
-  const epCount = totalEpisodes > 0 ? totalEpisodes : 100;
-  currentRangeStart = 0;
   renderRangeButtons(epCount);
   renderEpGrid(epCount, 0);
 }
@@ -615,28 +605,19 @@ function renderRangeButtons(total) {
   const bar = document.getElementById('epRangeBtns');
   if (total <= RANGE_SIZE) { bar.innerHTML = ''; return; }
 
-  const rangeEnd = Math.min(currentRangeStart + RANGE_SIZE, total);
-  const hasPrev = currentRangeStart > 0;
-  const hasNext = rangeEnd < total;
-
-  bar.innerHTML = `
-    <button class="ep-range-btn" onclick="shiftRange(-1, ${total})" ${hasPrev ? '' : 'disabled style="opacity:0.3;cursor:default"'}>‹</button>
-    <span style="font-size:0.65rem;color:#888;padding:0 0.4rem;align-self:center">${currentRangeStart+1}–${rangeEnd}</span>
-    <button class="ep-range-btn" onclick="shiftRange(1, ${total})" ${hasNext ? '' : 'disabled style="opacity:0.3;cursor:default"'}>›</button>
-  `;
-}
-
-function shiftRange(dir, total) {
-  const newStart = currentRangeStart + (dir * RANGE_SIZE);
-  if (newStart < 0 || newStart >= total) return;
-  currentRangeStart = newStart;
-  renderRangeButtons(total);
-  renderEpGrid(total, currentRangeStart);
+  let html = '';
+  for (let start = 0; start < total; start += RANGE_SIZE) {
+    const end = Math.min(start + RANGE_SIZE, total);
+    const isActive = start === currentRangeStart;
+    html += `<button class="ep-range-btn${isActive ? ' active' : ''}" onclick="switchRange(${start}, ${total})">${start+1}–${end}</button>`;
+  }
+  bar.innerHTML = html;
 }
 
 function switchRange(start, total) {
   currentRangeStart = start;
-  renderRangeButtons(total);
+  document.querySelectorAll('.ep-range-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
   renderEpGrid(total, start);
 }
 
@@ -675,7 +656,7 @@ function selectEpisode(ep) {
   document.getElementById('currentEpLabel').textContent = ep;
 
   // Re-render grid to update active/watched states
-  const total = totalEpisodes > 0 ? totalEpisodes : 100;
+  const total = totalEpisodes > 0 ? totalEpisodes : 12;
   renderEpGrid(total, currentRangeStart);
 
   // Load the stream
@@ -729,23 +710,7 @@ async function resolveStreamUrl(ep, server) {
     .replace(/-+/g, '-')              // collapse dashes
     .replace(/^-|-$/g, '');           // trim leading/trailing
 
-  // Try to pull a better slug from Jikan's external_links (mal sync data)
-  // Jikan v4 provides streaming links in /anime/{id}/streaming
-  let streamingSlug = slug;
-  try {
-    await DELAY(300);
-    const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=anime/${MAL_ID}/streaming`);
-    const json = await res.json();
-    const gogo = (json.data || []).find(s => s.name && s.name.toLowerCase().includes('gogo'));
-    if (gogo && gogo.url) {
-      // Extract slug from the gogoanime URL
-      const match = gogo.url.match(/category\/([^/?#]+)/);
-      if (match) streamingSlug = match[1];
-    }
-  } catch { /* use title slug fallback */ }
-
-  // Gogoanime embed — loads the video player directly in the iframe
-  return `https://gogoanime3.co/streaming.php?id=${streamingSlug}-episode-${ep}`;
+  return `https://gogoanime3.co/streaming.php?id=${slug}-episode-${ep}`;
 }
 
 // ── SERVER SWITCH ─────────────────────────────────────────────────────────────
@@ -779,7 +744,7 @@ async function loadRelated(a) {
 
   // Try recommendations first
   try {
-    await DELAY(500);
+    await DELAY(1200);
     const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=anime/${MAL_ID}/recommendations`);
     const json = await res.json();
     if (json.data && json.data.length > 0) {
@@ -793,7 +758,7 @@ async function loadRelated(a) {
     // Fetch basic info for each related entry (max 6, staggered)
     for (const rel of related.slice(0, 6)) {
       try {
-        await DELAY(350);
+        await DELAY(800);
         const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=anime/${rel.mal_id}`);
         const json = await res.json();
         if (json.data) items.push(json.data);
@@ -804,7 +769,7 @@ async function loadRelated(a) {
   if (items.length === 0) {
     // Last resort: load top anime as suggestions
     try {
-      await DELAY(400);
+      await DELAY(1000);
       const res = await fetch(`https://anize-backend-ijcn.vercel.app/api/jikan?path=top/anime&filter=bypopularity&limit=10&sfw=true`);
       const json = await res.json();
       items = (json.data || []).filter(x => x.mal_id !== parseInt(MAL_ID)).slice(0, 8);
