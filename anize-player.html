@@ -671,38 +671,80 @@ const AW = 'https://api-anime-rouge.vercel.app';
 let awAnimeId  = null;
 let awEpisodes = [];
 
+function normTitle(t) {
+  return (t || '').toLowerCase()
+    .replace(/\([\d]{4}\)/g, '')        // remove (2011) year
+    .replace(/season\s*\d+/gi, '')      // remove "Season 2"
+    .replace(/\d+(st|nd|rd|th)\s*season/gi, '') // remove "2nd Season"
+    .replace(/[^a-z0-9\s]/g, '')        // remove special chars
+    .replace(/\s+/g, ' ').trim();
+}
+
+function titleScore(a, b) {
+  const na = normTitle(a), nb = normTitle(b);
+  if (na === nb) return 100;
+  if (na.startsWith(nb) || nb.startsWith(na)) return 90;
+  // first word match
+  const wa = na.split(' ')[0], wb = nb.split(' ')[0];
+  if (wa === wb && wa.length > 3) return 70;
+  // contains
+  if (na.includes(nb) || nb.includes(na)) return 60;
+  return 0;
+}
+
+async function searchAW(keyword) {
+  try {
+    const r = await fetch(`${AW}/aniwatch/search?keyword=${encodeURIComponent(keyword)}&page=1`);
+    const d = await r.json();
+    return d.animes || [];
+  } catch { return []; }
+}
+
 async function resolveAniWatchId() {
   if (awAnimeId) return awAnimeId;
   if (!animeData) return null;
 
-  // Check sessionStorage cache first
   const cacheKey = `aw_id_${MAL_ID}`;
   const cached = sessionStorage.getItem(cacheKey);
   if (cached) { awAnimeId = cached; return awAnimeId; }
 
-  const titles = [
+  // Build list of search terms to try
+  const terms = [
     animeData.title_english,
     animeData.title,
-  ].filter(Boolean);
+    animeData.title_japanese,
+    // Shortened versions
+    animeData.title_english?.split(':')[0]?.trim(),
+    animeData.title?.split(':')[0]?.trim(),
+    // Remove year/season from english title
+    animeData.title_english?.replace(/\s*\([\d]{4}\)/g,'').replace(/\s*Season\s*\d+/gi,'').trim(),
+    animeData.title?.replace(/\s*\([\d]{4}\)/g,'').replace(/\s*Season\s*\d+/gi,'').trim(),
+  ].filter((t, i, arr) => t && t.length > 1 && arr.indexOf(t) === i);
 
-  for (const title of titles) {
-    try {
-      const r = await fetch(`${AW}/aniwatch/search?keyword=${encodeURIComponent(title)}&page=1`);
-      const d = await r.json();
-      const animes = d.animes || [];
-      if (!animes.length) continue;
+  let bestMatch = null, bestScore = 0;
 
-      const tl = title.toLowerCase();
-      const match = animes.find(a => a.name?.toLowerCase() === tl)
-                 || animes.find(a => a.name?.toLowerCase().replace(/[^a-z0-9]/g,'').includes(tl.replace(/[^a-z0-9]/g,'').slice(0,15)))
-                 || animes[0];
-
-      if (match) {
-        awAnimeId = match.id;
-        sessionStorage.setItem(cacheKey, awAnimeId);
-        return awAnimeId;
+  for (const term of terms) {
+    const results = await searchAW(term);
+    for (const anime of results.slice(0, 8)) {
+      const score = Math.max(
+        titleScore(anime.name, animeData.title_english || ''),
+        titleScore(anime.name, animeData.title || ''),
+      );
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = anime;
       }
-    } catch {}
+    }
+    // Good enough match found
+    if (bestScore >= 90) break;
+    // Small delay between searches to avoid rate limit
+    if (terms.indexOf(term) < terms.length - 1) await new Promise(r => setTimeout(r, 300));
+  }
+
+  if (bestMatch) {
+    awAnimeId = bestMatch.id;
+    sessionStorage.setItem(cacheKey, awAnimeId);
+    return awAnimeId;
   }
   return null;
 }
