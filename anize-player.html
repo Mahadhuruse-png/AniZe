@@ -590,13 +590,21 @@ function toggleSynopsis() {
 }
 
 // ── EPISODE SECTION ───────────────────────────────────────────────────────────
-function renderEpisodeSection(a) {
+async function renderEpisodeSection(a) {
   totalEpisodes = a.episodes || 0;
 
-  // If episodes unknown (airing), try to show at least some
-  // We'll render a grid — for ongoing shows with unknown ep count we show up to 9999 by watching the episode count
-  // If 0 (unknown), show a placeholder row of 12 as "partial"
-  const epCount = totalEpisodes > 0 ? totalEpisodes : 12;
+  // Show initial grid with Jikan count first
+  const epCount = totalEpisodes > 0 ? totalEpisodes : 24;
+  renderEpGrid(epCount, 0);
+
+  // Then try to get real count from AniWatch in background
+  try {
+    const animeId = await resolveAniWatchId();
+    if (animeId) {
+      await fetchAniWatchEpisodes(animeId); // this updates totalEpisodes and re-renders
+    }
+  } catch {}
+}
 
   renderRangeButtons(epCount);
   renderEpGrid(epCount, 0);
@@ -666,37 +674,65 @@ function selectEpisode(ep) {
 
 // ── STREAM LOADING with AniWatch API ─────────────────────────────────────────
 const AW = 'https://api-anime-rouge.vercel.app';
-let awAnimeId   = null; // e.g. "one-piece-100"
-let awEpisodes  = [];   // full episode list from AniWatch
+let awAnimeId   = null;
+let awEpisodes  = [];
 
-// Search AniWatch for this anime by MAL ID title match
 async function resolveAniWatchId() {
   if (awAnimeId) return awAnimeId;
   if (!animeData) return null;
 
-  const title = animeData.title_english || animeData.title || '';
-  const keyword = title.toLowerCase().replace(/\s+/g, '+');
-  try {
-    const r = await fetch(`${AW}/aniwatch/search?keyword=${encodeURIComponent(title)}&page=1`);
-    const d = await r.json();
-    const animes = d.animes || [];
-    // Find best match by name similarity or MAL id
-    const match = animes.find(a =>
-      a.name?.toLowerCase() === title.toLowerCase() ||
-      a.name?.toLowerCase().includes(title.toLowerCase().split(':')[0].trim())
-    ) || animes[0];
-    if (match) { awAnimeId = match.id; return awAnimeId; }
-  } catch {}
+  const titles = [
+    animeData.title_english,
+    animeData.title,
+    animeData.title_synonyms?.[0],
+  ].filter(Boolean);
+
+  for (const title of titles) {
+    try {
+      const r = await fetch(`${AW}/aniwatch/search?keyword=${encodeURIComponent(title)}&page=1`);
+      const d = await r.json();
+      const animes = d.animes || [];
+      if (!animes.length) continue;
+
+      // Try to verify by MAL ID
+      for (const anime of animes.slice(0, 5)) {
+        try {
+          const infoR = await fetch(`${AW}/aniwatch/anime/${anime.id}`);
+          const infoD = await infoR.json();
+          if (infoD?.info?.mal_id && Number(infoD.info.mal_id) === Number(MAL_ID)) {
+            awAnimeId = anime.id;
+            return awAnimeId;
+          }
+        } catch {}
+      }
+
+      // Fallback — take closest name match
+      const titleLow = title.toLowerCase();
+      const match = animes.find(a => a.name?.toLowerCase() === titleLow)
+                 || animes.find(a => a.name?.toLowerCase().includes(titleLow.split(':')[0].trim()))
+                 || animes.find(a => titleLow.includes(a.name?.toLowerCase().split(':')[0]?.trim()))
+                 || animes[0];
+      if (match) { awAnimeId = match.id; return awAnimeId; }
+    } catch {}
+  }
   return null;
 }
 
-// Fetch episode list from AniWatch
 async function fetchAniWatchEpisodes(animeId) {
   if (awEpisodes.length) return awEpisodes;
   try {
     const r = await fetch(`${AW}/aniwatch/episodes/${animeId}`);
     const d = await r.json();
     awEpisodes = d.episodes || [];
+
+    // Update episode count in UI if AniWatch has more accurate count
+    if (awEpisodes.length > 0) {
+      totalEpisodes = awEpisodes.length;
+      renderEpGrid(totalEpisodes, currentRangeStart);
+      // Update pill
+      const pill = document.querySelector('.meta-pill:nth-child(4)');
+      if (pill) pill.textContent = `${totalEpisodes} eps`;
+    }
     return awEpisodes;
   } catch { return []; }
 }
