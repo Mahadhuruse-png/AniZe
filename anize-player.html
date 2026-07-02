@@ -539,8 +539,8 @@ async function loadAnime() {
     // Auto-play episode from URL param
     if (EP_PARAM > 0) selectEpisode(EP_PARAM);
 
-    // Load related after 3s to avoid hitting Jikan rate limits
-    setTimeout(() => loadRelated(animeData), 3000);
+    // Load related after 2s to avoid Jikan rate limits
+    setTimeout(() => loadRelated(animeData), 2000);
 
   } catch (err) {
     console.error('Failed to load anime:', err);
@@ -592,19 +592,13 @@ function toggleSynopsis() {
 // ── EPISODE SECTION ───────────────────────────────────────────────────────────
 async function renderEpisodeSection(a) {
   totalEpisodes = a.episodes || 0;
-
-  // Show initial grid with Jikan count first
   const epCount = totalEpisodes > 0 ? totalEpisodes : 24;
   renderEpGrid(epCount, 0);
 
-  // Then try to get real count from AniWatch in background
-  try {
-    const animeId = await resolveAniWatchId();
-    if (animeId) {
-      await fetchAniWatchEpisodes(animeId); // this updates totalEpisodes and re-renders
-    }
-  } catch {}
-}
+  // Load real episode count from AniWatch in background (non-blocking)
+  resolveAniWatchId().then(id => {
+    if (id) fetchAniWatchEpisodes(id);
+  });
 
   renderRangeButtons(epCount);
   renderEpGrid(epCount, 0);
@@ -674,17 +668,21 @@ function selectEpisode(ep) {
 
 // ── STREAM LOADING with AniWatch API ─────────────────────────────────────────
 const AW = 'https://api-anime-rouge.vercel.app';
-let awAnimeId   = null;
-let awEpisodes  = [];
+let awAnimeId  = null;
+let awEpisodes = [];
 
 async function resolveAniWatchId() {
   if (awAnimeId) return awAnimeId;
   if (!animeData) return null;
 
+  // Check sessionStorage cache first
+  const cacheKey = `aw_id_${MAL_ID}`;
+  const cached = sessionStorage.getItem(cacheKey);
+  if (cached) { awAnimeId = cached; return awAnimeId; }
+
   const titles = [
     animeData.title_english,
     animeData.title,
-    animeData.title_synonyms?.[0],
   ].filter(Boolean);
 
   for (const title of titles) {
@@ -694,25 +692,16 @@ async function resolveAniWatchId() {
       const animes = d.animes || [];
       if (!animes.length) continue;
 
-      // Try to verify by MAL ID
-      for (const anime of animes.slice(0, 5)) {
-        try {
-          const infoR = await fetch(`${AW}/aniwatch/anime/${anime.id}`);
-          const infoD = await infoR.json();
-          if (infoD?.info?.mal_id && Number(infoD.info.mal_id) === Number(MAL_ID)) {
-            awAnimeId = anime.id;
-            return awAnimeId;
-          }
-        } catch {}
-      }
-
-      // Fallback — take closest name match
-      const titleLow = title.toLowerCase();
-      const match = animes.find(a => a.name?.toLowerCase() === titleLow)
-                 || animes.find(a => a.name?.toLowerCase().includes(titleLow.split(':')[0].trim()))
-                 || animes.find(a => titleLow.includes(a.name?.toLowerCase().split(':')[0]?.trim()))
+      const tl = title.toLowerCase();
+      const match = animes.find(a => a.name?.toLowerCase() === tl)
+                 || animes.find(a => a.name?.toLowerCase().replace(/[^a-z0-9]/g,'').includes(tl.replace(/[^a-z0-9]/g,'').slice(0,15)))
                  || animes[0];
-      if (match) { awAnimeId = match.id; return awAnimeId; }
+
+      if (match) {
+        awAnimeId = match.id;
+        sessionStorage.setItem(cacheKey, awAnimeId);
+        return awAnimeId;
+      }
     } catch {}
   }
   return null;
@@ -720,18 +709,24 @@ async function resolveAniWatchId() {
 
 async function fetchAniWatchEpisodes(animeId) {
   if (awEpisodes.length) return awEpisodes;
+
+  const cacheKey = `aw_eps_${animeId}`;
+  const cached = sessionStorage.getItem(cacheKey);
+  if (cached) {
+    awEpisodes = JSON.parse(cached);
+    totalEpisodes = awEpisodes.length;
+    renderEpGrid(totalEpisodes, currentRangeStart);
+    return awEpisodes;
+  }
+
   try {
     const r = await fetch(`${AW}/aniwatch/episodes/${animeId}`);
     const d = await r.json();
     awEpisodes = d.episodes || [];
-
-    // Update episode count in UI if AniWatch has more accurate count
-    if (awEpisodes.length > 0) {
+    if (awEpisodes.length) {
+      sessionStorage.setItem(cacheKey, JSON.stringify(awEpisodes));
       totalEpisodes = awEpisodes.length;
       renderEpGrid(totalEpisodes, currentRangeStart);
-      // Update pill
-      const pill = document.querySelector('.meta-pill:nth-child(4)');
-      if (pill) pill.textContent = `${totalEpisodes} eps`;
     }
     return awEpisodes;
   } catch { return []; }
